@@ -13,17 +13,22 @@
 - Vercel-এ ইমপোর্ট করো, Environment Variables-এ `NEXT_PUBLIC_SUPABASE_URL` ও `NEXT_PUBLIC_SUPABASE_ANON_KEY` বসাও
 - Deploy
 
-## এই স্ক্যাফোল্ডে যা আছে (Phase 1 শুরু)
-- Homepage (top tools + category list)
-- Tool detail page (`/tool/[slug]`) — SEO metadata সহ
+## এই স্ক্যাফোল্ডে যা আছে (Phase 1)
+- Homepage (rank-list top tools + category chips) — ডিজাইন পলিশ করা
+- Tool detail page (`/tool/[slug]`) — SEO metadata + voting সহ
 - Category page (`/category/[slug]`)
+- **Voting (upvote/downvote)**: `/api/vote` route, `VoteButton` component, toggle/switch লজিক, optimistic UI
+- Auth: passwordless magic-link login (`/login`), Supabase email OTP, `/auth/callback` handler
+- `middleware.ts` — auth session cookie রিফ্রেশ করে (Server Component-এ user পড়ার জন্য দরকার)
 - Supabase client (server + browser)
 - TypeScript types
+
+## Supabase Dashboard-এ একটা সেটিং লাগবে ভোটিং কাজ করার জন্য
+Authentication → Providers → Email → **Enable "Confirm email"** অফ রাখলে magic link সরাসরি কাজ করবে (অথবা রেখে দিতে পারো, Supabase নিজে থেকেই ইমেইল ভেরিফাই করে নেবে ক্লিক করলে)।
+Authentication → URL Configuration-এ `Site URL` এবং `Redirect URLs`-এ তোমার Vercel ডোমেইন (এবং `http://localhost:3000` ডেভের জন্য) যোগ করতে হবে — নাহলে magic link কাজ করবে না।
 
 ## এখনো বাকি (পরের ধাপ)
 - Search page + filter UI
 - `/top/[slug]` ranking pages
 - `/compare/[a]-vs-[b]` pages
-- Voting UI (upvote/downvote button + auth)
 - Admin panel (tool add/edit)
-- ডিজাইন পলিশ (এখন শুধু কার্যকরী, বেসিক Tailwind স্টাইল)

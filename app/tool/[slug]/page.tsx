@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tool } from "@/types/database";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import VoteButton from "@/components/VoteButton";
 
 type Props = { params: { slug: string } };
 
@@ -25,8 +26,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ToolPage({ params }: Props) {
+  const supabase = createClient();
   const tool = await getTool(params.slug);
   if (!tool) notFound();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userVote: "up" | "down" | null = null;
+  if (user) {
+    const { data: existingVote } = await supabase
+      .from("votes")
+      .select("vote_type")
+      .eq("user_id", user.id)
+      .eq("tool_id", tool.id)
+      .maybeSingle();
+    userVote = (existingVote?.vote_type as "up" | "down" | null) ?? null;
+  }
 
   const netVotes = tool.upvotes - tool.downvotes;
 
@@ -37,11 +54,13 @@ export default async function ToolPage({ params }: Props) {
           <h1 className="font-display font-bold text-3xl">{tool.name}</h1>
           <p className="text-ink/70 mt-2">{tool.short_description}</p>
         </div>
-        <div className="text-center shrink-0">
-          <div className="rank-badge text-2xl font-bold bg-ink text-base rounded px-3 py-2">
-            ▲ {netVotes}
-          </div>
-          <span className="text-xs text-ink/50 block mt-1">net votes</span>
+        <div className="shrink-0">
+          <VoteButton
+            toolId={tool.id}
+            initialNetVotes={netVotes}
+            initialUserVote={userVote}
+            isLoggedIn={!!user}
+          />
         </div>
       </div>
 
