@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: #F5F6F2;
+  color: #181B22;
+}
+
+.rank-badge {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}

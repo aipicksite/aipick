@@ -28,25 +28,38 @@ export default async function ToolPage({ params }: Props) {
   const tool = await getTool(params.slug);
   if (!tool) notFound();
 
-  return (
-    <main className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">{tool.name}</h1>
-      <p className="text-gray-600 mt-2">{tool.short_description}</p>
+  const netVotes = tool.upvotes - tool.downvotes;
 
-      <div className="mt-6 flex items-center gap-4 text-sm text-gray-500">
-        <span>{tool.pricing_summary}</span>
-        <span>▲ {tool.upvotes - tool.downvotes} votes</span>
+  return (
+    <main className="max-w-3xl mx-auto px-4 py-14">
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="font-display font-bold text-3xl">{tool.name}</h1>
+          <p className="text-ink/70 mt-2">{tool.short_description}</p>
+        </div>
+        <div className="text-center shrink-0">
+          <div className="rank-badge text-2xl font-bold bg-ink text-base rounded px-3 py-2">
+            ▲ {netVotes}
+          </div>
+          <span className="text-xs text-ink/50 block mt-1">net votes</span>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4 mt-6 pb-6 border-b border-line text-sm">
+        <span className="px-3 py-1 border border-line rounded-full">
+          {tool.pricing_summary}
+        </span>
         <a
           href={tool.website_url}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="text-blue-600 hover:underline"
+          className="text-violet font-medium hover:underline"
         >
-          Visit website →
+          Visit website
         </a>
       </div>
 
-      <article className="prose mt-8 max-w-none">
+      <article className="prose prose-neutral mt-8 max-w-none font-body">
         <p>{tool.description}</p>
       </article>
     </main>

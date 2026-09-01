@@ -19,25 +19,29 @@ export default async function HomePage() {
     .select("*")
     .order("name");
 
+  const toolList = (tools as Tool[] | null) ?? [];
+
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <section className="text-center py-16">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          Discover the Best AI Tools
-        </h1>
-        <p className="mt-4 text-lg text-gray-600">
-          Community-voted rankings across every category of AI tool.
-        </p>
+    <main>
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-12">
+        <div className="max-w-2xl">
+          <h1 className="font-display font-bold text-4xl md:text-5xl leading-[1.1]">
+            Find the AI tool that actually gets the job done.
+          </h1>
+          <p className="mt-5 text-lg text-ink/70 max-w-lg">
+            Ranked by people who use them, not by whoever pays the most.
+            Browse, compare, and vote on the tools worth your time.
+          </p>
+        </div>
       </section>
 
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">Categories</h2>
+      <section className="max-w-6xl mx-auto px-4 mb-16">
         <div className="flex flex-wrap gap-2">
           {(categories as Category[] | null)?.map((cat) => (
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
-              className="px-4 py-2 rounded-full border border-gray-200 hover:border-gray-400 text-sm"
+              className="px-4 py-2 border border-line rounded-full text-sm hover:border-violet hover:text-violet transition-colors"
             >
               {cat.name}
             </Link>
@@ -45,23 +49,32 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Top Ranked Tools</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {(tools as Tool[] | null)?.map((tool) => (
+      <section className="max-w-6xl mx-auto px-4 pb-20">
+        <h2 className="font-display font-bold text-2xl mb-6">Top Ranked</h2>
+        <div className="divide-y divide-line border-t border-b border-line">
+          {toolList.map((tool, i) => (
             <Link
               key={tool.id}
               href={`/tool/${tool.slug}`}
-              className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition"
+              className="flex items-center gap-6 py-5 group"
             >
-              <h3 className="font-semibold">{tool.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {tool.short_description}
-              </p>
-              <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                <span>{tool.pricing_summary}</span>
-                <span>▲ {tool.upvotes - tool.downvotes}</span>
+              <span className="rank-badge text-2xl font-bold text-ink/30 w-10 shrink-0 group-hover:text-accent transition-colors">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display font-medium text-lg">
+                  {tool.name}
+                </h3>
+                <p className="text-sm text-ink/60 truncate">
+                  {tool.short_description}
+                </p>
               </div>
+              <span className="text-sm text-ink/50 shrink-0 hidden sm:block">
+                {tool.pricing_summary}
+              </span>
+              <span className="rank-badge text-sm font-medium bg-ink text-base px-2.5 py-1 rounded shrink-0">
+                ▲ {tool.upvotes - tool.downvotes}
+              </span>
             </Link>
           ))}
         </div>

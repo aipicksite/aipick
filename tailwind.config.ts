@@ -6,7 +6,19 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        base: "#F5F6F2",
+        ink: "#181B22",
+        accent: "#C8FF4D",
+        violet: "#4C3A8C",
+        line: "#E1E2DC",
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-body)", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };

@@ -24,21 +24,27 @@ export default async function CategoryPage({ params }: Props) {
   const tools = (toolLinks?.map((t: any) => t.tools) ?? []) as Tool[];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">{category.name} AI Tools</h1>
-      <p className="text-gray-600 mt-2">{category.description}</p>
+    <main className="max-w-6xl mx-auto px-4 py-14">
+      <h1 className="font-display font-bold text-3xl">{category.name} AI Tools</h1>
+      <p className="text-ink/70 mt-2 max-w-xl">{category.description}</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-        {tools.map((tool) => (
+      <div className="divide-y divide-line border-t border-b border-line mt-10">
+        {tools.map((tool, i) => (
           <Link
             key={tool.id}
             href={`/tool/${tool.slug}`}
-            className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition"
+            className="flex items-center gap-6 py-5 group"
           >
-            <h3 className="font-semibold">{tool.name}</h3>
-            <p className="text-sm text-gray-600 mt-1">
-              {tool.short_description}
-            </p>
+            <span className="rank-badge text-2xl font-bold text-ink/30 w-10 shrink-0 group-hover:text-accent transition-colors">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-medium text-lg">{tool.name}</h3>
+              <p className="text-sm text-ink/60 truncate">{tool.short_description}</p>
+            </div>
+            <span className="text-sm text-ink/50 shrink-0 hidden sm:block">
+              {tool.pricing_summary}
+            </span>
           </Link>
         ))}
       </div>
