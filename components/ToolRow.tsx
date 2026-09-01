@@ -42,6 +42,12 @@ export default function ToolRow({ tool, rank }: { tool: Tool; rank?: number }) {
         </p>
       </div>
 
+      {tool.rating_count > 0 && (
+        <span className="hidden md:inline-block text-xs font-medium text-ink/50 shrink-0 tabular-nums">
+          ★ {tool.rating_avg.toFixed(1)}
+        </span>
+      )}
+
       {tool.pricing_type && (
         <span className="hidden sm:inline-block text-xs font-medium px-2.5 py-1 rounded-full border border-line text-ink/60 shrink-0">
           {PRICING_LABEL[tool.pricing_type] ?? tool.pricing_summary}

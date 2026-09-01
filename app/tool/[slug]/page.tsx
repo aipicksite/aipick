@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
 import ToolAvatar from "@/components/ToolAvatar";
+import ReviewSection from "@/components/ReviewSection";
 
 type Props = { params: { slug: string } };
 
@@ -57,6 +58,21 @@ export default async function ToolPage({ params }: Props) {
   const totalVotes = tool.upvotes + tool.downvotes;
   const upRatio = totalVotes > 0 ? Math.round((tool.upvotes / totalVotes) * 100) : null;
 
+  const { data: reviewRows } = await supabase
+    .from("reviews")
+    .select("*, profiles(username)")
+    .eq("tool_id", tool.id)
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
+
+  const allReviews = (reviewRows ?? []) as any[];
+  const myReview = user
+    ? (allReviews.find((r) => r.user_id === user.id) as any) ?? null
+    : null;
+  const otherReviews = allReviews
+    .filter((r) => r.user_id !== user?.id)
+    .map((r) => ({ ...r, author_label: r.profiles?.username ?? "AIPick user" }));
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
       <div className="text-sm text-ink/45 mb-6">
@@ -104,6 +120,11 @@ export default async function ToolPage({ params }: Props) {
               {upRatio}% would recommend
             </span>
           )}
+          {tool.rating_count > 0 && (
+            <span className="px-3 py-1 border border-line rounded-full text-ink/60">
+              ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count} reviews)
+            </span>
+          )}
           <a
             href={tool.website_url}
             target="_blank"
@@ -132,6 +153,16 @@ export default async function ToolPage({ params }: Props) {
         <h2 className="font-display font-bold text-xl mb-3">Overview</h2>
         <p>{tool.description}</p>
       </article>
+
+      <ReviewSection
+        toolId={tool.id}
+        toolName={tool.name}
+        isLoggedIn={!!user}
+        myReview={myReview}
+        otherReviews={otherReviews}
+        ratingAvg={tool.rating_avg}
+        ratingCount={tool.rating_count}
+      />
     </main>
   );
 }

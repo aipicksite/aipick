@@ -13,6 +13,23 @@ export type Tool = {
   upvotes: number;
   downvotes: number;
   score: number;
+  rating_avg: number;
+  rating_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Review = {
+  id: string;
+  tool_id: string;
+  user_id: string;
+  rating: number;
+  ease_of_use: number | null;
+  value_for_money: number | null;
+  would_recommend: boolean | null;
+  body: string | null;
+  helpful_count: number;
+  status: "published" | "flagged" | "removed";
   created_at: string;
   updated_at: string;
 };
@@ -23,5 +40,16 @@ export type Category = {
   slug: string;
   description: string | null;
   icon: string | null;
+  created_at: string;
+};
+
+export type BlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  body: string;
+  published_at: string | null;
   created_at: string;
 };

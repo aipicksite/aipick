@@ -94,6 +94,7 @@ export default function RootLayout({
               <h4 className="font-medium text-ink/80 mb-3">Community</h4>
               <ul className="space-y-2 text-ink/55">
                 <li><Link href="/submit" className="hover:text-plum">Submit a tool</Link></li>
+                <li><Link href="/blog" className="hover:text-plum">Blog</Link></li>
                 <li><Link href="/login" className="hover:text-plum">Sign in</Link></li>
               </ul>
             </div>
@@ -101,13 +102,19 @@ export default function RootLayout({
               <h4 className="font-medium text-ink/80 mb-3">Company</h4>
               <ul className="space-y-2 text-ink/55">
                 <li><Link href="/about" className="hover:text-plum">About</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-plum">How ranking works</Link></li>
+                <li><Link href="/support" className="hover:text-plum">Support</Link></li>
                 <li><Link href="/contact" className="hover:text-plum">Contact</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-line">
-            <div className="max-w-6xl mx-auto px-4 py-5 text-xs text-ink/45">
-              © {new Date().getFullYear()} AIPick.site — a community-ranked directory of AI tools.
+            <div className="max-w-6xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-ink/45">
+              <span>© {new Date().getFullYear()} AIPick.site — a community-ranked directory of AI tools.</span>
+              <div className="flex gap-4">
+                <Link href="/privacy" className="hover:text-plum">Privacy</Link>
+                <Link href="/terms" className="hover:text-plum">Terms</Link>
+              </div>
             </div>
           </div>
         </footer>
