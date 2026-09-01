@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tool, Category } from "@/types/database";
 import Link from "next/link";
+import ToolRow from "@/components/ToolRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -86,7 +87,7 @@ export default async function ToolsPage({
           name="q"
           defaultValue={q}
           placeholder="Search tools by name or feature…"
-          className="w-full max-w-xl border border-line rounded px-4 py-2.5 text-sm focus:outline-none focus:border-violet"
+          className="w-full max-w-xl bg-surface border border-line rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-plum"
         />
       </form>
 
@@ -95,8 +96,8 @@ export default async function ToolsPage({
           href={buildUrl({ pricing: undefined })}
           className={`px-3 py-1.5 rounded-full text-xs border ${
             !pricing
-              ? "bg-ink text-base border-ink"
-              : "border-line hover:border-ink"
+              ? "bg-plum text-white border-plum"
+              : "border-line hover:border-plum"
           }`}
         >
           All pricing
@@ -107,8 +108,8 @@ export default async function ToolsPage({
             href={buildUrl({ pricing: opt.value })}
             className={`px-3 py-1.5 rounded-full text-xs border ${
               pricing === opt.value
-                ? "bg-ink text-base border-ink"
-                : "border-line hover:border-ink"
+                ? "bg-plum text-white border-plum"
+                : "border-line hover:border-plum"
             }`}
           >
             {opt.label}
@@ -125,7 +126,7 @@ export default async function ToolsPage({
             <Link
               href={buildUrl({ category: undefined })}
               className={`block text-sm py-1 ${
-                !category ? "text-violet font-medium" : "text-ink/70 hover:text-ink"
+                !category ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
               }`}
             >
               All categories
@@ -136,7 +137,7 @@ export default async function ToolsPage({
                 href={buildUrl({ category: cat.slug })}
                 className={`block text-sm py-1 ${
                   category === cat.slug
-                    ? "text-violet font-medium"
+                    ? "text-plum font-medium"
                     : "text-ink/70 hover:text-ink"
                 }`}
               >
@@ -153,28 +154,9 @@ export default async function ToolsPage({
               different search term.
             </p>
           ) : (
-            <div className="divide-y divide-line border-t border-b border-line">
+            <div className="flex flex-col">
               {toolList.map((tool) => (
-                <Link
-                  key={tool.id}
-                  href={`/tool/${tool.slug}`}
-                  className="flex items-center gap-6 py-5 group"
-                >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display font-medium text-lg">
-                      {tool.name}
-                    </h3>
-                    <p className="text-sm text-ink/60 truncate">
-                      {tool.short_description}
-                    </p>
-                  </div>
-                  <span className="text-sm text-ink/50 shrink-0 hidden sm:block">
-                    {tool.pricing_summary}
-                  </span>
-                  <span className="rank-badge text-sm font-medium bg-ink text-base px-2.5 py-1 rounded shrink-0">
-                    ▲ {tool.upvotes - tool.downvotes}
-                  </span>
-                </Link>
+                <ToolRow key={tool.id} tool={tool} />
               ))}
             </div>
           )}

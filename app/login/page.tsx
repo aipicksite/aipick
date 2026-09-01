@@ -41,11 +41,11 @@ export default function LoginPage() {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-line rounded px-3 py-2 text-sm focus:outline-none focus:border-violet"
+            className="w-full border border-line rounded px-3 py-2 text-sm focus:outline-none focus:border-plum"
           />
           <button
             type="submit"
-            className="w-full bg-ink text-base rounded px-3 py-2 text-sm font-medium hover:bg-ink/90"
+            className="w-full bg-plum text-white rounded px-3 py-2 text-sm font-medium hover:bg-plum-deep"
           >
             Send sign-in link
           </button>

@@ -68,15 +68,15 @@ export default function VoteButton({
         disabled={isPending}
         aria-pressed={userVote === "up"}
         aria-label="Upvote"
-        className={`w-9 h-9 rounded flex items-center justify-center border transition-colors ${
+        className={`w-9 h-9 rounded-md flex items-center justify-center border transition-colors ${
           userVote === "up"
-            ? "bg-accent border-accent text-ink"
-            : "border-line hover:border-ink"
+            ? "bg-forest border-forest text-white"
+            : "border-line hover:border-forest hover:text-forest"
         }`}
       >
         ▲
       </button>
-      <span className="rank-badge text-lg font-bold w-10 text-center">
+      <span className="rank-badge text-lg font-bold w-10 text-center tabular-nums">
         {netVotes}
       </span>
       <button
@@ -84,10 +84,10 @@ export default function VoteButton({
         disabled={isPending}
         aria-pressed={userVote === "down"}
         aria-label="Downvote"
-        className={`w-9 h-9 rounded flex items-center justify-center border transition-colors ${
+        className={`w-9 h-9 rounded-md flex items-center justify-center border transition-colors ${
           userVote === "down"
-            ? "bg-ink border-ink text-base"
-            : "border-line hover:border-ink"
+            ? "bg-coral border-coral text-white"
+            : "border-line hover:border-coral hover:text-coral"
         }`}
       >
         ▼

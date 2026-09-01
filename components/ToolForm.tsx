@@ -144,7 +144,7 @@ export default function ToolForm({
 
       <button
         type="submit"
-        className="bg-ink text-base rounded px-5 py-2.5 text-sm font-medium hover:bg-ink/90"
+        className="bg-plum text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-plum-deep"
       >
         {submitLabel}
       </button>

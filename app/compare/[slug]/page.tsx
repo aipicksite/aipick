@@ -66,10 +66,10 @@ export default async function ComparePage({ params }: Props) {
 
       <div className="grid grid-cols-3 gap-4 mt-10 pb-4 border-b-2 border-ink">
         <span></span>
-        <Link href={`/tool/${toolA.slug}`} className="font-display font-bold text-lg hover:text-violet">
+        <Link href={`/tool/${toolA.slug}`} className="font-display font-bold text-lg hover:text-plum">
           {toolA.name}
         </Link>
-        <Link href={`/tool/${toolB.slug}`} className="font-display font-bold text-lg hover:text-violet">
+        <Link href={`/tool/${toolB.slug}`} className="font-display font-bold text-lg hover:text-plum">
           {toolB.name}
         </Link>
       </div>
@@ -84,8 +84,8 @@ export default async function ComparePage({ params }: Props) {
       />
       <Row
         label="Website"
-        a={<a href={toolA.website_url} target="_blank" rel="noopener noreferrer nofollow" className="text-violet hover:underline">Visit →</a>}
-        b={<a href={toolB.website_url} target="_blank" rel="noopener noreferrer nofollow" className="text-violet hover:underline">Visit →</a>}
+        a={<a href={toolA.website_url} target="_blank" rel="noopener noreferrer nofollow" className="text-plum hover:underline">Visit →</a>}
+        b={<a href={toolB.website_url} target="_blank" rel="noopener noreferrer nofollow" className="text-plum hover:underline">Visit →</a>}
       />
     </main>
   );

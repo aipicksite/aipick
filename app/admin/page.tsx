@@ -18,7 +18,7 @@ export default async function AdminPage() {
         <h1 className="font-display font-bold text-3xl">Admin — Tools</h1>
         <Link
           href="/admin/tools/new"
-          className="bg-ink text-base rounded px-4 py-2 text-sm font-medium hover:bg-ink/90"
+          className="bg-plum text-white rounded px-4 py-2 text-sm font-medium hover:bg-plum-deep"
         >
           + Add tool
         </Link>
@@ -42,7 +42,7 @@ export default async function AdminPage() {
             </span>
             <Link
               href={`/admin/tools/${tool.id}/edit`}
-              className="text-sm text-violet hover:underline"
+              className="text-sm text-plum hover:underline"
             >
               Edit
             </Link>

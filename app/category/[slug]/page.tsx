@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tool, Category } from "@/types/database";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import ToolRow from "@/components/ToolRow";
 
 type Props = { params: { slug: string } };
 
@@ -21,32 +21,23 @@ export default async function CategoryPage({ params }: Props) {
     .select("tool_id, tools(*)")
     .eq("category_id", category.id);
 
-  const tools = (toolLinks?.map((t: any) => t.tools) ?? []) as Tool[];
+  const tools = ((toolLinks?.map((t: any) => t.tools) ?? []) as Tool[]).sort(
+    (a, b) => b.score - a.score
+  );
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-14">
-      <h1 className="font-display font-bold text-3xl">{category.name} AI Tools</h1>
-      <p className="text-ink/70 mt-2 max-w-xl">{category.description}</p>
+      <span className="text-xs font-medium text-plum uppercase tracking-wide">Category</span>
+      <h1 className="font-display font-bold text-3xl mt-1">{category.name} AI Tools</h1>
+      <p className="text-ink/60 mt-2 max-w-xl">{category.description}</p>
 
-      <div className="divide-y divide-line border-t border-b border-line mt-10">
+      <div className="flex flex-col mt-10">
         {tools.map((tool, i) => (
-          <Link
-            key={tool.id}
-            href={`/tool/${tool.slug}`}
-            className="flex items-center gap-6 py-5 group"
-          >
-            <span className="rank-badge text-2xl font-bold text-ink/30 w-10 shrink-0 group-hover:text-accent transition-colors">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-display font-medium text-lg">{tool.name}</h3>
-              <p className="text-sm text-ink/60 truncate">{tool.short_description}</p>
-            </div>
-            <span className="text-sm text-ink/50 shrink-0 hidden sm:block">
-              {tool.pricing_summary}
-            </span>
-          </Link>
+          <ToolRow key={tool.id} tool={tool} rank={i + 1} />
         ))}
+        {tools.length === 0 && (
+          <p className="text-sm text-ink/55 py-10">No tools in this category yet.</p>
+        )}
       </div>
     </main>
   );

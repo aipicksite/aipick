@@ -7,12 +7,56 @@
   --font-body: "Inter", sans-serif;
 }
 
+html {
+  background-color: #F6F4EE;
+}
+
 body {
-  background-color: #F5F6F2;
-  color: #181B22;
+  background-color: #F6F4EE;
+  color: #191712;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(25,23,18,0.06) 1px, transparent 0);
+  background-size: 22px 22px;
 }
 
 .rank-badge {
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
+}
+
+/* Shared row card used for every tool listing (home, /tools, /category, /top) */
+.tool-row {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1rem 1.1rem;
+  background: #FFFFFF;
+  border: 1px solid #E4DECD;
+  border-radius: 14px;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tool-row:hover {
+  border-color: #3E2A5C;
+  box-shadow: 0 4px 8px rgba(25,23,18,0.06), 0 16px 32px -16px rgba(25,23,18,0.18);
+  transform: translateY(-1px);
+}
+
+.tool-row + .tool-row {
+  margin-top: 0.6rem;
+}
+
+/* Rank medal badges for top-3 positions */
+.medal-1 { background: #C68A28; color: #FFF7E8; }
+.medal-2 { background: #8C8577; color: #FFFFFF; }
+.medal-3 { background: #8C5A2E; color: #FFF3E6; }
+
+::selection {
+  background: #3E2A5C;
+  color: #FFFFFF;
+}
+
+:focus-visible {
+  outline: 2px solid #3E2A5C;
+  outline-offset: 2px;
 }
