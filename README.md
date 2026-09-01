@@ -27,8 +27,9 @@
 Authentication → Providers → Email → **Enable "Confirm email"** অফ রাখলে magic link সরাসরি কাজ করবে (অথবা রেখে দিতে পারো, Supabase নিজে থেকেই ইমেইল ভেরিফাই করে নেবে ক্লিক করলে)।
 Authentication → URL Configuration-এ `Site URL` এবং `Redirect URLs`-এ তোমার Vercel ডোমেইন (এবং `http://localhost:3000` ডেভের জন্য) যোগ করতে হবে — নাহলে magic link কাজ করবে না।
 
+- **Search & filter**: `/tools` page — full-text search (Postgres `search_vector`), category sidebar filter, pricing-type filter, all URL-based (shareable/bookmarkable links)
+
 ## এখনো বাকি (পরের ধাপ)
-- Search page + filter UI
 - `/top/[slug]` ranking pages
 - `/compare/[a]-vs-[b]` pages
 - Admin panel (tool add/edit)
