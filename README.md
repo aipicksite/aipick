@@ -36,6 +36,14 @@ Authentication → URL Configuration-এ `Site URL` এবং `Redirect URLs`-�
 2. Supabase → Table Editor → `admin_users` টেবিলে নিজের ইমেইল দিয়ে একটা রো যোগ করো
 3. এরপর `/admin`-এ গেলে অ্যাক্সেস পাবা — অন্য কেউ গেলে `/admin/denied`-এ redirect হবে
 
-## এখনো বাকি (পরের ধাপ)
-- `/top/[slug]` ranking pages
-- `/compare/[a]-vs-[b]` pages
+- **Ranking pages** (`/top/[slug]`) — `/top/ai-writing` style pulls top tools from a matching category automatically; also two special pages: `/top/best-free-ai-tools` and `/top/trending-ai-tools`
+- **Comparison pages** (`/compare/[slug]`) — reads from the `comparisons` table (see below for how to add one)
+
+## Comparison পেজ যোগ করা
+`comparisons` টেবিলে এখনো কোনো admin UI নেই (Phase 2-এ যোগ হবে) — আপাতত Supabase Table Editor থেকে ম্যানুয়ালি একটা রো অ্যাড করো:
+- `slug`: যেমন `chatgpt-vs-claude` (এটাই URL হবে: `/compare/chatgpt-vs-claude`)
+- `tool_a_id`, `tool_b_id`: দুটো টুলের UUID (tools টেবিল থেকে কপি করো)
+- `intro_text`: ঐচ্ছিক, ১-২ লাইন ভূমিকা
+
+## এখনো বাকি (Phase 2+)
+Phase 1-এর মূল স্কোপ এখানেই শেষ। বাকিটা Phase 2 (reviews, submission form, user lists) — Phase 1 প্ল্যান ডকুমেন্টে বিস্তারিত আছে।
