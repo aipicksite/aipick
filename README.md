@@ -29,7 +29,13 @@ Authentication → URL Configuration-এ `Site URL` এবং `Redirect URLs`-�
 
 - **Search & filter**: `/tools` page — full-text search (Postgres `search_vector`), category sidebar filter, pricing-type filter, all URL-based (shareable/bookmarkable links)
 
+- **Admin panel** (`/admin`) — tool list, add (`/admin/tools/new`), edit/delete (`/admin/tools/[id]/edit`); protected by `admin_users` table (see setup below)
+
+## Admin অ্যাক্সেস দেওয়া
+1. প্রথমে সাইটে normal login (`/login`) দিয়ে নিজের ইমেইল দিয়ে একবার সাইন-ইন করো (এটা `profiles`-এ একটা রো বানাবে)
+2. Supabase → Table Editor → `admin_users` টেবিলে নিজের ইমেইল দিয়ে একটা রো যোগ করো
+3. এরপর `/admin`-এ গেলে অ্যাক্সেস পাবা — অন্য কেউ গেলে `/admin/denied`-এ redirect হবে
+
 ## এখনো বাকি (পরের ধাপ)
 - `/top/[slug]` ranking pages
 - `/compare/[a]-vs-[b]` pages
-- Admin panel (tool add/edit)
