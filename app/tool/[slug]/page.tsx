@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
+import SaveButton from "@/components/SaveButton";
 import ToolAvatar from "@/components/ToolAvatar";
 import ReviewSection from "@/components/ReviewSection";
 
@@ -52,6 +53,17 @@ export default async function ToolPage({ params }: Props) {
       .eq("tool_id", tool.id)
       .maybeSingle();
     userVote = (existingVote?.vote_type as "up" | "down" | null) ?? null;
+  }
+
+  let isSaved = false;
+  if (user) {
+    const { data: savedRow } = await supabase
+      .from("saved_tools")
+      .select("tool_id")
+      .eq("user_id", user.id)
+      .eq("tool_id", tool.id)
+      .maybeSingle();
+    isSaved = !!savedRow;
   }
 
   const netVotes = tool.upvotes - tool.downvotes;
@@ -104,13 +116,14 @@ export default async function ToolPage({ params }: Props) {
               </p>
             </div>
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-2">
             <VoteButton
               toolId={tool.id}
               initialNetVotes={netVotes}
               initialUserVote={userVote}
               isLoggedIn={!!user}
             />
+            <SaveButton toolId={tool.id} initialSaved={isSaved} isLoggedIn={!!user} />
           </div>
         </div>
 

@@ -44,6 +44,9 @@ export default function UserMenu({
           <Link href="/account" className="block px-3.5 py-2 hover:bg-ink/5" onClick={() => setOpen(false)}>
             Account settings
           </Link>
+          <Link href="/saved" className="block px-3.5 py-2 hover:bg-ink/5" onClick={() => setOpen(false)}>
+            Saved tools
+          </Link>
           {isAdmin && (
             <Link href="/admin" className="block px-3.5 py-2 hover:bg-ink/5" onClick={() => setOpen(false)}>
               Admin
