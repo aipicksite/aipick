@@ -37,3 +37,89 @@ export async function setReviewStatus(
   await supabase.from("reviews").update({ status }).eq("id", reviewId);
   revalidatePath("/admin/reviews");
 }
+
+function toSlug(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+export async function approveSubmission(submissionId: string) {
+  const { supabase } = await requireAdmin();
+
+  const { data: submission } = await supabase
+    .from("tool_submissions")
+    .select("*")
+    .eq("id", submissionId)
+    .single();
+
+  if (!submission) return;
+
+  const { data: tool, error } = await supabase
+    .from("tools")
+    .insert({
+      name: submission.name,
+      slug: toSlug(submission.name),
+      website_url: submission.website_url,
+      short_description: submission.short_description,
+      description: submission.description,
+      pricing_type: submission.pricing_type ?? "freemium",
+      pricing_summary: submission.pricing_summary,
+      platforms: [],
+      status: "active",
+    })
+    .select("id")
+    .single();
+
+  if (error || !tool) {
+    await supabase
+      .from("tool_submissions")
+      .update({ reviewer_note: error?.message ?? "Could not create tool", reviewed_at: new Date().toISOString() })
+      .eq("id", submissionId);
+    revalidatePath("/admin/submissions");
+    return;
+  }
+
+  // Attach categories by name, creating any that don't exist yet.
+  const categoryNames = (submission.category_names ?? "")
+    .split(",")
+    .map((c: string) => c.trim())
+    .filter(Boolean);
+
+  for (const name of categoryNames) {
+    const slug = toSlug(name);
+    const { data: existing } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    const categoryId =
+      existing?.id ??
+      (await supabase.from("categories").insert({ name, slug }).select("id").single()).data?.id;
+
+    if (categoryId) {
+      await supabase.from("tool_categories").insert({ tool_id: tool.id, category_id: categoryId });
+    }
+  }
+
+  await supabase
+    .from("tool_submissions")
+    .update({ status: "approved", created_tool_id: tool.id, reviewed_at: new Date().toISOString() })
+    .eq("id", submissionId);
+
+  revalidatePath("/admin/submissions");
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+export async function rejectSubmission(submissionId: string, note: string) {
+  const { supabase } = await requireAdmin();
+  await supabase
+    .from("tool_submissions")
+    .update({ status: "rejected", reviewer_note: note || null, reviewed_at: new Date().toISOString() })
+    .eq("id", submissionId);
+  revalidatePath("/admin/submissions");
+}

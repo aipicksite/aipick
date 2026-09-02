@@ -10,6 +10,7 @@ export default async function AdminLayout({
 
   const links = [
     { href: "/admin", label: "Tools" },
+    { href: "/admin/submissions", label: "Submissions" },
     { href: "/admin/reviews", label: "Reviews" },
     { href: "/admin/admins", label: "Admins" },
   ];

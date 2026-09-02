@@ -60,3 +60,20 @@ export type Profile = {
   created_at: string;
   updated_at: string;
 };
+
+export type ToolSubmission = {
+  id: string;
+  submitted_by: string;
+  name: string;
+  website_url: string;
+  short_description: string | null;
+  description: string | null;
+  pricing_type: "free" | "freemium" | "paid" | null;
+  pricing_summary: string | null;
+  category_names: string | null;
+  status: "pending" | "approved" | "rejected";
+  reviewer_note: string | null;
+  created_tool_id: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+};
