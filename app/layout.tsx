@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import { createClient } from "@/lib/supabase/server";
+import UserMenu from "@/components/UserMenu";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
@@ -20,11 +22,28 @@ export const metadata: Metadata = {
     "A community-powered directory to discover, compare, and rank the best AI tools.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let username: string | null = null;
+  let isAdmin = false;
+
+  if (user) {
+    const [{ data: profile }, { data: adminRow }] = await Promise.all([
+      supabase.from("profiles").select("username").eq("id", user.id).maybeSingle(),
+      supabase.from("admin_users").select("id").eq("email", user.email).maybeSingle(),
+    ]);
+    username = profile?.username ?? null;
+    isAdmin = !!adminRow;
+  }
+
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="min-h-screen bg-base text-ink font-body antialiased">
@@ -61,12 +80,16 @@ export default function RootLayout({
               >
                 Submit a tool
               </Link>
-              <Link
-                href="/login"
-                className="text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors"
-              >
-                Sign in
-              </Link>
+              {user ? (
+                <UserMenu email={user.email ?? ""} username={username} isAdmin={isAdmin} />
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors"
+                >
+                  Sign in
+                </Link>
+              )}
             </div>
           </div>
         </header>

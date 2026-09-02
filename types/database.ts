@@ -53,3 +53,10 @@ export type BlogPost = {
   published_at: string | null;
   created_at: string;
 };
+
+export type Profile = {
+  id: string;
+  username: string | null;
+  created_at: string;
+  updated_at: string;
+};

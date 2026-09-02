@@ -33,7 +33,7 @@ export default async function EditToolPage({ params }: Props) {
   const deleteToolWithId = deleteTool.bind(null, params.id);
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-14">
+    <main className="max-w-2xl">
       <div className="flex items-center justify-between">
         <h1 className="font-display font-bold text-3xl">
           Edit {(tool as Tool).name}

@@ -11,7 +11,7 @@ export default async function NewToolPage() {
     .order("name");
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-14">
+    <main className="max-w-2xl">
       <h1 className="font-display font-bold text-3xl">Add a tool</h1>
       <ToolForm
         categories={(categories as Category[] | null) ?? []}

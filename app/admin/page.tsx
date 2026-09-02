@@ -13,36 +13,44 @@ export default async function AdminPage() {
   const toolList = (tools as Tool[] | null) ?? [];
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-14">
+    <main>
       <div className="flex items-center justify-between">
-        <h1 className="font-display font-bold text-3xl">Admin — Tools</h1>
+        <h1 className="font-display font-bold text-2xl">Tools</h1>
         <Link
           href="/admin/tools/new"
-          className="bg-plum text-white rounded px-4 py-2 text-sm font-medium hover:bg-plum-deep"
+          className="bg-plum text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-plum-deep transition-colors"
         >
           + Add tool
         </Link>
       </div>
 
-      <div className="divide-y divide-line border-t border-b border-line mt-8">
+      <div className="mt-6 flex flex-col gap-2">
         {toolList.map((tool) => (
-          <div key={tool.id} className="flex items-center gap-4 py-4">
+          <div
+            key={tool.id}
+            className="flex items-center gap-4 bg-surface border border-line rounded-lg px-4 py-3"
+          >
             <div className="flex-1 min-w-0">
               <span className="font-medium">{tool.name}</span>
-              <span className="text-ink/50 text-sm ml-2">/{tool.slug}</span>
+              <span className="text-ink/45 text-sm ml-2">/{tool.slug}</span>
             </div>
+            {tool.rating_count > 0 && (
+              <span className="text-xs text-ink/45 shrink-0">
+                ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count})
+              </span>
+            )}
             <span
-              className={`text-xs px-2 py-1 rounded-full border ${
+              className={`text-xs px-2 py-1 rounded-full border shrink-0 ${
                 tool.status === "active"
-                  ? "border-line text-ink/60"
-                  : "border-red-200 text-red-600"
+                  ? "border-forest/25 text-forest bg-forest-soft"
+                  : "border-coral/25 text-coral bg-coral-soft"
               }`}
             >
               {tool.status}
             </span>
             <Link
               href={`/admin/tools/${tool.id}/edit`}
-              className="text-sm text-plum hover:underline"
+              className="text-sm text-plum hover:underline shrink-0"
             >
               Edit
             </Link>
