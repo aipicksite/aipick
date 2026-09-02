@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CreditedImage from "@/components/CreditedImage";
+import { getPexelsImage } from "@/lib/pexels";
+
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Support | AIPick",
@@ -33,7 +37,9 @@ const faqs = [
   },
 ];
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const heroImage = await getPexelsImage("customer support headset friendly", "landscape");
+
   return (
     <main className="max-w-2xl mx-auto px-4 py-16">
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Support</span>
@@ -42,6 +48,12 @@ export default function SupportPage() {
         Common questions below — or{" "}
         <Link href="/contact" className="text-plum hover:underline">contact us</Link> directly.
       </p>
+
+      {heroImage && (
+        <div className="rounded-xl overflow-hidden border border-line aspect-[16/6] mt-7">
+          <CreditedImage image={heroImage} className="w-full h-full" />
+        </div>
+      )}
 
       <div className="mt-9 flex flex-col gap-2.5">
         {faqs.map((f) => (

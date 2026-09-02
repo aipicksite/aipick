@@ -2,23 +2,39 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tool, Category } from "@/types/database";
 import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
+import CreditedImage from "@/components/CreditedImage";
+import { getPexelsImage } from "@/lib/pexels";
 
 export const revalidate = 3600; // ISR: refresh homepage hourly
+
+const FEATURES = [
+  {
+    title: "Vote, don't guess",
+    body: "Every tool's rank comes from real upvotes and reviews — not ad spend.",
+  },
+  {
+    title: "Compare side by side",
+    body: "Line up pricing, platforms and ratings before you commit to one tool.",
+  },
+  {
+    title: "Verified by owners",
+    body: "Claimed listings are kept accurate by the people who actually run the tool.",
+  },
+];
 
 export default async function HomePage() {
   const supabase = createClient();
 
-  const { data: tools } = await supabase
-    .from("tools")
-    .select("*")
-    .eq("status", "active")
-    .order("score", { ascending: false })
-    .limit(12);
-
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("*")
-    .order("name");
+  const [{ data: tools }, { data: categories }, heroImage] = await Promise.all([
+    supabase
+      .from("tools")
+      .select("*")
+      .eq("status", "active")
+      .order("score", { ascending: false })
+      .limit(12),
+    supabase.from("categories").select("*").order("name"),
+    getPexelsImage("futuristic technology gradient abstract", "landscape"),
+  ]);
 
   const toolList = (tools as Tool[] | null) ?? [];
   const categoryList = (categories as Category[] | null) ?? [];
@@ -27,8 +43,8 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section className="max-w-6xl mx-auto px-4 pt-16 pb-14">
-        <div className="max-w-2xl">
+      <section className="max-w-6xl mx-auto px-4 pt-14 pb-14 grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
+        <div>
           <h1 className="font-display font-bold text-4xl md:text-[3.25rem] leading-[1.05] tracking-tight">
             Find the AI tool that actually gets the job done.
           </h1>
@@ -66,6 +82,25 @@ export default async function HomePage() {
               <span className="text-ink/50">Community votes</span>
             </div>
           </div>
+        </div>
+
+        <div className="hidden lg:block rounded-xl overflow-hidden border border-line shadow-lift aspect-[4/3]">
+          {heroImage ? (
+            <CreditedImage image={heroImage} className="w-full h-full" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-plum to-plum-deep" />
+          )}
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 mb-16">
+        <div className="grid sm:grid-cols-3 gap-4">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="bg-surface border border-line rounded-lg p-5">
+              <h3 className="font-display font-semibold text-sm">{f.title}</h3>
+              <p className="text-sm text-ink/55 mt-1.5 leading-relaxed">{f.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
