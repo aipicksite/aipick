@@ -123,3 +123,45 @@ export async function rejectSubmission(submissionId: string, note: string) {
     .eq("id", submissionId);
   revalidatePath("/admin/submissions");
 }
+
+export async function approveClaim(claimId: string) {
+  const { supabase } = await requireAdmin();
+
+  const { data: claim } = await supabase
+    .from("tool_claims")
+    .select("*")
+    .eq("id", claimId)
+    .single();
+
+  if (!claim) return;
+
+  await supabase
+    .from("tools")
+    .update({ owner_id: claim.user_id, verified: true })
+    .eq("id", claim.tool_id);
+
+  await supabase
+    .from("tool_claims")
+    .update({ status: "approved", reviewed_at: new Date().toISOString() })
+    .eq("id", claimId);
+
+  // Reject any other pending claims on the same tool.
+  await supabase
+    .from("tool_claims")
+    .update({ status: "rejected", reviewer_note: "Another claim was approved for this tool.", reviewed_at: new Date().toISOString() })
+    .eq("tool_id", claim.tool_id)
+    .neq("id", claimId)
+    .eq("status", "pending");
+
+  revalidatePath("/admin/claims");
+  revalidatePath("/");
+}
+
+export async function rejectClaim(claimId: string, note: string) {
+  const { supabase } = await requireAdmin();
+  await supabase
+    .from("tool_claims")
+    .update({ status: "rejected", reviewer_note: note || null, reviewed_at: new Date().toISOString() })
+    .eq("id", claimId);
+  revalidatePath("/admin/claims");
+}

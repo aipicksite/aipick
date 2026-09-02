@@ -86,9 +86,19 @@ export default async function ToolPage({ params }: Props) {
           <div className="flex items-start gap-4 min-w-0">
             <ToolAvatar name={tool.name} logoUrl={tool.logo_url} size={56} />
             <div className="min-w-0">
-              <h1 className="font-display font-bold text-2xl sm:text-3xl leading-tight">
-                {tool.name}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="font-display font-bold text-2xl sm:text-3xl leading-tight">
+                  {tool.name}
+                </h1>
+                {tool.verified && (
+                  <span
+                    title="Verified by AIPick"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-forest bg-forest-soft px-2 py-0.5 rounded-full shrink-0"
+                  >
+                    ✓ Verified
+                  </span>
+                )}
+              </div>
               <p className="text-ink/60 mt-1.5 leading-relaxed">
                 {tool.short_description}
               </p>
@@ -133,6 +143,18 @@ export default async function ToolPage({ params }: Props) {
           >
             Visit website →
           </a>
+        </div>
+
+        <div className="mt-3 text-xs">
+          {user && tool.owner_id === user.id ? (
+            <Link href={`/dashboard/tools/${tool.slug}`} className="text-plum hover:underline">
+              Manage this listing →
+            </Link>
+          ) : !tool.owner_id ? (
+            <Link href={`/claim/${tool.slug}`} className="text-ink/40 hover:text-plum">
+              Is this your tool? Claim this listing →
+            </Link>
+          ) : null}
         </div>
       </div>
 

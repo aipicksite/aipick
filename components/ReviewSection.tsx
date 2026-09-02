@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import StarRating from "./StarRating";
 import type { Review } from "@/types/database";
 
@@ -168,7 +169,9 @@ export default function ReviewSection({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <StarRating value={r.rating} readOnly size={16} />
-                <span className="text-sm font-medium text-ink/70">{r.author_label}</span>
+                <Link href={`/u/${r.author_label}`} className="text-sm font-medium text-ink/70 hover:text-plum">
+                  @{r.author_label}
+                </Link>
               </div>
               {r.would_recommend !== null && (
                 <span

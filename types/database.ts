@@ -15,6 +15,8 @@ export type Tool = {
   score: number;
   rating_avg: number;
   rating_count: number;
+  owner_id: string | null;
+  verified: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -74,6 +76,19 @@ export type ToolSubmission = {
   status: "pending" | "approved" | "rejected";
   reviewer_note: string | null;
   created_tool_id: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+};
+
+export type ToolClaim = {
+  id: string;
+  tool_id: string;
+  user_id: string;
+  business_email: string;
+  role: string | null;
+  note: string | null;
+  status: "pending" | "approved" | "rejected";
+  reviewer_note: string | null;
   created_at: string;
   reviewed_at: string | null;
 };

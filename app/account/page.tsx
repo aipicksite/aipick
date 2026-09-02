@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { updateUsername } from "./actions";
 import type { Profile } from "@/types/database";
 
@@ -31,6 +32,11 @@ export default async function AccountPage({
       <div className="mt-8 bg-surface border border-line rounded-lg p-6">
         <p className="text-sm text-ink/50">Signed in as</p>
         <p className="font-medium mt-0.5">{user.email}</p>
+        {p?.username && (
+          <Link href={`/u/${p.username}`} className="inline-block mt-1 text-sm text-plum hover:underline">
+            View public profile →
+          </Link>
+        )}
 
         <form action={updateUsername} className="mt-6 space-y-2">
           <label className="text-sm font-medium block">Username</label>
