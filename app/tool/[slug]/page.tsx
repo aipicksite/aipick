@@ -83,6 +83,14 @@ export default async function ToolPage({ params }: Props) {
     isSaved = !!savedRow;
   }
 
+  const { data: categoryRows } = await supabase
+    .from("tool_categories")
+    .select("categories(name, slug)")
+    .eq("tool_id", tool.id);
+  const toolCategories = (categoryRows ?? [])
+    .map((r: any) => r.categories)
+    .filter(Boolean) as { name: string; slug: string }[];
+
   const netVotes = tool.upvotes - tool.downvotes;
   const totalVotes = tool.upvotes + tool.downvotes;
   const upRatio = totalVotes > 0 ? Math.round((tool.upvotes / totalVotes) * 100) : null;
@@ -170,7 +178,7 @@ export default async function ToolPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="rounded-lg overflow-hidden border border-line mt-6 aspect-[16/9]">
+          <div className="rounded-lg overflow-hidden border border-line mt-6 aspect-[16/9] max-h-[320px] sm:max-h-[380px]">
             <ToolScreenshot
               websiteUrl={tool.website_url}
               overrideUrl={tool.screenshot_url}
@@ -228,7 +236,7 @@ export default async function ToolPage({ params }: Props) {
                   : "border-l-gold"
               }`}
             >
-              <h2 className="font-display font-bold text-base mb-1.5">Pricing</h2>
+              <h2 className="font-display font-bold text-base mb-1.5 text-ink">Pricing</h2>
               <p className="text-[15px] text-ink/70">{tool.pricing_summary}</p>
             </section>
           )}
@@ -249,7 +257,7 @@ export default async function ToolPage({ params }: Props) {
           <div className="lg:sticky lg:top-24 bg-surface border border-line rounded-lg overflow-hidden shadow-card">
             <div className="h-1.5 bg-gradient-to-r from-plum via-gold to-forest" />
             <div className="p-5">
-            <a
+            
               href={tool.website_url}
               target="_blank"
               rel="noopener noreferrer nofollow"
@@ -294,6 +302,31 @@ export default async function ToolPage({ params }: Props) {
                 <dd className="font-medium">▲ {netVotes}</dd>
               </div>
             </dl>
+
+            {toolCategories.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-line">
+                <p className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-2">
+                  Categories
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {toolCategories.map((cat) => (
+                    <Link
+                      key={cat.slug}
+                      href={`/category/${cat.slug}`}
+                      className="text-xs font-medium px-2.5 py-1 rounded-full border border-line text-ink/60 hover:border-plum hover:text-plum transition-colors"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 pt-4 border-t border-line text-xs flex items-center justify-between gap-2">
+              <Link href={`/compare?a=${tool.slug}`} className="text-ink/40 hover:text-plum">
+                ⇄ Compare with another tool
+              </Link>
+            </div>
 
             <div className="mt-4 pt-4 border-t border-line text-xs">
               {user && tool.owner_id === user.id ? (
