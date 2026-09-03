@@ -6,6 +6,7 @@ import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
 import SaveButton from "@/components/SaveButton";
 import ToolAvatar from "@/components/ToolAvatar";
+import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
 
 type Props = { params: { slug: string } };
@@ -169,6 +170,10 @@ export default async function ToolPage({ params }: Props) {
             </Link>
           ) : null}
         </div>
+      </div>
+
+      <div className="rounded-lg overflow-hidden border border-line mt-6 aspect-[16/9]">
+        <ToolScreenshot websiteUrl={tool.website_url} name={tool.name} className="w-full h-full" />
       </div>
 
       {tool.platforms && tool.platforms.length > 0 && (

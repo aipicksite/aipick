@@ -38,6 +38,18 @@ export default async function AdminSubmissionsPage() {
                 {s.short_description && (
                   <p className="text-sm text-ink/60 mt-2">{s.short_description}</p>
                 )}
+                {s.highlights && (
+                  <ul className="mt-2 space-y-1">
+                    {s.highlights.split("\n").map((h, hi) => (
+                      h.trim() && (
+                        <li key={hi} className="flex gap-2 text-xs text-ink/60">
+                          <span className="text-forest shrink-0">✓</span>
+                          <span>{h.trim()}</span>
+                        </li>
+                      )
+                    ))}
+                  </ul>
+                )}
                 <div className="flex flex-wrap gap-1.5 mt-2 text-xs text-ink/45">
                   {s.pricing_type && <span className="border border-line rounded-full px-2 py-0.5">{s.pricing_type}</span>}
                   {s.category_names && <span className="border border-line rounded-full px-2 py-0.5">{s.category_names}</span>}

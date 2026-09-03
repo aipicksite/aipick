@@ -74,6 +74,7 @@ export type ToolSubmission = {
   pricing_type: "free" | "freemium" | "paid" | null;
   pricing_summary: string | null;
   category_names: string | null;
+  highlights: string | null;
   status: "pending" | "approved" | "rejected";
   reviewer_note: string | null;
   created_tool_id: string | null;

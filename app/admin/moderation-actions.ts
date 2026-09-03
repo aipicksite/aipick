@@ -68,6 +68,10 @@ export async function approveSubmission(submissionId: string) {
       pricing_type: submission.pricing_type ?? "freemium",
       pricing_summary: submission.pricing_summary,
       platforms: [],
+      highlights: (submission.highlights ?? "")
+        .split("\n")
+        .map((h: string) => h.trim())
+        .filter(Boolean),
       status: "active",
     })
     .select("id")

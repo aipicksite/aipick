@@ -71,6 +71,19 @@ export default async function OwnerDashboardPage({ params, searchParams }: Props
             className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
           />
         </div>
+        <div>
+          <label className="text-sm font-medium block mb-1">
+            Highlights / key features (one per line)
+          </label>
+          <textarea
+            name="highlights"
+            rows={4}
+            defaultValue={t.highlights?.join("\n") ?? ""}
+            placeholder={"Real-time collaboration\nExports to Figma\nFree tier includes 3 projects"}
+            className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
+          />
+          <p className="text-xs text-ink/45 mt-1">Shown as bullet points on ranking pages.</p>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium block mb-1">Pricing type</label>

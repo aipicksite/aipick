@@ -115,6 +115,20 @@ export default async function SubmitPage({
               className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
             />
           </div>
+          <div>
+            <label className="text-sm font-medium block mb-1">
+              Highlights / key features (one per line)
+            </label>
+            <textarea
+              name="highlights"
+              rows={4}
+              placeholder={"Real-time collaboration\nExports to Figma\nFree tier includes 3 projects"}
+              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
+            />
+            <p className="text-xs text-ink/45 mt-1">
+              These show as bullet points on ranking pages once approved — the more specific, the better.
+            </p>
+          </div>
 
           {searchParams.error && <p className="text-sm text-coral">{searchParams.error}</p>}
 

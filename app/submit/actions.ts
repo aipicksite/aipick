@@ -27,6 +27,7 @@ export async function submitTool(formData: FormData) {
     pricing_type: String(formData.get("pricing_type") ?? "") || null,
     pricing_summary: String(formData.get("pricing_summary") ?? "").trim() || null,
     category_names: String(formData.get("category_names") ?? "").trim() || null,
+    highlights: String(formData.get("highlights") ?? "").trim() || null,
   });
 
   if (error) {
