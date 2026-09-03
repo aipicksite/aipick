@@ -205,18 +205,29 @@ export default async function ToolPage({ params }: Props) {
             <section className="mt-10">
               <h2 className="font-display font-bold text-xl mb-4">Key features</h2>
               <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
-                {tool.highlights.map((h, i) => (
-                  <li key={i} className="flex gap-2.5 text-[15px] text-ink/70 leading-snug">
-                    <span className="text-forest shrink-0 mt-0.5">✓</span>
-                    <span>{h}</span>
-                  </li>
-                ))}
+                {tool.highlights.map((h, i) => {
+                  const dotColors = ["bg-forest", "bg-gold", "bg-plum", "bg-coral"];
+                  return (
+                    <li key={i} className="flex gap-2.5 text-[15px] text-ink/70 leading-snug">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${dotColors[i % dotColors.length]}`} />
+                      <span>{h}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
 
           {tool.pricing_summary && (
-            <section className="mt-10 bg-surface border border-line rounded-lg p-5">
+            <section
+              className={`mt-10 bg-surface border-l-4 border border-line rounded-lg p-5 ${
+                tool.pricing_type === "free"
+                  ? "border-l-forest"
+                  : tool.pricing_type === "paid"
+                  ? "border-l-plum"
+                  : "border-l-gold"
+              }`}
+            >
               <h2 className="font-display font-bold text-base mb-1.5">Pricing</h2>
               <p className="text-[15px] text-ink/70">{tool.pricing_summary}</p>
             </section>
@@ -235,7 +246,9 @@ export default async function ToolPage({ params }: Props) {
 
         {/* Sticky sidebar */}
         <aside className="mt-10 lg:mt-0">
-          <div className="lg:sticky lg:top-24 bg-surface border border-line rounded-lg p-5 shadow-card">
+          <div className="lg:sticky lg:top-24 bg-surface border border-line rounded-lg overflow-hidden shadow-card">
+            <div className="h-1.5 bg-gradient-to-r from-plum via-gold to-forest" />
+            <div className="p-5">
             <a
               href={tool.website_url}
               target="_blank"
@@ -292,6 +305,7 @@ export default async function ToolPage({ params }: Props) {
                   Is this your tool? Claim this listing →
                 </Link>
               ) : null}
+            </div>
             </div>
           </div>
         </aside>

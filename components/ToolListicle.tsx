@@ -87,12 +87,15 @@ export default function ToolListicle({ tools, rankOffset = 0 }: { tools: Tool[];
 
                 {tool.highlights?.length > 0 && (
                   <ul className="mt-4 space-y-1.5">
-                    {tool.highlights.map((h, hi) => (
-                      <li key={hi} className="flex gap-2.5 text-sm text-ink/70">
-                        <span className="text-forest shrink-0">✓</span>
-                        <span>{h}</span>
-                      </li>
-                    ))}
+                    {tool.highlights.map((h, hi) => {
+                      const dotColors = ["bg-forest", "bg-gold", "bg-plum", "bg-coral"];
+                      return (
+                        <li key={hi} className="flex gap-2.5 text-sm text-ink/70">
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${dotColors[hi % dotColors.length]}`} />
+                          <span>{h}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
 
