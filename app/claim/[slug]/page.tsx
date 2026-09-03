@@ -47,7 +47,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
     <main className="max-w-lg mx-auto px-4 py-16">
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Claim this listing</span>
       <div className="flex items-center gap-3 mt-2">
-        <ToolAvatar name={t.name} logoUrl={t.logo_url} size={40} />
+        <ToolAvatar name={t.name} logoUrl={t.logo_url} websiteUrl={t.website_url} size={40} />
         <h1 className="font-display font-bold text-2xl">{t.name}</h1>
       </div>
       <p className="text-ink/60 mt-3 leading-relaxed">

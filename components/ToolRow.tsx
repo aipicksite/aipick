@@ -31,7 +31,7 @@ export default function ToolRow({ tool, rank }: { tool: Tool; rank?: number }) {
         </span>
       )}
 
-      <ToolAvatar name={tool.name} logoUrl={tool.logo_url} />
+      <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} />
 
       <div className="flex-1 min-w-0">
         <h3 className="font-display font-medium text-[15px] leading-tight group-hover:text-plum transition-colors">

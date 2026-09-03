@@ -97,7 +97,7 @@ export default async function ToolPage({ params }: Props) {
       <div className="bg-surface border border-line rounded-lg p-6 sm:p-8 shadow-card">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-4 min-w-0">
-            <ToolAvatar name={tool.name} logoUrl={tool.logo_url} size={56} />
+            <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={56} />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h1 className="font-display font-bold text-2xl sm:text-3xl leading-tight">
@@ -173,7 +173,12 @@ export default async function ToolPage({ params }: Props) {
       </div>
 
       <div className="rounded-lg overflow-hidden border border-line mt-6 aspect-[16/9]">
-        <ToolScreenshot websiteUrl={tool.website_url} name={tool.name} className="w-full h-full" />
+        <ToolScreenshot
+          websiteUrl={tool.website_url}
+          overrideUrl={tool.screenshot_url}
+          name={tool.name}
+          className="w-full h-full"
+        />
       </div>
 
       {tool.platforms && tool.platforms.length > 0 && (

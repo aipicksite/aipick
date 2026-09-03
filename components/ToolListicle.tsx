@@ -34,6 +34,7 @@ export default function ToolListicle({ tools }: { tools: Tool[] }) {
             <span className={`rank-badge w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${medalClass(i + 1)}`}>
               {i + 1}
             </span>
+            <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={22} />
             <span className="font-medium truncate">{tool.name}</span>
             <span className="ml-auto text-ink/40 text-xs shrink-0">
               ▲ {tool.upvotes - tool.downvotes}
@@ -50,7 +51,7 @@ export default function ToolListicle({ tools }: { tools: Tool[] }) {
               <span className={`rank-badge w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${medalClass(i + 1)}`}>
                 {i + 1}
               </span>
-              <ToolAvatar name={tool.name} logoUrl={tool.logo_url} size={36} />
+              <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={36} />
               <h2 className="font-display font-bold text-xl">
                 <Link href={`/tool/${tool.slug}`} className="hover:text-plum">
                   {tool.name}
@@ -63,63 +64,72 @@ export default function ToolListicle({ tools }: { tools: Tool[] }) {
               )}
             </div>
 
-            <div className="rounded-lg overflow-hidden border border-line mt-4 aspect-[16/8]">
-              <ToolScreenshot websiteUrl={tool.website_url} name={tool.name} className="w-full h-full" />
-            </div>
+            <div className="sm:grid sm:grid-cols-[220px_1fr] sm:gap-6 mt-4">
+              <div className="rounded-lg overflow-hidden border border-line aspect-[4/3] sm:sticky sm:top-20 h-fit">
+                <ToolScreenshot
+                  websiteUrl={tool.website_url}
+                  overrideUrl={tool.screenshot_url}
+                  name={tool.name}
+                  className="w-full h-full"
+                />
+              </div>
 
-            {tool.short_description && (
-              <p className="mt-4 text-[17px] leading-relaxed text-ink/80 font-medium">
-                {tool.short_description}
-              </p>
-            )}
+              <div className="mt-4 sm:mt-0 min-w-0">
+                {tool.short_description && (
+                  <p className="text-[17px] leading-relaxed text-ink/80 font-medium">
+                    {tool.short_description}
+                  </p>
+                )}
 
-            {tool.description && (
-              <p className="mt-3 text-[15px] leading-relaxed text-ink/65">{tool.description}</p>
-            )}
+                {tool.description && (
+                  <p className="mt-3 text-[15px] leading-relaxed text-ink/65">{tool.description}</p>
+                )}
 
-            {tool.highlights?.length > 0 && (
-              <ul className="mt-4 space-y-1.5">
-                {tool.highlights.map((h, hi) => (
-                  <li key={hi} className="flex gap-2.5 text-sm text-ink/70">
-                    <span className="text-forest shrink-0">✓</span>
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                {tool.highlights?.length > 0 && (
+                  <ul className="mt-4 space-y-1.5">
+                    {tool.highlights.map((h, hi) => (
+                      <li key={hi} className="flex gap-2.5 text-sm text-ink/70">
+                        <span className="text-forest shrink-0">✓</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-            <div className="flex flex-wrap items-center gap-2.5 mt-5 text-xs">
-              {tool.pricing_type && (
-                <span className="px-2.5 py-1 bg-forest-soft text-forest font-medium rounded-full">
-                  {PRICING_LABEL[tool.pricing_type] ?? tool.pricing_type}
-                  {tool.pricing_summary && ` · ${tool.pricing_summary}`}
-                </span>
-              )}
-              {tool.rating_count > 0 && (
-                <span className="px-2.5 py-1 border border-line rounded-full text-ink/60">
-                  ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count} reviews)
-                </span>
-              )}
-              <span className="px-2.5 py-1 border border-line rounded-full text-ink/60">
-                ▲ {tool.upvotes - tool.downvotes} net votes
-              </span>
-            </div>
+                <div className="flex flex-wrap items-center gap-2.5 mt-5 text-xs">
+                  {tool.pricing_type && (
+                    <span className="px-2.5 py-1 bg-forest-soft text-forest font-medium rounded-full">
+                      {PRICING_LABEL[tool.pricing_type] ?? tool.pricing_type}
+                      {tool.pricing_summary && ` · ${tool.pricing_summary}`}
+                    </span>
+                  )}
+                  {tool.rating_count > 0 && (
+                    <span className="px-2.5 py-1 border border-line rounded-full text-ink/60">
+                      ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count} reviews)
+                    </span>
+                  )}
+                  <span className="px-2.5 py-1 border border-line rounded-full text-ink/60">
+                    ▲ {tool.upvotes - tool.downvotes} net votes
+                  </span>
+                </div>
 
-            <div className="flex gap-3 mt-4">
-              <a
-                href={tool.website_url}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="bg-plum text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-plum-deep transition-colors"
-              >
-                Visit {tool.name} →
-              </a>
-              <Link
-                href={`/tool/${tool.slug}`}
-                className="border border-line text-sm font-medium px-4 py-2 rounded-md hover:border-plum hover:text-plum transition-colors"
-              >
-                Full review & reviews
-              </Link>
+                <div className="flex gap-3 mt-4">
+                  <a
+                    href={tool.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="bg-plum text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-plum-deep transition-colors"
+                  >
+                    Visit {tool.name} →
+                  </a>
+                  <Link
+                    href={`/tool/${tool.slug}`}
+                    className="border border-line text-sm font-medium px-4 py-2 rounded-md hover:border-plum hover:text-plum transition-colors"
+                  >
+                    Full review & reviews
+                  </Link>
+                </div>
+              </div>
             </div>
           </article>
         ))}

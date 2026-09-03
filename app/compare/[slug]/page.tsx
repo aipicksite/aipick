@@ -100,7 +100,7 @@ export default async function ComparePage({ params }: Props) {
             }`}
           >
             <div className="flex items-center gap-3">
-              <ToolAvatar name={t.name} logoUrl={t.logo_url} size={36} />
+              <ToolAvatar name={t.name} logoUrl={t.logo_url} websiteUrl={t.website_url} size={36} />
               <div className="min-w-0">
                 <h2 className="font-display font-semibold truncate">{t.name}</h2>
                 {i === winnerIndex && (

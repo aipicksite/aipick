@@ -10,10 +10,15 @@ function screenshotUrl(websiteUrl: string) {
 
 export default function ToolScreenshot({
   websiteUrl,
+  overrideUrl,
   name,
   className = "",
 }: {
   websiteUrl: string;
+  /** Manual screenshot set by an admin/owner — used instead of the
+   * auto-generated one when the auto one shows a bot-check page or looks
+   * wrong. Set via tools.screenshot_url. */
+  overrideUrl?: string | null;
   name: string;
   className?: string;
 }) {
@@ -32,7 +37,7 @@ export default function ToolScreenshot({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={screenshotUrl(websiteUrl)}
+      src={overrideUrl || screenshotUrl(websiteUrl)}
       alt={`Screenshot of ${name}`}
       loading="lazy"
       onError={() => setFailed(true)}

@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 const PALETTE = [
   { bg: "#3E2A5C", fg: "#F4E3BE" }, // plum / gold
   { bg: "#28603F", fg: "#DCEBE0" }, // forest
@@ -13,24 +17,42 @@ function paletteFor(name: string) {
   return PALETTE[hash % PALETTE.length];
 }
 
+function faviconUrl(websiteUrl: string, size: number) {
+  try {
+    const hostname = new URL(websiteUrl).hostname;
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=${Math.max(size, 64)}`;
+  } catch {
+    return null;
+  }
+}
+
 export default function ToolAvatar({
   name,
   logoUrl,
+  websiteUrl,
   size = 44,
 }: {
   name: string;
   logoUrl?: string | null;
+  /** When provided (tool contexts, not user avatars) and no logoUrl is set,
+   * falls back to the site's favicon before falling back to initials. */
+  websiteUrl?: string | null;
   size?: number;
 }) {
-  if (logoUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const imageSrc = logoUrl || (websiteUrl ? faviconUrl(websiteUrl, size) : null);
+
+  if (imageSrc && !imgFailed) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={logoUrl}
+        src={imageSrc}
         alt=""
         width={size}
         height={size}
-        className="rounded-[10px] object-cover shrink-0 border border-line"
+        onError={() => setImgFailed(true)}
+        className="rounded-[10px] object-cover shrink-0 border border-line bg-surface"
         style={{ width: size, height: size }}
       />
     );

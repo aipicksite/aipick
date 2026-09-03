@@ -39,6 +39,7 @@ export async function createTool(formData: FormData) {
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
       highlights,
+      screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
     })
     .select("id")
@@ -84,6 +85,7 @@ export async function updateTool(toolId: string, formData: FormData) {
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
       highlights,
+      screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
       updated_at: new Date().toISOString(),
     })

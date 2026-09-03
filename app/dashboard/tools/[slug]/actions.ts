@@ -32,6 +32,7 @@ export async function updateOwnedTool(toolId: string, slug: string, formData: Fo
         .split("\n")
         .map((h) => h.trim())
         .filter(Boolean),
+      screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       pricing_type: String(formData.get("pricing_type") ?? "freemium"),
       pricing_summary: String(formData.get("pricing_summary") ?? "").trim(),
       logo_url: String(formData.get("logo_url") ?? "").trim() || null,

@@ -18,6 +18,7 @@ export type Tool = {
   owner_id: string | null;
   verified: boolean;
   highlights: string[];
+  screenshot_url: string | null;
   created_at: string;
   updated_at: string;
 };

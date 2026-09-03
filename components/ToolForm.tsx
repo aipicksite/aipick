@@ -87,6 +87,23 @@ export default function ToolForm({
         />
       </div>
 
+      <div>
+        <label className="text-sm font-medium block mb-1">
+          Screenshot URL (optional — overrides the auto-generated one)
+        </label>
+        <input
+          name="screenshot_url"
+          defaultValue={tool?.screenshot_url ?? ""}
+          placeholder="Leave blank to auto-generate from the website"
+          className="w-full border border-line rounded px-3 py-2 text-sm"
+        />
+        <p className="text-xs text-ink/45 mt-1">
+          The auto screenshot occasionally shows a bot-check page for sites
+          with strict anti-bot protection — paste a real screenshot URL here
+          to override it when that happens.
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium block mb-1">

@@ -25,13 +25,15 @@ const FEATURES = [
 export default async function HomePage() {
   const supabase = createClient();
 
-  const [{ data: tools }, { data: categories }, heroImage] = await Promise.all([
+  const [{ data: tools }, { count: totalTools }, { data: voteRows }, { data: categories }, heroImage] = await Promise.all([
     supabase
       .from("tools")
       .select("*")
       .eq("status", "active")
       .order("score", { ascending: false })
       .limit(12),
+    supabase.from("tools").select("*", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("tools").select("upvotes, downvotes").eq("status", "active"),
     supabase.from("categories").select("*").order("name"),
     getPexelsImage("futuristic technology gradient abstract", "landscape"),
   ]);
@@ -39,7 +41,10 @@ export default async function HomePage() {
   const toolList = (tools as Tool[] | null) ?? [];
   const categoryList = (categories as Category[] | null) ?? [];
 
-  const totalVotes = toolList.reduce((sum, t) => sum + t.upvotes + t.downvotes, 0);
+  const totalVotes = (voteRows ?? []).reduce(
+    (sum: number, t: { upvotes: number; downvotes: number }) => sum + t.upvotes + t.downvotes,
+    0
+  );
 
   return (
     <main>
@@ -57,7 +62,7 @@ export default async function HomePage() {
             <input
               type="text"
               name="q"
-              placeholder="Search 500+ AI tools — “image generator”, “SEO”…"
+              placeholder={`Search ${totalTools ?? toolList.length}+ AI tools — “image generator”, “SEO”…`}
               className="flex-1 bg-surface border border-line rounded-l-md px-4 py-3 text-sm focus:outline-none focus:border-plum"
             />
             <button
@@ -70,7 +75,7 @@ export default async function HomePage() {
 
           <div className="flex gap-8 mt-9 text-sm">
             <div>
-              <span className="rank-badge block text-2xl font-bold">{toolList.length}+</span>
+              <span className="rank-badge block text-2xl font-bold">{totalTools ?? toolList.length}</span>
               <span className="text-ink/50">Tools ranked</span>
             </div>
             <div>
@@ -78,7 +83,7 @@ export default async function HomePage() {
               <span className="text-ink/50">Categories</span>
             </div>
             <div>
-              <span className="rank-badge block text-2xl font-bold">{totalVotes}+</span>
+              <span className="rank-badge block text-2xl font-bold">{totalVotes}</span>
               <span className="text-ink/50">Community votes</span>
             </div>
           </div>

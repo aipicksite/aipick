@@ -84,6 +84,17 @@ export default async function OwnerDashboardPage({ params, searchParams }: Props
           />
           <p className="text-xs text-ink/45 mt-1">Shown as bullet points on ranking pages.</p>
         </div>
+        <div>
+          <label className="text-sm font-medium block mb-1">
+            Screenshot URL (optional — overrides the auto-generated one)
+          </label>
+          <input
+            name="screenshot_url"
+            defaultValue={t.screenshot_url ?? ""}
+            placeholder="Leave blank to auto-generate"
+            className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium block mb-1">Pricing type</label>
