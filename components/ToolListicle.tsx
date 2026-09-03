@@ -16,7 +16,7 @@ function medalClass(rank: number) {
   return "bg-base text-ink/40 border border-line";
 }
 
-export default function ToolListicle({ tools }: { tools: Tool[] }) {
+export default function ToolListicle({ tools, rankOffset = 0 }: { tools: Tool[]; rankOffset?: number }) {
   if (tools.length === 0) {
     return <p className="py-8 text-sm text-ink/60">No tools here yet.</p>;
   }
@@ -31,8 +31,8 @@ export default function ToolListicle({ tools }: { tools: Tool[] }) {
             href={`#${tool.slug}`}
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-base transition-colors text-sm"
           >
-            <span className={`rank-badge w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${medalClass(i + 1)}`}>
-              {i + 1}
+            <span className={`rank-badge w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${medalClass(i + 1 + rankOffset)}`}>
+              {i + 1 + rankOffset}
             </span>
             <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={22} />
             <span className="font-medium truncate">{tool.name}</span>
@@ -48,8 +48,8 @@ export default function ToolListicle({ tools }: { tools: Tool[] }) {
         {tools.map((tool, i) => (
           <article key={tool.id} id={tool.slug} className="scroll-mt-20">
             <div className="flex items-center gap-3">
-              <span className={`rank-badge w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${medalClass(i + 1)}`}>
-                {i + 1}
+              <span className={`rank-badge w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${medalClass(i + 1 + rankOffset)}`}>
+                {i + 1 + rankOffset}
               </span>
               <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={36} />
               <h2 className="font-display font-bold text-xl">

@@ -124,12 +124,15 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
-        <div className="flex items-baseline justify-between mb-6">
+        <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-display font-bold text-2xl">Top Ranked</h2>
           <Link href="/tools" className="text-sm font-medium text-plum hover:underline">
             View all tools
           </Link>
         </div>
+        <p className="text-sm text-ink/50 mb-6">
+          The 12 highest by <Link href="/how-it-works" className="text-plum hover:underline">AIPick Score</Link> — votes, reviews and recent activity combined, not just newest or cheapest.
+        </p>
         <div className="flex flex-col">
           {toolList.map((tool, i) => (
             <ToolRow key={tool.id} tool={tool} rank={i + 1} />

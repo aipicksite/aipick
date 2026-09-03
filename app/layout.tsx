@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
 import UserMenu from "@/components/UserMenu";
+import Logo from "@/components/Logo";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
@@ -50,9 +51,7 @@ export default async function RootLayout({
         <header className="sticky top-0 z-30 backdrop-blur bg-base/85 border-b border-line">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <span className="w-8 h-8 rounded-[8px] bg-plum text-gold-soft font-display font-bold flex items-center justify-center text-sm">
-                AP
-              </span>
+              <Logo size={32} />
               <span className="font-display font-bold text-lg tracking-tight">
                 AIPick
               </span>
@@ -99,7 +98,10 @@ export default async function RootLayout({
         <footer className="border-t border-line mt-24">
           <div className="max-w-6xl mx-auto px-4 py-12 grid gap-8 sm:grid-cols-[1.3fr_1fr_1fr_1fr]">
             <div>
-              <span className="font-display font-bold text-lg">AIPick</span>
+              <span className="font-display font-bold text-lg flex items-center gap-2">
+                <Logo size={22} />
+                AIPick
+              </span>
               <p className="text-sm text-ink/55 mt-2 max-w-xs leading-relaxed">
                 Discover. Vote. Review. Pick. A community-ranked directory of
                 AI tools — not a pay-to-rank list.

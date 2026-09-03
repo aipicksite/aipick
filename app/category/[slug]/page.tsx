@@ -3,10 +3,13 @@ import type { Tool, Category } from "@/types/database";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
+import Pagination from "@/components/Pagination";
 
 export const revalidate = 21600;
 
-type Props = { params: { slug: string } };
+const PAGE_SIZE = 10;
+
+type Props = { params: { slug: string }; searchParams: { page?: string } };
 
 async function getCategory(slug: string) {
   const supabase = createClient();
@@ -40,10 +43,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const result = await getCategory(params.slug);
   if (!result) notFound();
   const { category, tools } = result;
+
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
+  const totalPages = Math.max(1, Math.ceil(tools.length / PAGE_SIZE));
+  const pageTools = tools.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
@@ -53,10 +60,16 @@ export default async function CategoryPage({ params }: Props) {
         <p className="text-ink/65 mt-2 leading-relaxed max-w-xl">{category.description}</p>
       )}
       <p className="text-xs text-ink/40 mt-2">
-        Ranked by community votes and reviews · updated every few hours
+        {tools.length} tool{tools.length === 1 ? "" : "s"} · ranked by community votes and reviews
       </p>
 
-      <ToolListicle tools={tools} />
+      <ToolListicle tools={pageTools} rankOffset={(page - 1) * PAGE_SIZE} />
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        buildUrl={(p) => (p === 1 ? `/category/${category.slug}` : `/category/${category.slug}?page=${p}`)}
+      />
     </main>
   );
 }
