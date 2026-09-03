@@ -16,7 +16,7 @@ export default function Pagination({
 
   // Show first, last, current ±1, with ellipses between gaps.
   const pages = new Set<number>([1, totalPages, currentPage, currentPage - 1, currentPage + 1]);
-  const pageList = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+  const pageList = Array.from(pages).filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
 
   return (
     <nav className="flex items-center justify-center gap-1.5 mt-10" aria-label="Pagination">
