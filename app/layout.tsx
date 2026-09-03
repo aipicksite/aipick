@@ -18,9 +18,24 @@ const bodyFont = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://aipick.site"),
   title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
   description:
     "A community-powered directory to discover, compare, and rank the best AI tools.",
+  openGraph: {
+    siteName: "AIPick",
+    type: "website",
+    locale: "en_US",
+    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
+    description:
+      "A community-powered directory to discover, compare, and rank the best AI tools.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
+    description:
+      "A community-powered directory to discover, compare, and rank the best AI tools.",
+  },
 };
 
 export default async function RootLayout({

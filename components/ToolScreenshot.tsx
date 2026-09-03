@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Logo from "./Logo";
 
 function screenshotUrl(websiteUrl: string) {
   // thum.io — free, keyless URL-to-screenshot service. Format:
@@ -13,6 +14,7 @@ export default function ToolScreenshot({
   overrideUrl,
   name,
   className = "",
+  watermark = true,
 }: {
   websiteUrl: string;
   /** Manual screenshot set by an admin/owner — used instead of the
@@ -21,6 +23,9 @@ export default function ToolScreenshot({
   overrideUrl?: string | null;
   name: string;
   className?: string;
+  /** Small AIPick logo badge in the corner — off by default for tiny
+   * thumbnails where it would just be noise. */
+  watermark?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -35,13 +40,20 @@ export default function ToolScreenshot({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={overrideUrl || screenshotUrl(websiteUrl)}
-      alt={`Screenshot of ${name}`}
-      loading="lazy"
-      onError={() => setFailed(true)}
-      className={`object-cover object-top ${className}`}
-    />
+    <div className={`relative ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={overrideUrl || screenshotUrl(websiteUrl)}
+        alt={`Screenshot of ${name}`}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        className="w-full h-full object-cover object-top"
+      />
+      {watermark && (
+        <div className="absolute bottom-2 right-2 opacity-90 drop-shadow-md">
+          <Logo size={26} />
+        </div>
+      )}
+    </div>
   );
 }
