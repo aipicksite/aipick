@@ -17,6 +17,7 @@ export type Tool = {
   rating_count: number;
   owner_id: string | null;
   verified: boolean;
+  highlights: string[];
   created_at: string;
   updated_at: string;
 };

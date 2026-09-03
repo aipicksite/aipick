@@ -74,6 +74,19 @@ export default function ToolForm({
         />
       </div>
 
+      <div>
+        <label className="text-sm font-medium block mb-1">
+          Highlights / key features (one per line — shown as bullet points on ranking pages)
+        </label>
+        <textarea
+          name="highlights"
+          rows={4}
+          placeholder={"Real-time collaboration\nExports to Figma\nFree tier includes 3 projects"}
+          defaultValue={tool?.highlights?.join("\n") ?? ""}
+          className="w-full border border-line rounded px-3 py-2 text-sm"
+        />
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium block mb-1">

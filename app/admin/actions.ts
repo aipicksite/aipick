@@ -22,6 +22,11 @@ export async function createTool(formData: FormData) {
     .map((p) => p.trim())
     .filter(Boolean);
 
+  const highlights = String(formData.get("highlights") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
   const { data: tool, error } = await supabase
     .from("tools")
     .insert({
@@ -33,6 +38,7 @@ export async function createTool(formData: FormData) {
       pricing_type: String(formData.get("pricing_type") ?? "freemium"),
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
+      highlights,
       status: String(formData.get("status") ?? "active"),
     })
     .select("id")
@@ -61,6 +67,11 @@ export async function updateTool(toolId: string, formData: FormData) {
     .map((p) => p.trim())
     .filter(Boolean);
 
+  const highlights = String(formData.get("highlights") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
   await supabase
     .from("tools")
     .update({
@@ -72,6 +83,7 @@ export async function updateTool(toolId: string, formData: FormData) {
       pricing_type: String(formData.get("pricing_type") ?? "freemium"),
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
+      highlights,
       status: String(formData.get("status") ?? "active"),
       updated_at: new Date().toISOString(),
     })
