@@ -27,6 +27,16 @@ export async function createTool(formData: FormData) {
     .map((h) => h.trim())
     .filter(Boolean);
 
+  const use_cases = String(formData.get("use_cases") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
+  const audience = String(formData.get("audience") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
   const { data: tool, error } = await supabase
     .from("tools")
     .insert({
@@ -39,6 +49,8 @@ export async function createTool(formData: FormData) {
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
       highlights,
+      use_cases,
+      audience,
       screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
     })
@@ -73,6 +85,16 @@ export async function updateTool(toolId: string, formData: FormData) {
     .map((h) => h.trim())
     .filter(Boolean);
 
+  const use_cases = String(formData.get("use_cases") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
+  const audience = String(formData.get("audience") ?? "")
+    .split("\n")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
   await supabase
     .from("tools")
     .update({
@@ -85,6 +107,8 @@ export async function updateTool(toolId: string, formData: FormData) {
       pricing_summary: String(formData.get("pricing_summary") ?? ""),
       platforms,
       highlights,
+      use_cases,
+      audience,
       screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
       updated_at: new Date().toISOString(),
