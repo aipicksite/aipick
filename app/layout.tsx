@@ -3,8 +3,10 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteSettings } from "@/lib/settings";
 import UserMenu from "@/components/UserMenu";
 import Logo from "@/components/Logo";
+import Script from "next/script";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
@@ -21,26 +23,30 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://aipick.site"),
-  title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
-  description:
-    "A community-powered directory to discover, compare, and rank the best AI tools.",
-  openGraph: {
-    siteName: "AIPick",
-    type: "website",
-    locale: "en_US",
-    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
-    description:
-      "A community-powered directory to discover, compare, and rank the best AI tools.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
-    description:
-      "A community-powered directory to discover, compare, and rank the best AI tools.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return {
+    metadataBase: new URL("https://aipick.site"),
+    title: settings.site_title,
+    description: settings.site_description,
+    verification: settings.google_site_verification
+      ? { google: settings.google_site_verification }
+      : undefined,
+    openGraph: {
+      siteName: "AIPick",
+      type: "website",
+      locale: "en_US",
+      title: settings.site_title,
+      description: settings.site_description,
+      images: settings.og_image_url ? [{ url: settings.og_image_url }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: settings.site_title,
+      description: settings.site_description,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -48,9 +54,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [
+    {
+      data: { user },
+    },
+    settings,
+  ] = await Promise.all([supabase.auth.getUser(), getSiteSettings()]);
 
   let username: string | null = null;
   let isAdmin = false;
@@ -67,6 +76,22 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="min-h-screen bg-base text-ink font-body antialiased">
+        {settings.google_analytics_id && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${settings.google_analytics_id}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${settings.google_analytics_id}');
+              `}
+            </Script>
+          </>
+        )}
         <header className="sticky top-0 z-30 backdrop-blur bg-base/85 border-b border-line">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 shrink-0">

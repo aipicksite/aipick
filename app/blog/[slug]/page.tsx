@@ -23,9 +23,20 @@ async function getPost(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPost(params.slug);
   if (!post) return {};
+  const title = (post as any).meta_title || `${post.title} | AIPick Blog`;
+  const description = (post as any).meta_description || post.excerpt || undefined;
   return {
-    title: `${post.title} | AIPick Blog`,
-    description: post.excerpt ?? undefined,
+    title,
+    description,
+    alternates: { canonical: `https://aipick.site/blog/${post.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `https://aipick.site/blog/${post.slug}`,
+      type: "article",
+      images: post.cover_image_url ? [{ url: post.cover_image_url }] : undefined,
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
