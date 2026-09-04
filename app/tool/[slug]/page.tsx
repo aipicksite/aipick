@@ -257,7 +257,7 @@ export default async function ToolPage({ params }: Props) {
           <div className="lg:sticky lg:top-24 bg-surface border border-line rounded-lg overflow-hidden shadow-card">
             <div className="h-1.5 bg-gradient-to-r from-plum via-gold to-forest" />
             <div className="p-5">
-            
+            <a
               href={tool.website_url}
               target="_blank"
               rel="noopener noreferrer nofollow"
