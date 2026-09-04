@@ -144,6 +144,32 @@ export default function ToolForm({
       </div>
 
       <div>
+        <label className="text-sm font-medium block mb-1">
+          Use cases (one per line — shown as a &quot;Use cases&quot; section on the tool page)
+        </label>
+        <textarea
+          name="use_cases"
+          rows={3}
+          placeholder={"Draft product descriptions in seconds\nSummarize long research papers\nTranslate marketing copy into 10 languages"}
+          defaultValue={tool?.use_cases?.join("\n") ?? ""}
+          className="w-full border border-line rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium block mb-1">
+          Who it&apos;s for (one per line — shown as a &quot;Who it&apos;s for&quot; section)
+        </label>
+        <textarea
+          name="audience"
+          rows={3}
+          placeholder={"Marketing teams\nSolo founders\nContent creators"}
+          defaultValue={tool?.audience?.join("\n") ?? ""}
+          className="w-full border border-line rounded px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
         <label className="text-sm font-medium block mb-2">Categories</label>
         <div className="flex flex-wrap gap-3">
           {categories.map((cat) => (

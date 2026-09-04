@@ -18,6 +18,8 @@ export type Tool = {
   owner_id: string | null;
   verified: boolean;
   highlights: string[];
+  use_cases: string[];
+  audience: string[];
   screenshot_url: string | null;
   created_at: string;
   updated_at: string;
@@ -54,8 +56,11 @@ export type BlogPost = {
   excerpt: string | null;
   cover_image_url: string | null;
   body: string;
+  meta_title: string | null;
+  meta_description: string | null;
   published_at: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type Profile = {
