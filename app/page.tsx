@@ -1,11 +1,32 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tool, Category } from "@/types/database";
+import type { Metadata } from "next";
 import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import CreditedImage from "@/components/CreditedImage";
 import { getPexelsImage } from "@/lib/pexels";
 
 export const revalidate = 3600; // ISR: refresh homepage hourly
+
+export const metadata: Metadata = {
+  title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
+  description:
+    "A community-powered directory to discover, compare, and rank the best AI tools. Real votes and reviews, not pay-to-rank listings.",
+  alternates: { canonical: "https://aipick.site" },
+  openGraph: {
+    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
+    description:
+      "A community-powered directory to discover, compare, and rank the best AI tools. Real votes and reviews, not pay-to-rank listings.",
+    url: "https://aipick.site",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AIPick — Discover, Vote, and Pick the Best AI Tools",
+    description:
+      "A community-powered directory to discover, compare, and rank the best AI tools.",
+  },
+};
 
 const FEATURES = [
   {

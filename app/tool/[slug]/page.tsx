@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
 import SaveButton from "@/components/SaveButton";
+import AddToListButton from "@/components/AddToListButton";
 import ToolAvatar from "@/components/ToolAvatar";
 import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
@@ -274,6 +275,7 @@ export default async function ToolPage({ params }: Props) {
                 isLoggedIn={!!user}
               />
               <SaveButton toolId={tool.id} initialSaved={isSaved} isLoggedIn={!!user} />
+              <AddToListButton toolId={tool.id} isLoggedIn={!!user} />
             </div>
 
             <dl className="mt-5 pt-5 border-t border-line space-y-3 text-sm">
