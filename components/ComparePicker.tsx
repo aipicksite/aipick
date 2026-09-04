@@ -5,9 +5,15 @@ import { useRouter } from "next/navigation";
 
 type ToolOption = { slug: string; name: string };
 
-export default function ComparePicker({ tools }: { tools: ToolOption[] }) {
+export default function ComparePicker({
+  tools,
+  initialA,
+}: {
+  tools: ToolOption[];
+  initialA?: string;
+}) {
   const router = useRouter();
-  const [a, setA] = useState("");
+  const [a, setA] = useState(initialA ?? "");
   const [b, setB] = useState("");
   const [error, setError] = useState<string | null>(null);
 
