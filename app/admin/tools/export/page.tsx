@@ -10,7 +10,7 @@ export default async function AdminToolsExportPage() {
     .order("slug", { ascending: true });
 
   const toolList = tools ?? [];
-  const exportUrl = "https://aipick.site/api/tools-export";
+  const exportUrl = "https://aipick.site/tools-export";
 
   return (
     <main>
