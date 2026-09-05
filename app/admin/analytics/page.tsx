@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { classifyReferrer } from "@/lib/traffic-source";
 import Link from "next/link";
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -93,6 +94,32 @@ export default async function AdminAnalyticsPage() {
     .slice(0, 10);
   const maxViews = topByViews[0]?.views ?? 0;
 
+  // Traffic sources + top pages, both from the last 30 days of page_views.
+  const { data: recentViewRows } = await supabase
+    .from("page_views")
+    .select("path, referrer")
+    .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString());
+
+  const sourceCounts = new Map<string, number>();
+  const pathCounts = new Map<string, number>();
+  for (const row of (recentViewRows ?? []) as { path: string; referrer: string | null }[]) {
+    const source = classifyReferrer(row.referrer);
+    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+    pathCounts.set(row.path, (pathCounts.get(row.path) ?? 0) + 1);
+  }
+
+  const topSources = Array.from(sourceCounts.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+  const maxSource = topSources[0]?.value ?? 0;
+
+  const topPages = Array.from(pathCounts.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
+  const maxPage = topPages[0]?.value ?? 0;
+
   return (
     <main>
       <h1 className="font-display font-bold text-2xl">Analytics</h1>
@@ -139,6 +166,41 @@ export default async function AdminAnalyticsPage() {
                 No page-view data yet — this fills in once visitors start
                 hitting tool pages after the analytics migration is run.
               </p>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8 mt-10">
+        <section>
+          <h2 className="font-display font-bold text-lg mb-1">Traffic sources (30d)</h2>
+          <p className="text-xs text-ink/45 mb-4">
+            Based on the referring page for each visit — includes AI chat
+            assistants like ChatGPT and Perplexity alongside Google, social,
+            and direct traffic.
+          </p>
+          <div className="flex flex-col gap-3">
+            {topSources.map((s) => (
+              <Bar key={s.label} label={s.label} value={s.value} max={maxSource} />
+            ))}
+            {topSources.length === 0 && (
+              <p className="text-sm text-ink/50">No traffic data yet.</p>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-display font-bold text-lg mb-1">Top pages (30d)</h2>
+          <p className="text-xs text-ink/45 mb-4">
+            Every page path visited, not just tool pages — useful for seeing
+            how the homepage, blog, and category pages are doing too.
+          </p>
+          <div className="flex flex-col gap-3">
+            {topPages.map((p) => (
+              <Bar key={p.label} label={p.label} value={p.value} max={maxPage} href={p.label} />
+            ))}
+            {topPages.length === 0 && (
+              <p className="text-sm text-ink/50">No page-view data yet.</p>
             )}
           </div>
         </section>
