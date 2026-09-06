@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import MarkdownContent from "@/components/MarkdownContent";
 
-export const revalidate = 3600;
+export const revalidate = 60; // short ISR window as a safety net alongside on-demand revalidatePath from admin edits
 
 type Props = { params: { slug: string } };
 

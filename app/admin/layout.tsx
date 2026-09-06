@@ -1,6 +1,37 @@
 import { requireAdmin } from "@/lib/admin";
 import Link from "next/link";
 
+const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
+  {
+    label: "",
+    links: [{ href: "/admin", label: "Overview" }],
+  },
+  {
+    label: "Content",
+    links: [
+      { href: "/admin/tools", label: "Tools" },
+      { href: "/admin/submissions", label: "Submissions" },
+      { href: "/admin/claims", label: "Claims" },
+      { href: "/admin/reviews", label: "Reviews" },
+      { href: "/admin/blog", label: "Blog" },
+    ],
+  },
+  {
+    label: "Insights",
+    links: [
+      { href: "/admin/analytics", label: "Analytics" },
+      { href: "/admin/tools/export", label: "Export" },
+    ],
+  },
+  {
+    label: "Settings",
+    links: [
+      { href: "/admin/seo", label: "SEO" },
+      { href: "/admin/admins", label: "Admins" },
+    ],
+  },
+];
+
 export default async function AdminLayout({
   children,
 }: {
@@ -8,38 +39,37 @@ export default async function AdminLayout({
 }) {
   await requireAdmin();
 
-  const links = [
-    { href: "/admin", label: "Tools" },
-    { href: "/admin/submissions", label: "Submissions" },
-    { href: "/admin/claims", label: "Claims" },
-    { href: "/admin/reviews", label: "Reviews" },
-    { href: "/admin/blog", label: "Blog" },
-    { href: "/admin/analytics", label: "Analytics" },
-    { href: "/admin/tools/export", label: "Export" },
-    { href: "/admin/seo", label: "SEO" },
-    { href: "/admin/admins", label: "Admins" },
-  ];
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 flex gap-10">
       <aside className="w-44 shrink-0 hidden sm:block">
         <div className="text-xs font-medium text-ink/40 uppercase tracking-wide mb-3 px-2">
           Admin
         </div>
-        <nav className="flex flex-col gap-0.5">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-sm px-2.5 py-2 rounded-md hover:bg-ink/5 transition-colors"
-            >
-              {l.label}
-            </Link>
+        <nav className="flex flex-col gap-4">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label || "root"}>
+              {group.label && (
+                <div className="text-[11px] font-medium text-ink/35 uppercase tracking-wide mb-1 px-2.5">
+                  {group.label}
+                </div>
+              )}
+              <div className="flex flex-col gap-0.5">
+                {group.links.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className="text-sm px-2.5 py-2 rounded-md hover:bg-ink/5 transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
         <Link
           href="/"
-          className="block text-sm px-2.5 py-2 mt-4 text-ink/40 hover:text-ink transition-colors"
+          className="block text-sm px-2.5 py-2 mt-6 text-ink/40 hover:text-ink transition-colors"
         >
           ← Back to site
         </Link>
