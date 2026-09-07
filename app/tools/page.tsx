@@ -87,6 +87,84 @@ export default async function ToolsPage({
     { label: "Paid", value: "paid" },
   ];
 
+  function FiltersPanel() {
+    return (
+      <>
+        <div>
+          <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
+            Sort by
+          </h2>
+          <div className="space-y-1">
+            {Object.entries(SORT_OPTIONS).map(([key, opt]) => (
+              <Link
+                key={key}
+                href={buildUrl({ sort: key === "score" ? undefined : key, page: undefined })}
+                className={`block text-sm py-1 ${
+                  sortKey === key ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
+                }`}
+              >
+                {opt.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-7">
+          <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
+            Filters
+          </h2>
+          <Link
+            href={buildUrl({ verified: verified === "1" ? undefined : "1", page: undefined })}
+            className="flex items-center gap-2 text-sm py-1"
+          >
+            <span
+              className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${
+                verified === "1" ? "bg-forest border-forest text-white" : "border-line"
+              }`}
+            >
+              {verified === "1" && "✓"}
+            </span>
+            <span className={verified === "1" ? "text-forest font-medium" : "text-ink/70"}>
+              Verified only
+            </span>
+          </Link>
+        </div>
+
+        <div className="mt-7">
+          <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
+            Category
+          </h2>
+          <div className="space-y-1">
+            <Link
+              href={buildUrl({ category: undefined, page: undefined })}
+              className={`block text-sm py-1 ${
+                !category ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
+              }`}
+            >
+              All categories
+            </Link>
+            {(categories as Category[] | null)?.map((cat) => (
+              <Link
+                key={cat.id}
+                href={buildUrl({ category: cat.slug, page: undefined })}
+                className={`block text-sm py-1 ${
+                  category === cat.slug ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
+                }`}
+              >
+                {cat.name}
+              </Link>
+            ))}
+            {(categories as Category[] | null)?.length === 0 && (
+              <p className="text-xs text-ink/40 leading-relaxed">
+                No categories yet — add some from Admin.
+              </p>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-14">
       <h1 className="font-display font-bold text-3xl">Browse AI Tools</h1>
@@ -133,79 +211,21 @@ export default async function ToolsPage({
         ))}
       </div>
 
+      {/* Mobile filters/sort — the sidebar below is desktop-only (md:), so
+          without this, phone users had no way to sort or filter by
+          category/verified at all. <details> needs no client JS. */}
+      <details className="md:hidden mt-4 border border-line rounded-lg">
+        <summary className="px-4 py-3 text-sm font-medium cursor-pointer select-none">
+          Filters &amp; sort
+        </summary>
+        <div className="px-4 pb-4 pt-1 border-t border-line">
+          <FiltersPanel />
+        </div>
+      </details>
+
       <div className="flex gap-10 mt-8">
         <aside className="w-52 shrink-0 hidden md:block">
-          <div>
-            <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
-              Sort by
-            </h2>
-            <div className="space-y-1">
-              {Object.entries(SORT_OPTIONS).map(([key, opt]) => (
-                <Link
-                  key={key}
-                  href={buildUrl({ sort: key === "score" ? undefined : key, page: undefined })}
-                  className={`block text-sm py-1 ${
-                    sortKey === key ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
-                  }`}
-                >
-                  {opt.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-7">
-            <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
-              Filters
-            </h2>
-            <Link
-              href={buildUrl({ verified: verified === "1" ? undefined : "1", page: undefined })}
-              className="flex items-center gap-2 text-sm py-1"
-            >
-              <span
-                className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${
-                  verified === "1" ? "bg-forest border-forest text-white" : "border-line"
-                }`}
-              >
-                {verified === "1" && "✓"}
-              </span>
-              <span className={verified === "1" ? "text-forest font-medium" : "text-ink/70"}>
-                Verified only
-              </span>
-            </Link>
-          </div>
-
-          <div className="mt-7">
-            <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
-              Category
-            </h2>
-            <div className="space-y-1">
-              <Link
-                href={buildUrl({ category: undefined, page: undefined })}
-                className={`block text-sm py-1 ${
-                  !category ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
-                }`}
-              >
-                All categories
-              </Link>
-              {(categories as Category[] | null)?.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={buildUrl({ category: cat.slug, page: undefined })}
-                  className={`block text-sm py-1 ${
-                    category === cat.slug ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
-                  }`}
-                >
-                  {cat.name}
-                </Link>
-              ))}
-              {(categories as Category[] | null)?.length === 0 && (
-                <p className="text-xs text-ink/40 leading-relaxed">
-                  No categories yet — add some from Admin.
-                </p>
-              )}
-            </div>
-          </div>
+          <FiltersPanel />
         </aside>
 
         <div className="flex-1 min-w-0">
