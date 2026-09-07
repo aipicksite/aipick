@@ -11,6 +11,7 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
     label: "Content",
     links: [
       { href: "/admin/tools", label: "Tools" },
+      { href: "/admin/users", label: "Users" },
       { href: "/admin/submissions", label: "Submissions" },
       { href: "/admin/claims", label: "Claims" },
       { href: "/admin/reviews", label: "Reviews" },
@@ -18,15 +19,9 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
     ],
   },
   {
-    label: "Insights",
-    links: [
-      { href: "/admin/analytics", label: "Analytics" },
-      { href: "/admin/tools/export", label: "Export" },
-    ],
-  },
-  {
     label: "Settings",
     links: [
+      { href: "/admin/tools/export", label: "Export" },
       { href: "/admin/seo", label: "SEO" },
       { href: "/admin/admins", label: "Admins" },
     ],
