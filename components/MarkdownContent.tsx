@@ -1,25 +1,39 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
 import Link from "next/link";
 
 // Renders blog_posts.body (markdown) into properly structured HTML —
 // headings, bullet lists, tables, bold/italic, links, and images all get
 // real elements instead of being dumped as plain text.
+//
+// rehypeRaw: some posts have literal HTML tags (<br>, <strong>, <div>, etc.)
+// mixed into the markdown source. By default react-markdown escapes/drops
+// raw HTML, so those tags were showing up as visible text on the page.
+// rehypeRaw parses that embedded HTML into real elements instead.
+//
+// rehypeSlug: gives every heading a stable `id` (via github-slugger) so the
+// in-article Table of Contents can link straight to a section with #id.
 export default function MarkdownContent({ content }: { content: string }) {
   return (
     <div className="font-body text-[15px] leading-relaxed text-ink/80">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
-          h1: ({ children }) => (
-            <h1 className="font-display font-bold text-2xl mt-10 mb-4 text-ink">{children}</h1>
+          h1: ({ id, children }) => (
+            <h1 id={id} className="font-display font-bold text-2xl mt-10 mb-4 text-ink scroll-mt-28">{children}</h1>
           ),
-          h2: ({ children }) => (
-            <h2 className="font-display font-bold text-xl mt-10 mb-3 text-ink">{children}</h2>
+          h2: ({ id, children }) => (
+            <h2 id={id} className="font-display font-bold text-xl mt-10 mb-3 text-ink scroll-mt-28">{children}</h2>
           ),
-          h3: ({ children }) => (
-            <h3 className="font-display font-semibold text-lg mt-8 mb-2.5 text-ink">{children}</h3>
+          h3: ({ id, children }) => (
+            <h3 id={id} className="font-display font-semibold text-lg mt-8 mb-2.5 text-ink scroll-mt-28">{children}</h3>
           ),
+          br: () => <br />,
+          div: ({ children }) => <div className="mb-4">{children}</div>,
+          span: ({ children }) => <span>{children}</span>,
           p: ({ children }) => <p className="mb-4">{children}</p>,
           a: ({ href, children }) => {
             const isInternal = href?.startsWith("/") || href?.startsWith("https://aipick.site");

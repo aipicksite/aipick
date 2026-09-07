@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSiteSettings } from "@/lib/settings";
 import UserMenu from "@/components/UserMenu";
 import Logo from "@/components/Logo";
+import MobileNav from "@/components/MobileNav";
 import Script from "next/script";
 
 const displayFont = Space_Grotesk({
@@ -92,7 +93,7 @@ export default async function RootLayout({
             </Script>
           </>
         )}
-        <header className="sticky top-0 z-30 backdrop-blur bg-base/85 border-b border-line">
+        <header className="sticky top-0 z-30 backdrop-blur bg-base/85 border-b border-line relative">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <Logo size={32} />
@@ -133,6 +134,7 @@ export default async function RootLayout({
                   Sign in
                 </Link>
               )}
+              <MobileNav />
             </div>
           </div>
         </header>

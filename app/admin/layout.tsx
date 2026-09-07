@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import Link from "next/link";
+import AdminMobileNav from "@/components/AdminMobileNav";
 
 const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
   {
@@ -74,7 +75,10 @@ export default async function AdminLayout({
           ← Back to site
         </Link>
       </aside>
-      <div className="flex-1 min-w-0">{children}</div>
+      <div className="flex-1 min-w-0">
+        <AdminMobileNav groups={NAV_GROUPS} />
+        {children}
+      </div>
     </div>
   );
 }
