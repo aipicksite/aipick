@@ -25,13 +25,15 @@ function normalizeName(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function buildPrompt(existingNames: string[], batchSize: number, focus: string) {
+function buildPrompt(existingNamesSample: string[], totalExistingCount: number, batchSize: number, focus: string) {
   return `You are helping curate a directory of AI tools and AI-powered products at AIPick.site.
 
-Find ${batchSize} REAL, currently operating AI tools/products that are NOT already in the list below. Search the web to confirm each one is real and still active before including it — do not rely on memory alone, and do not invent or guess a website URL.
+Find ${batchSize} REAL, currently operating AI tools/products. Search the web to confirm each one is real and still active before including it — do not rely on memory alone, and do not invent or guess a website URL.
 
-Tools we already have (do not repeat any of these, or obvious re-brands/variants of them):
-${existingNames.join(", ")}
+We already have ${totalExistingCount} tools in our database — including these (a sample, not the full list):
+${existingNamesSample.join(", ")}
+
+Avoid repeating anything on that sample list or obvious re-brands/variants of them. It's fine if you're not 100% sure something is new — we automatically filter out anything too similar to what we already have after you respond, so focus on finding real, notable tools rather than trying to perfectly avoid every possible overlap.
 
 ${focus ? `Preferred focus for this batch: ${focus}` : "Cover a good spread of different categories rather than clustering on one."}
 
@@ -147,17 +149,21 @@ export async function runDiscovery(
 ): Promise<DiscoveryResult> {
   const batchSize = Math.max(1, Math.min(30, parseInt(settings.discovery_batch_size, 10) || 10));
 
-  const [{ data: existingTools }, { data: existingSubs }] = await Promise.all([
-    admin.from("tools").select("name"),
+  const [{ count: totalToolCount }, { data: recentTools }, { data: pendingSubs }] = await Promise.all([
+    admin.from("tools").select("*", { count: "exact", head: true }),
+    admin.from("tools").select("name").order("created_at", { ascending: false }).limit(150),
     admin.from("tool_submissions").select("name").eq("status", "pending"),
   ]);
 
-  const existingNames = [
-    ...((existingTools ?? []) as { name: string }[]).map((t) => t.name),
-    ...((existingSubs ?? []) as { name: string }[]).map((s) => s.name),
-  ];
+  // Only a capped sample goes into the prompt (token cost stays flat no
+  // matter how large the catalog gets) — the real dedup safety net is the
+  // DB-side fuzzy match below (022_fuzzy_matching.sql), which checks every
+  // existing tool/pending submission via Postgres trigram similarity, not
+  // just whatever fit in the prompt.
+  const sampleNames = ((recentTools ?? []) as { name: string }[]).map((t) => t.name);
+  const pendingNames = ((pendingSubs ?? []) as { name: string }[]).map((s) => s.name);
 
-  const prompt = buildPrompt(existingNames, batchSize, settings.discovery_focus);
+  const prompt = buildPrompt(sampleNames, totalToolCount ?? sampleNames.length, batchSize, settings.discovery_focus);
 
   let raw: string;
   if (settings.discovery_provider === "openai") {
@@ -180,7 +186,11 @@ export async function runDiscovery(
     };
   }
 
-  const seenNormalized = new Set(existingNames.map(normalizeName));
+  // Cheap in-memory pass first (catches exact/near-exact matches within the
+  // sample and within this batch, no DB round-trip needed), then a fuzzy
+  // DB check per remaining candidate against the FULL tools + pending
+  // tables — this is what actually scales to a large catalog.
+  const seenNormalized = new Set([...sampleNames, ...pendingNames].map(normalizeName));
   const toInsert: Record<string, unknown>[] = [];
   const skipped: { name: string; reason: string }[] = [];
 
@@ -194,6 +204,12 @@ export async function runDiscovery(
     const key = normalizeName(name);
     if (seenNormalized.has(key)) {
       skipped.push({ name, reason: "duplicate of an existing tool or pending submission" });
+      continue;
+    }
+
+    const { data: isDup } = await admin.rpc("is_duplicate_tool_name", { candidate_name: name });
+    if (isDup) {
+      skipped.push({ name, reason: "close match to an existing tool (fuzzy match)" });
       continue;
     }
     seenNormalized.add(key); // also dedupes within this same batch

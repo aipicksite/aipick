@@ -100,9 +100,21 @@ export async function approveSubmission(submissionId: string) {
       .eq("slug", slug)
       .maybeSingle();
 
-    const categoryId =
-      existing?.id ??
-      (await supabase.from("categories").insert({ name, slug }).select("id").single()).data?.id;
+    let categoryId = existing?.id;
+
+    // No exact slug match — check for a near-duplicate (e.g. "Video
+    // Generation" vs "AI Video Generation") via Postgres trigram similarity
+    // before creating what might just be the same category worded differently.
+    if (!categoryId) {
+      const { data: fuzzyMatches } = await supabase.rpc("find_similar_category", {
+        candidate_name: name,
+      });
+      categoryId = fuzzyMatches?.[0]?.id;
+    }
+
+    if (!categoryId) {
+      categoryId = (await supabase.from("categories").insert({ name, slug }).select("id").single()).data?.id;
+    }
 
     if (categoryId) {
       await supabase.from("tool_categories").insert({ tool_id: tool.id, category_id: categoryId });
