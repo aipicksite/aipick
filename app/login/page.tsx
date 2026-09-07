@@ -44,7 +44,9 @@ function LoginForm() {
     });
     setVerifying(false);
     if (error) {
-      setError(error.message);
+      setError(
+        `${error.message}. If you already clicked the sign-in link in your email, that used up this code — request a new one below.`
+      );
       return;
     }
     window.location.href = next;
@@ -83,7 +85,7 @@ function LoginForm() {
       ) : (
         <div className="mt-6 space-y-5">
           <div className="text-sm bg-forest-soft border border-forest/20 text-forest rounded-lg p-4">
-            Check <strong>{email}</strong> — click the link, or enter the 6-digit code below (more reliable if the link doesn&apos;t seem to work).
+            Check <strong>{email}</strong> — use <em>either</em> the link <em>or</em> the 6-digit code below, not both. They're the same one-time sign-in — clicking the link first will make the code say "invalid or expired."
           </div>
 
           <form onSubmit={handleVerifyCode} className="space-y-3">
@@ -108,12 +110,31 @@ function LoginForm() {
           {error && <p className="text-sm text-coral">{error}</p>}
 
           <button
+            onClick={async () => {
+              setError(null);
+              const supabase = createClient();
+              const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                  emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+                  captchaToken: captchaToken ?? undefined,
+                },
+              });
+              if (error) setError(error.message);
+              else setCode("");
+            }}
+            className="text-sm text-plum hover:underline"
+          >
+            Resend a fresh code
+          </button>
+
+          <button
             onClick={() => {
               setSent(false);
               setCode("");
               setError(null);
             }}
-            className="text-sm text-ink/45 hover:text-ink"
+            className="text-sm text-ink/45 hover:text-ink block mt-2"
           >
             ← Use a different email
           </button>

@@ -20,7 +20,7 @@ export async function updateUsername(formData: FormData) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ username, updated_at: new Date().toISOString() })
+    .update({ username })
     .eq("id", user.id);
 
   if (error) {
