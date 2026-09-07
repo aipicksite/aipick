@@ -57,7 +57,7 @@ function LoginForm() {
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Sign in</span>
       <h1 className="font-display font-bold text-2xl mt-1">Sign in to AIPick</h1>
       <p className="text-ink/60 mt-2 text-sm">
-        We&apos;ll email you a link and a 6-digit code — no password needed.
+        We&apos;ll email you a link and a code — no password needed.
       </p>
 
       {!sent ? (
@@ -85,22 +85,22 @@ function LoginForm() {
       ) : (
         <div className="mt-6 space-y-5">
           <div className="text-sm bg-forest-soft border border-forest/20 text-forest rounded-lg p-4">
-            Check <strong>{email}</strong> — use <em>either</em> the link <em>or</em> the 6-digit code below, not both. They're the same one-time sign-in — clicking the link first will make the code say "invalid or expired."
+            Check <strong>{email}</strong> — use <em>either</em> the link <em>or</em> the code below, not both. They're the same one-time sign-in — clicking the link first will make the code say "invalid or expired."
           </div>
 
           <form onSubmit={handleVerifyCode} className="space-y-3">
             <input
               type="text"
               inputMode="numeric"
-              maxLength={6}
-              placeholder="123456"
+              maxLength={8}
+              placeholder="12345678"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm tracking-[0.3em] text-center focus:outline-none focus:border-plum"
+              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm tracking-[0.2em] text-center focus:outline-none focus:border-plum"
             />
             <button
               type="submit"
-              disabled={verifying || code.length < 6}
+              disabled={verifying || code.length < 8}
               className="w-full bg-plum text-white rounded-md px-3.5 py-2.5 text-sm font-medium hover:bg-plum-deep transition-colors disabled:opacity-50"
             >
               {verifying ? "Verifying…" : "Verify code & sign in"}
