@@ -60,6 +60,12 @@ export default async function AdminSubmissionsPage() {
               </span>
             </div>
 
+            {s.source === "ai_discovery" && (
+              <p className="text-xs text-plum bg-plum/5 border border-plum/20 rounded-md px-2.5 py-1.5 mt-3 inline-block">
+                🤖 AI-discovered{s.ai_model ? ` · ${s.ai_model}` : ""} — double-check details before approving
+              </p>
+            )}
+
             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-line">
               <form action={approveSubmission.bind(null, s.id)}>
                 <button className="bg-forest text-white text-xs font-medium px-3.5 py-1.5 rounded-md hover:opacity-90">

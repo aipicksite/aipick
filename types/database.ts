@@ -72,7 +72,7 @@ export type Profile = {
 
 export type ToolSubmission = {
   id: string;
-  submitted_by: string;
+  submitted_by: string | null;
   name: string;
   website_url: string;
   short_description: string | null;
@@ -86,6 +86,8 @@ export type ToolSubmission = {
   created_tool_id: string | null;
   created_at: string;
   reviewed_at: string | null;
+  source: "user" | "ai_discovery";
+  ai_model: string | null;
 };
 
 export type ToolClaim = {

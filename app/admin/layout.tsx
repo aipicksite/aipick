@@ -21,6 +21,7 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
   {
     label: "Settings",
     links: [
+      { href: "/admin/discovery", label: "AI Discovery" },
       { href: "/admin/tools/export", label: "Export" },
       { href: "/admin/seo", label: "SEO" },
       { href: "/admin/admins", label: "Admins" },
