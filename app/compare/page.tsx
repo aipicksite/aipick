@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import ComparePicker from "@/components/ComparePicker";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 3600;
 
@@ -15,6 +16,7 @@ export default async function ComparePage({
 }: {
   searchParams?: { a?: string };
 }) {
+  trackPageView("/compare");
   const supabase = createClient();
   const { data: tools } = await supabase
     .from("tools")

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
 import Pagination from "@/components/Pagination";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 21600;
 
@@ -49,6 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
+  trackPageView(`/category/${params.slug}`);
   const result = await getCategory(params.slug);
   if (!result) notFound();
   const { category, tools } = result;

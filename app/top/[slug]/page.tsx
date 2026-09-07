@@ -3,6 +3,7 @@ import type { Tool, Category } from "@/types/database";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 21600; // 6 hours — matches the rankings-refresh cadence
 
@@ -77,6 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TopPage({ params }: Props) {
+  trackPageView(`/top/${params.slug}`);
   const ranking = await resolveRanking(params.slug);
   if (!ranking) notFound();
   const { title, blurb, tools } = ranking;

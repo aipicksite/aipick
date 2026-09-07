@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { classifyReferrer } from "@/lib/traffic-source";
 import Link from "next/link";
 import DailySparkline from "@/components/DailySparkline";
@@ -61,6 +62,14 @@ function Bar({ label, value, max, href }: { label: string; value: number; max: n
 
 export default async function AdminOverviewPage() {
   const { supabase } = await requireAdmin();
+  // page_views reads use the service-role client, not the RLS-scoped one —
+  // if that table's Row Level Security has no (or too narrow a) SELECT
+  // policy for regular authenticated users, admin queries against it would
+  // silently return zero rows (RLS denial isn't an error, just empty
+  // results), which is exactly what "Traffic sources shows no data" looks
+  // like. Service role bypasses RLS entirely, so this works regardless of
+  // how that table's policies are set up.
+  const admin = createAdminClient();
 
   const now = Date.now();
   const day = 86400000;
@@ -97,9 +106,9 @@ export default async function AdminOverviewPage() {
     supabase.from("reviews").select("*", { count: "exact", head: true }).eq("status", "published"),
     supabase.from("saved_tools").select("*", { count: "exact", head: true }),
     supabase.from("custom_lists").select("*", { count: "exact", head: true }),
-    supabase.from("page_views").select("*", { count: "exact", head: true }),
-    supabase.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", new Date(now - 7 * day).toISOString()),
-    supabase.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", new Date(now - 30 * day).toISOString()),
+    admin.from("page_views").select("*", { count: "exact", head: true }),
+    admin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", new Date(now - 7 * day).toISOString()),
+    admin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", new Date(now - 30 * day).toISOString()),
     supabase
       .from("tool_submissions")
       .select("name, created_at")
@@ -128,7 +137,7 @@ export default async function AdminOverviewPage() {
   // Everything below is aggregated in JS from raw page_views rows — the
   // dataset is small enough for this to be cheap, and it avoids needing
   // Postgres functions/views just for a dashboard.
-  const { data: toolViewRows } = await supabase
+  const { data: toolViewRows } = await admin
     .from("page_views")
     .select("tool_id")
     .not("tool_id", "is", null)
@@ -145,7 +154,7 @@ export default async function AdminOverviewPage() {
     .slice(0, 10);
   const maxViews = topByViews[0]?.views ?? 0;
 
-  const { data: recentViewRows } = await supabase
+  const { data: recentViewRows } = await admin
     .from("page_views")
     .select("path, referrer, created_at")
     .gte("created_at", new Date(now - 30 * day).toISOString());

@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import TurnstileWidget from "@/components/TurnstileWidget";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -14,6 +15,7 @@ function LoginForm() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(callbackError);
   const [verifying, setVerifying] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
@@ -23,6 +25,7 @@ function LoginForm() {
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        captchaToken: captchaToken ?? undefined,
       },
     });
     if (error) setError(error.message);
@@ -65,9 +68,13 @@ function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
           />
+          <TurnstileWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
           <button
             type="submit"
-            className="w-full bg-plum text-white rounded-md px-3.5 py-2.5 text-sm font-medium hover:bg-plum-deep transition-colors"
+            disabled={
+              !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken
+            }
+            className="w-full bg-plum text-white rounded-md px-3.5 py-2.5 text-sm font-medium hover:bg-plum-deep transition-colors disabled:opacity-50"
           >
             Send sign-in link & code
           </button>

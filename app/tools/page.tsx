@@ -4,6 +4,7 @@ import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import Pagination from "@/components/Pagination";
 import type { Metadata } from "next";
+import { trackPageView } from "@/lib/track-view";
 
 export const metadata: Metadata = {
   title: "Browse AI Tools | AIPick",
@@ -33,6 +34,7 @@ export default async function ToolsPage({
 }: {
   searchParams: SearchParams;
 }) {
+  trackPageView("/tools");
   const supabase = createClient();
   const { q, category, pricing, verified } = searchParams;
   const sortKey = searchParams.sort && SORT_OPTIONS[searchParams.sort] ? searchParams.sort : "score";

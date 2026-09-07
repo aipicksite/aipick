@@ -7,6 +7,7 @@ import MarkdownContent from "@/components/MarkdownContent";
 import TableOfContents from "@/components/TableOfContents";
 import ArticleSidebar from "@/components/ArticleSidebar";
 import { extractHeadings, splitAfterParagraphs } from "@/lib/article-toc";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 60; // short ISR window as a safety net alongside on-demand revalidatePath from admin edits
 
@@ -47,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const post = await getPost(params.slug);
   if (!post) notFound();
+  trackPageView(`/blog/${post.slug}`);
 
   const toc = extractHeadings(post.body);
   const { intro, rest } = splitAfterParagraphs(post.body, 2);
@@ -62,15 +64,6 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Main content */}
         <div className="min-w-0 max-w-2xl mx-auto lg:mx-0 w-full">
           <h1 className="font-display font-bold text-3xl leading-tight">{post.title}</h1>
-          {post.published_at && (
-            <p className="text-sm text-ink/45 mt-2">
-              {new Date(post.published_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
 
           {post.cover_image_url && (
             // eslint-disable-next-line @next/next/no-img-element

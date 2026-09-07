@@ -37,7 +37,6 @@ export default function TermsPage() {
     <main className="max-w-2xl mx-auto px-4 py-16">
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Legal</span>
       <h1 className="font-display font-bold text-3xl mt-1">Terms & Conditions</h1>
-      <p className="text-sm text-ink/45 mt-2">Last updated: [DATE]</p>
 
       <div className="mt-7 bg-gold-soft border border-gold/25 rounded-lg p-5">
         <h2 className="font-display font-semibold text-gold text-sm uppercase tracking-wide">

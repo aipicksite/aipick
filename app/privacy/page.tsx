@@ -37,7 +37,6 @@ export default function PrivacyPage() {
     <main className="max-w-2xl mx-auto px-4 py-16">
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Legal</span>
       <h1 className="font-display font-bold text-3xl mt-1">Privacy Policy</h1>
-      <p className="text-sm text-ink/45 mt-2">Last updated: [DATE]</p>
 
       <div className="mt-7 bg-forest-soft border border-forest/15 rounded-lg p-5">
         <h2 className="font-display font-semibold text-forest text-sm uppercase tracking-wide">
@@ -101,7 +100,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section n="07" title="Changes to this policy">
-        <p>We'll update the "last updated" date above whenever this policy changes, and post material changes on this page.</p>
+        <p>If this policy changes in a material way, we'll post the update on this page.</p>
       </Section>
 
       <Section n="08" title="Contact">

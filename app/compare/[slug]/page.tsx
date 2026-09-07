@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ToolAvatar from "@/components/ToolAvatar";
 import ComparisonTable from "@/components/ComparisonTable";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 21600;
 
@@ -55,6 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ComparePage({ params }: Props) {
+  trackPageView(`/compare/${params.slug}`);
   const comparison = await getComparison(params.slug);
   if (!comparison) notFound();
   const { toolA, toolB, introText } = comparison;

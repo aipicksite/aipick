@@ -5,6 +5,7 @@ import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import CreditedImage from "@/components/CreditedImage";
 import { getPexelsImage } from "@/lib/pexels";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 3600; // ISR: refresh homepage hourly
 
@@ -67,6 +68,7 @@ const FAQS = [
 ];
 
 export default async function HomePage() {
+  trackPageView("/");
   const supabase = createClient();
 
   const [

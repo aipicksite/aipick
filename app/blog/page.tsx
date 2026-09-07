@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { BlogPost } from "@/types/database";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { trackPageView } from "@/lib/track-view";
 
 export const revalidate = 3600;
 
@@ -12,15 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://aipick.site/blog" },
 };
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 export default async function BlogIndexPage() {
+  trackPageView("/blog");
   const supabase = createClient();
   const { data } = await supabase
     .from("blog_posts")
@@ -98,9 +92,6 @@ export default async function BlogIndexPage() {
             {featured.excerpt && (
               <p className="text-sm text-ink/60 mt-3 leading-relaxed">{featured.excerpt}</p>
             )}
-            {featured.published_at && (
-              <p className="text-xs text-ink/40 mt-4">{formatDate(featured.published_at)}</p>
-            )}
           </div>
         </Link>
       )}
@@ -132,9 +123,6 @@ export default async function BlogIndexPage() {
                   <p className="text-sm text-ink/60 mt-2 leading-relaxed line-clamp-3">
                     {post.excerpt}
                   </p>
-                )}
-                {post.published_at && (
-                  <p className="text-xs text-ink/40 mt-4">{formatDate(post.published_at)}</p>
                 )}
               </div>
             </Link>
