@@ -46,6 +46,7 @@ export type Category = {
   slug: string;
   description: string | null;
   icon: string | null;
+  parent_id: string | null;
   created_at: string;
 };
 
