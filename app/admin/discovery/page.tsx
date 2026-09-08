@@ -57,13 +57,26 @@ export default async function AdminDiscoveryPage() {
           <label className="text-sm font-medium block mb-1">Model</label>
           <input
             name="discovery_model"
+            list="discovery-model-options"
             defaultValue={settings.discovery_model}
-            placeholder="e.g. gemini-2.0-flash or gpt-4o"
+            placeholder="e.g. gemini-3.8-flash"
             className="w-full border border-line rounded px-3 py-2 text-sm font-mono"
           />
+          <datalist id="discovery-model-options">
+            <option value="gemini-3.8-flash" label="Gemini 3.8 Flash — newest, free, built-in search grounding" />
+            <option value="gemini-3.7-flash" label="Gemini 3.7 Flash — free" />
+            <option value="gemini-3.6-flash" label="Gemini 3.6 Flash — free" />
+            <option value="gemini-3.5-flash" label="Gemini 3.5 Flash — free" />
+            <option value="gemini-3.5-flash-lite" label="Gemini 3.5 Flash-Lite — free, fastest/cheapest" />
+            <option value="gpt-5.6" label="GPT-5.6 — OpenAI's newest" />
+            <option value="gpt-5.5" label="GPT-5.5 — OpenAI" />
+            <option value="gpt-5.4-mini" label="GPT-5.4 mini — OpenAI, lighter/cheaper" />
+            <option value="gpt-5-search-api" label="GPT-5 Search API — OpenAI, built for live web search" />
+          </datalist>
           <p className="text-xs text-ink/45 mt-1">
-            Type the exact current model name from your provider's docs — update this whenever they
-            ship a newer model, since this isn't auto-detected.
+            Click the field for a dropdown of current free-tier options (as of Sept 2026), or type any
+            other model name. Providers rename/retire models often — if a run ever fails with a "model
+            not found" error, the error message itself usually names the current replacement.
           </p>
         </div>
 

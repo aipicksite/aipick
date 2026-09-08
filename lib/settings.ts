@@ -49,7 +49,7 @@ export type DiscoverySettings = {
 
 const DISCOVERY_DEFAULTS: DiscoverySettings = {
   discovery_provider: "gemini",
-  discovery_model: "gemini-2.0-flash",
+  discovery_model: "gemini-3.8-flash",
   discovery_batch_size: "10",
   discovery_focus: "",
   discovery_enabled: "false",
