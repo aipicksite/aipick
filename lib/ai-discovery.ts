@@ -18,7 +18,8 @@ export type DiscoveryResult = {
   returned: number;
   added: number;
   skipped: { name: string; reason: string }[];
-  rawModelOutput?: string; // kept only on parse failure, to help debugging from the admin UI
+  groundedSearchUsed?: boolean;
+  rawModelOutput?: string; // kept when parsing fails OR the model returned zero results, to help debugging from the admin UI
 };
 
 function normalizeName(s: string) {
@@ -38,10 +39,11 @@ Avoid repeating anything on that sample list or obvious re-brands/variants of th
 ${focus ? `Preferred focus for this batch: ${focus}` : "Cover a good spread of different categories rather than clustering on one."}
 
 Rules:
-- Only include tools you can confirm are real and currently live.
-- If you are not fully confident a tool is real, currently active, and has the exact URL you're providing, leave it out rather than guessing.
+- If you have web search available, use it to confirm each tool is real, currently live, and has the exact URL you're providing.
+- If web search is NOT available to you in this response, it's fine to rely on well-established tools you're confident existed as of your training data — just don't invent a URL you're not sure of, and don't include anything you're only vaguely aware of.
 - Skip anything already in the exclusion list above, including close variants of the same product.
 - Descriptions must be factual and specific to that product — no generic filler.
+- Return whatever real tools you can find, even if it's fewer than ${batchSize} — only return an empty array if you genuinely cannot think of or find any qualifying tool at all.
 
 Respond with ONLY a raw JSON array (no markdown code fences, no commentary before or after) of exactly this shape:
 [
@@ -70,7 +72,7 @@ function extractJsonArray(text: string): Candidate[] {
   return parsed;
 }
 
-async function callGemini(model: string, prompt: string): Promise<string> {
+async function callGemini(model: string, prompt: string): Promise<{ text: string; grounded: boolean }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is not set in your environment variables.");
 
@@ -94,15 +96,17 @@ async function callGemini(model: string, prompt: string): Promise<string> {
   }
 
   try {
-    return await request(true);
+    const text = await request(true);
+    return { text, grounded: true };
   } catch {
     // Some model versions/keys don't support the google_search tool — retry
     // once without it rather than failing the whole run.
-    return await request(false);
+    const text = await request(false);
+    return { text, grounded: false };
   }
 }
 
-async function callOpenAI(model: string, prompt: string): Promise<string> {
+async function callOpenAI(model: string, prompt: string): Promise<{ text: string; grounded: boolean }> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is not set in your environment variables.");
 
@@ -135,11 +139,13 @@ async function callOpenAI(model: string, prompt: string): Promise<string> {
   }
 
   try {
-    return await request(true);
+    const text = await request(true);
+    return { text, grounded: true };
   } catch {
     // Not every model on every account has web_search access — retry once
     // without it rather than failing the whole run.
-    return await request(false);
+    const text = await request(false);
+    return { text, grounded: false };
   }
 }
 
@@ -166,10 +172,11 @@ export async function runDiscovery(
   const prompt = buildPrompt(sampleNames, totalToolCount ?? sampleNames.length, batchSize, settings.discovery_focus);
 
   let raw: string;
+  let groundedSearchUsed: boolean;
   if (settings.discovery_provider === "openai") {
-    raw = await callOpenAI(settings.discovery_model, prompt);
+    ({ text: raw, grounded: groundedSearchUsed } = await callOpenAI(settings.discovery_model, prompt));
   } else {
-    raw = await callGemini(settings.discovery_model, prompt);
+    ({ text: raw, grounded: groundedSearchUsed } = await callGemini(settings.discovery_model, prompt));
   }
 
   let candidates: Candidate[];
@@ -182,6 +189,21 @@ export async function runDiscovery(
       returned: 0,
       added: 0,
       skipped: [],
+      groundedSearchUsed,
+      rawModelOutput: raw.slice(0, 4000),
+    };
+  }
+
+  if (candidates.length === 0) {
+    return {
+      summary: `Requested ${batchSize}, but the model returned zero candidates${
+        groundedSearchUsed ? "" : " (web search grounding was unavailable for this call, so it fell back to a plain text response)"
+      }. See the raw output below for why — often the model was overly cautious, or the prompt needs a narrower focus.`,
+      requested: batchSize,
+      returned: 0,
+      added: 0,
+      skipped: [],
+      groundedSearchUsed,
       rawModelOutput: raw.slice(0, 4000),
     };
   }
@@ -243,15 +265,19 @@ export async function runDiscovery(
         returned: candidates.length,
         added: 0,
         skipped,
+        groundedSearchUsed,
       };
     }
   }
 
   return {
-    summary: `Requested ${batchSize}, model returned ${candidates.length}, added ${toInsert.length} as pending submissions, skipped ${skipped.length}.`,
+    summary: `Requested ${batchSize}, model returned ${candidates.length}, added ${toInsert.length} as pending submissions, skipped ${skipped.length}.${
+      groundedSearchUsed ? "" : " (Ran without web search grounding.)"
+    }`,
     requested: batchSize,
     returned: candidates.length,
     added: toInsert.length,
     skipped,
+    groundedSearchUsed,
   };
 }

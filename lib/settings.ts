@@ -45,6 +45,7 @@ export type DiscoverySettings = {
   discovery_enabled: string; // "true" | "false" — stored as text like the rest of site_settings
   discovery_last_run_at: string;
   discovery_last_run_summary: string;
+  discovery_last_raw_output: string;
 };
 
 const DISCOVERY_DEFAULTS: DiscoverySettings = {
@@ -55,6 +56,7 @@ const DISCOVERY_DEFAULTS: DiscoverySettings = {
   discovery_enabled: "false",
   discovery_last_run_at: "",
   discovery_last_run_summary: "",
+  discovery_last_raw_output: "",
 };
 
 // Same site_settings table, just a different set of keys — keeps one

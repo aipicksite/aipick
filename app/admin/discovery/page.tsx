@@ -30,6 +30,16 @@ export default async function AdminDiscoveryPage() {
               })}
             </p>
             <p className="text-sm text-ink/55 mt-1">{settings.discovery_last_run_summary}</p>
+            {settings.discovery_last_raw_output && (
+              <details className="mt-3">
+                <summary className="text-xs text-plum cursor-pointer hover:underline">
+                  Show raw model output (for debugging why nothing was added)
+                </summary>
+                <pre className="text-xs text-ink/60 bg-base border border-line rounded-md p-3 mt-2 overflow-x-auto whitespace-pre-wrap">
+                  {settings.discovery_last_raw_output}
+                </pre>
+              </details>
+            )}
           </>
         ) : (
           <p className="text-sm text-ink/50">Never run yet.</p>

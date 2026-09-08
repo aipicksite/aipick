@@ -26,6 +26,7 @@ export async function GET(request: Request) {
       [
         { key: "discovery_last_run_at", value: new Date().toISOString() },
         { key: "discovery_last_run_summary", value: result.summary },
+        { key: "discovery_last_raw_output", value: result.rawModelOutput ?? "" },
       ],
       { onConflict: "key" }
     );

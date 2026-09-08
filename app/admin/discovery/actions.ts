@@ -22,11 +22,12 @@ export async function saveDiscoverySettings(formData: FormData) {
   revalidatePath("/admin/discovery");
 }
 
-async function recordRun(admin: ReturnType<typeof createAdminClient>, summary: string) {
+async function recordRun(admin: ReturnType<typeof createAdminClient>, summary: string, rawOutput?: string) {
   await admin.from("site_settings").upsert(
     [
       { key: "discovery_last_run_at", value: new Date().toISOString() },
       { key: "discovery_last_run_summary", value: summary },
+      { key: "discovery_last_raw_output", value: rawOutput ?? "" },
     ],
     { onConflict: "key" }
   );
@@ -39,7 +40,7 @@ export async function runDiscoveryNow() {
 
   try {
     const result = await runDiscovery(admin, settings);
-    await recordRun(admin, result.summary);
+    await recordRun(admin, result.summary, result.rawModelOutput);
   } catch (e) {
     await recordRun(admin, `Run failed: ${(e as Error).message}`);
   }
