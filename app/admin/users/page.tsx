@@ -9,6 +9,7 @@ import {
   unbanUser,
 } from "@/app/admin/users/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import SubmitButton from "@/components/SubmitButton";
 
 const STATUS_STYLE: Record<string, string> = {
   active: "bg-forest-soft text-forest",
@@ -120,16 +121,16 @@ export default async function AdminUsersPage({
                       <>
                         {u.status === "suspended" ? (
                           <form action={unsuspendUser.bind(null, u.id)}>
-                            <button className="text-forest hover:underline">Unsuspend</button>
+                            <SubmitButton pendingText="…" className="text-forest hover:underline">Unsuspend</SubmitButton>
                           </form>
                         ) : (
                           <form action={suspendUser.bind(null, u.id)}>
-                            <button className="text-gold hover:underline">Suspend</button>
+                            <SubmitButton pendingText="…" className="text-gold hover:underline">Suspend</SubmitButton>
                           </form>
                         )}
                         {u.status === "banned" ? (
                           <form action={unbanUser.bind(null, u.id)}>
-                            <button className="text-forest hover:underline">Unban</button>
+                            <SubmitButton pendingText="…" className="text-forest hover:underline">Unban</SubmitButton>
                           </form>
                         ) : (
                           <form action={banUser.bind(null, u.id)}>

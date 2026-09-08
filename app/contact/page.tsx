@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,12 +43,12 @@ export default function ContactPage() {
             className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
           />
         </div>
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Sending…"
           className="bg-plum text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
         >
           Send message
-        </button>
+        </SubmitButton>
       </form>
 
       <div className="mt-10 pt-6 border-t border-line text-sm text-ink/55 space-y-1.5">

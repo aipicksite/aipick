@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
 import { getSiteSettings } from "@/lib/settings";
 import { updateSiteSettings } from "./actions";
@@ -87,12 +88,12 @@ export default async function AdminSeoPage() {
           </p>
         </div>
 
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Saving…"
           className="bg-plum text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-plum-deep"
         >
           Save settings
-        </button>
+        </SubmitButton>
       </form>
     </main>
   );

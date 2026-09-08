@@ -29,9 +29,13 @@ export default function RemoveFromListButton({
       onClick={handleClick}
       disabled={isPending}
       title="Remove from list"
-      className="shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-ink/40 hover:text-coral hover:bg-coral/10 transition-colors"
+      className="shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-ink/40 hover:text-coral hover:bg-coral/10 transition-colors disabled:opacity-50"
     >
-      ✕
+      {isPending ? (
+        <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+      ) : (
+        "✕"
+      )}
     </button>
   );
 }

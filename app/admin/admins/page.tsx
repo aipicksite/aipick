@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import { addAdmin, removeAdmin } from "@/app/admin/moderation-actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminAdminsPage() {
   const { supabase, user } = await requireAdmin();
@@ -26,12 +27,12 @@ export default async function AdminAdminsPage() {
           placeholder="teammate@company.com"
           className="flex-1 bg-surface border border-line rounded-md px-3.5 py-2 text-sm focus:outline-none focus:border-plum"
         />
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Adding…"
           className="bg-plum text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-plum-deep transition-colors shrink-0"
         >
           Add
-        </button>
+        </SubmitButton>
       </form>
 
       <div className="mt-6 flex flex-col gap-2 max-w-sm">
@@ -48,9 +49,9 @@ export default async function AdminAdminsPage() {
             </span>
             {admin.email !== user.email && (
               <form action={removeAdmin.bind(null, admin.id)}>
-                <button type="submit" className="text-xs text-coral hover:underline">
+                <SubmitButton pendingText="…" className="text-xs text-coral hover:underline">
                   Remove
-                </button>
+                </SubmitButton>
               </form>
             )}
           </div>

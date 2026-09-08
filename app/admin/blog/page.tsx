@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/admin";
 import type { BlogPost } from "@/types/database";
 import Link from "next/link";
 import { deleteBlogPost } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminBlogPage() {
   const { supabase } = await requireAdmin();
@@ -53,9 +54,9 @@ export default async function AdminBlogPage() {
                 Edit
               </Link>
               <form action={deleteBlogPost.bind(null, post.id)}>
-                <button type="submit" className="text-sm text-coral hover:underline shrink-0">
+                <SubmitButton pendingText="Deleting…" className="text-sm text-coral hover:underline shrink-0">
                   Delete
-                </button>
+                </SubmitButton>
               </form>
             </div>
           );

@@ -1,4 +1,5 @@
 import type { BlogPost } from "@/types/database";
+import SubmitButton from "@/components/SubmitButton";
 
 type Props = {
   post?: BlogPost & { meta_title?: string | null; meta_description?: string | null };
@@ -108,12 +109,12 @@ export default function BlogForm({ post, action, submitLabel }: Props) {
         />
       </div>
 
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="Saving…"
         className="bg-plum text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-plum-deep"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

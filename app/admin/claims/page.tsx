@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
 import { approveClaim, rejectClaim } from "@/app/admin/moderation-actions";
 
@@ -37,12 +38,12 @@ export default async function AdminClaimsPage() {
             </div>
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-line">
               <form action={approveClaim.bind(null, c.id)}>
-                <button className="bg-forest text-white text-xs font-medium px-3.5 py-1.5 rounded-md hover:opacity-90">
+                <SubmitButton pendingText="Approving…" className="bg-forest text-white text-xs font-medium px-3.5 py-1.5 rounded-md hover:opacity-90">
                   Approve & verify
-                </button>
+                </SubmitButton>
               </form>
               <form action={rejectClaim.bind(null, c.id, "")}>
-                <button className="text-coral text-xs font-medium hover:underline">Reject</button>
+                <SubmitButton pendingText="Rejecting…" className="text-coral text-xs font-medium hover:underline">Reject</SubmitButton>
               </form>
             </div>
           </div>

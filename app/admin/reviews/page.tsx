@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
 import { setReviewStatus } from "@/app/admin/moderation-actions";
 import StarRating from "@/components/StarRating";
@@ -48,17 +49,17 @@ export default async function AdminReviewsPage() {
             <div className="flex gap-4 mt-3 text-xs">
               {r.status !== "published" && (
                 <form action={setReviewStatus.bind(null, r.id, "published")}>
-                  <button className="text-forest hover:underline">Publish</button>
+                  <SubmitButton pendingText="…" className="text-forest hover:underline">Publish</SubmitButton>
                 </form>
               )}
               {r.status !== "flagged" && (
                 <form action={setReviewStatus.bind(null, r.id, "flagged")}>
-                  <button className="text-gold hover:underline">Flag</button>
+                  <SubmitButton pendingText="…" className="text-gold hover:underline">Flag</SubmitButton>
                 </form>
               )}
               {r.status !== "removed" && (
                 <form action={setReviewStatus.bind(null, r.id, "removed")}>
-                  <button className="text-coral hover:underline">Remove</button>
+                  <SubmitButton pendingText="…" className="text-coral hover:underline">Remove</SubmitButton>
                 </form>
               )}
             </div>

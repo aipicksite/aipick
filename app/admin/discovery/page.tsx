@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
 import { getDiscoverySettings } from "@/lib/settings";
 import { saveDiscoverySettings, runDiscoveryNow } from "./actions";
@@ -118,21 +119,21 @@ export default async function AdminDiscoveryPage() {
           Enable the daily automatic run (via Vercel Cron)
         </label>
 
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Saving…"
           className="bg-plum text-white text-sm font-medium px-4 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
         >
           Save settings
-        </button>
+        </SubmitButton>
       </form>
 
       <form action={runDiscoveryNow} className="mt-6 pt-6 border-t border-line">
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Running — this can take up to a minute…"
           className="border border-line text-sm font-medium px-4 py-2.5 rounded-md hover:border-plum transition-colors"
         >
           Run now
-        </button>
+        </SubmitButton>
         <p className="text-xs text-ink/45 mt-2">
           Runs immediately with the settings above (saves them first if you haven't yet) — useful for
           testing before turning on the daily schedule.

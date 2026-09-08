@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
 import { approveSubmission, rejectSubmission } from "@/app/admin/moderation-actions";
 import type { ToolSubmission } from "@/types/database";
@@ -68,14 +69,14 @@ export default async function AdminSubmissionsPage() {
 
             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-line">
               <form action={approveSubmission.bind(null, s.id)}>
-                <button className="bg-forest text-white text-xs font-medium px-3.5 py-1.5 rounded-md hover:opacity-90">
+                <SubmitButton pendingText="Approving…" className="bg-forest text-white text-xs font-medium px-3.5 py-1.5 rounded-md hover:opacity-90">
                   Approve → publish
-                </button>
+                </SubmitButton>
               </form>
               <form action={rejectSubmission.bind(null, s.id, "")} className="flex items-center gap-2">
-                <button className="text-coral text-xs font-medium hover:underline">
+                <SubmitButton pendingText="Rejecting…" className="text-coral text-xs font-medium hover:underline">
                   Reject
-                </button>
+                </SubmitButton>
               </form>
             </div>
           </div>

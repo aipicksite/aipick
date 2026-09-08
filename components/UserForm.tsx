@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 type Props = {
   action: (formData: FormData) => void;
   submitLabel: string;
@@ -57,12 +58,12 @@ export default function UserForm({
         />
       </div>
 
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="Saving…"
         className="bg-plum text-white text-sm font-medium px-4 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

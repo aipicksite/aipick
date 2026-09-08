@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { updateOwnedTool } from "./actions";
@@ -126,12 +127,12 @@ export default async function OwnerDashboardPage({ params, searchParams }: Props
             className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
           />
         </div>
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="Saving…"
           className="bg-plum text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
         >
           Save changes
-        </button>
+        </SubmitButton>
       </form>
     </main>
   );

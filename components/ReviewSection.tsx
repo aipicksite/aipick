@@ -102,8 +102,8 @@ export default function ReviewSection({
                 <button onClick={() => setEditing(true)} className="text-plum hover:underline">
                   Edit
                 </button>
-                <button onClick={handleDelete} disabled={isPending} className="text-coral hover:underline">
-                  Delete
+                <button onClick={handleDelete} disabled={isPending} className="text-coral hover:underline disabled:opacity-60">
+                  {isPending ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function ReviewSection({
                 disabled={isPending}
                 className="bg-plum text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-plum-deep transition-colors disabled:opacity-60"
               >
-                {isLoggedIn ? "Post review" : "Sign in to post a review"}
+                {isPending ? "Posting…" : isLoggedIn ? "Post review" : "Sign in to post a review"}
               </button>
               {myReview && (
                 <button type="button" onClick={() => setEditing(false)} className="text-sm text-ink/50 hover:text-ink">

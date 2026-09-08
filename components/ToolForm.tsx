@@ -1,4 +1,5 @@
 import type { Tool, Category } from "@/types/database";
+import SubmitButton from "@/components/SubmitButton";
 
 type Props = {
   tool?: Tool;
@@ -198,12 +199,12 @@ export default function ToolForm({
         </select>
       </div>
 
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="Saving…"
         className="bg-plum text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-plum-deep"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

@@ -85,7 +85,7 @@ export default function AddToListButton({
                 key={list.id}
                 onClick={() => toggleTool(list.id, inList)}
                 disabled={isPending}
-                className="w-full text-left px-3.5 py-2 hover:bg-ink/5 flex items-center gap-2"
+                className="w-full text-left px-3.5 py-2 hover:bg-ink/5 flex items-center gap-2 disabled:opacity-50"
               >
                 <span className={inList ? "text-forest" : "text-ink/30"}>{inList ? "✓" : "○"}</span>
                 <span className="truncate">{list.title}</span>

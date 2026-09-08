@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -56,12 +57,12 @@ export default async function AccountPage({
           {searchParams.saved && (
             <p className="text-sm text-forest">Saved.</p>
           )}
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Saving…"
             className="bg-plum text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-plum-deep transition-colors"
           >
             Save
-          </button>
+          </SubmitButton>
         </form>
       </div>
 

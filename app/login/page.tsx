@@ -15,11 +15,13 @@ function LoginForm() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(callbackError);
   const [verifying, setVerifying] = useState(false);
+  const [sending, setSending] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSending(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -28,6 +30,7 @@ function LoginForm() {
         captchaToken: captchaToken ?? undefined,
       },
     });
+    setSending(false);
     if (error) setError(error.message);
     else setSent(true);
   }
@@ -74,11 +77,11 @@ function LoginForm() {
           <button
             type="submit"
             disabled={
-              !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken
+              sending || (!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken)
             }
             className="w-full bg-plum text-white rounded-md px-3.5 py-2.5 text-sm font-medium hover:bg-plum-deep transition-colors disabled:opacity-50"
           >
-            Send sign-in link & code
+            {sending ? "Sending…" : "Send sign-in link & code"}
           </button>
           {error && <p className="text-sm text-coral">{error}</p>}
         </form>
@@ -112,6 +115,7 @@ function LoginForm() {
           <button
             onClick={async () => {
               setError(null);
+              setSending(true);
               const supabase = createClient();
               const { error } = await supabase.auth.signInWithOtp({
                 email,
@@ -120,12 +124,14 @@ function LoginForm() {
                   captchaToken: captchaToken ?? undefined,
                 },
               });
+              setSending(false);
               if (error) setError(error.message);
               else setCode("");
             }}
-            className="text-sm text-plum hover:underline"
+            disabled={sending}
+            className="text-sm text-plum hover:underline disabled:opacity-50"
           >
-            Resend a fresh code
+            {sending ? "Sending…" : "Resend a fresh code"}
           </button>
 
           <button

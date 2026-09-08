@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
 import { submitTool } from "./actions";
 import type { ToolSubmission } from "@/types/database";
@@ -132,12 +133,12 @@ export default async function SubmitPage({
 
           {searchParams.error && <p className="text-sm text-coral">{searchParams.error}</p>}
 
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Submitting…"
             className="bg-plum text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
           >
             Submit for review
-          </button>
+          </SubmitButton>
         </form>
       )}
 
