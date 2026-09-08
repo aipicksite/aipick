@@ -136,7 +136,7 @@ export default async function ToolsPage({
           <h2 className="text-xs font-medium text-ink/50 uppercase tracking-wide mb-3">
             Category
           </h2>
-          <div className="space-y-1">
+          <div className="space-y-4">
             <Link
               href={buildUrl({ category: undefined, page: undefined })}
               className={`block text-sm py-1 ${
@@ -145,17 +145,54 @@ export default async function ToolsPage({
             >
               All categories
             </Link>
-            {(categories as Category[] | null)?.map((cat) => (
-              <Link
-                key={cat.id}
-                href={buildUrl({ category: cat.slug, page: undefined })}
-                className={`block text-sm py-1 ${
-                  category === cat.slug ? "text-plum font-medium" : "text-ink/70 hover:text-ink"
-                }`}
-              >
-                {cat.name}
-              </Link>
-            ))}
+            {(() => {
+              const all = (categories as Category[] | null) ?? [];
+              const parents = all.filter((c) => !c.parent_id);
+              const activeChild = all.find((c) => c.slug === category);
+              return parents.map((parent) => {
+                const children = all.filter((c) => c.parent_id === parent.id);
+                const isParentActive = category === parent.slug;
+                // Auto-expand the group containing the active selection.
+                const isOpenByDefault =
+                  isParentActive || activeChild?.parent_id === parent.id;
+                return (
+                  <details key={parent.id} open={isOpenByDefault || undefined} className="group">
+                    <summary className="flex items-center gap-1.5 cursor-pointer list-none text-sm py-1 select-none">
+                      {parent.icon && <span aria-hidden="true">{parent.icon}</span>}
+                      <Link
+                        href={buildUrl({ category: parent.slug, page: undefined })}
+                        onClick={(e) => e.stopPropagation()}
+                        className={
+                          isParentActive ? "text-plum font-medium" : "text-ink/80 font-medium hover:text-ink"
+                        }
+                      >
+                        {parent.name}
+                      </Link>
+                      {children.length > 0 && (
+                        <span className="ml-auto text-ink/30 text-xs group-open:rotate-90 transition-transform">
+                          ▸
+                        </span>
+                      )}
+                    </summary>
+                    {children.length > 0 && (
+                      <div className="mt-1 ml-3 pl-2 border-l border-line space-y-1">
+                        {children.map((cat) => (
+                          <Link
+                            key={cat.id}
+                            href={buildUrl({ category: cat.slug, page: undefined })}
+                            className={`block text-sm py-0.5 ${
+                              category === cat.slug ? "text-plum font-medium" : "text-ink/60 hover:text-ink"
+                            }`}
+                          >
+                            {cat.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </details>
+                );
+              });
+            })()}
             {(categories as Category[] | null)?.length === 0 && (
               <p className="text-xs text-ink/40 leading-relaxed">
                 No categories yet — add some from Admin.
