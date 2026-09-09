@@ -252,23 +252,22 @@ export default async function HomePage() {
               "radial-gradient(55% 45% at 10% 0%, rgba(62,42,92,0.10), transparent), radial-gradient(45% 40% at 95% 15%, rgba(198,138,40,0.12), transparent), radial-gradient(40% 35% at 60% 100%, rgba(196,90,74,0.06), transparent)",
           }}
         />
-        <div className="max-w-3xl mx-auto px-4 pt-16 pb-14 text-center">
-          <h1 className="font-display font-bold text-4xl md:text-[3.25rem] leading-[1.05] tracking-tight">
-            Find the AI tool that actually gets the job done.
+        <div className="max-w-3xl mx-auto px-4 pt-8 pb-5 text-center">
+          <h1 className="font-display font-bold text-xl sm:text-3xl md:text-4xl leading-tight tracking-tight whitespace-nowrap">
+            Find AI tools that work.
           </h1>
-          <p className="mt-5 text-lg text-ink/65 max-w-xl mx-auto leading-relaxed">
-            Ranked by the people who use them — not by whoever pays the most.
-            Vote, review, and compare the tools worth your time.
+          <p className="mt-2 text-xs sm:text-base text-ink/65 max-w-xl mx-auto leading-relaxed whitespace-nowrap">
+            Real reviews. Never pay-to-rank listings.
           </p>
 
-          <div className="mt-9 max-w-2xl mx-auto">
+          <div className="mt-5 max-w-2xl mx-auto">
             <ToolSearchBox
               variant="hero"
               placeholder={`Search ${totalTools ?? toolList.length}+ AI tools — “image generator”, “SEO”…`}
             />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 mt-4">
+          <div className="flex flex-wrap justify-center gap-2 mt-3">
             {POPULAR_SEARCHES.map((term) => (
               <Link
                 key={term}
@@ -280,7 +279,7 @@ export default async function HomePage() {
             ))}
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 mt-10 text-sm">
+          <div className="flex flex-wrap justify-center gap-8 mt-6 text-sm">
             <div>
               <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
               <span className="text-ink/50">Tools ranked</span>
@@ -294,10 +293,6 @@ export default async function HomePage() {
               <span className="text-ink/50">Community votes</span>
             </div>
           </div>
-
-          <p className="mt-5 text-xs text-ink/40">
-            New tools added every week · No pay-to-rank listings, ever
-          </p>
         </div>
       </section>
 
