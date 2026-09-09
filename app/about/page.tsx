@@ -32,7 +32,7 @@ const comparisonRows = [
   { label: "Written user reviews", values: [true, "Sometimes", false] },
   { label: "Owner-verified listings", values: [true, false, "Sometimes"] },
   { label: "Sponsored spots labelled", values: [true, "Rarely", "N/A"] },
-  { label: "Free to submit a tool", values: [true, true, "Paid tiers"] },
+  { label: "Listing fee", values: ["Paid tiers", true, "Paid tiers"] },
 ];
 
 export default async function AboutPage() {

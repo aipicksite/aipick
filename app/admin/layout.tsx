@@ -19,6 +19,13 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
     ],
   },
   {
+    label: "Payments",
+    links: [
+      { href: "/admin/pricing", label: "Pricing" },
+      { href: "/admin/coupons", label: "Coupons" },
+    ],
+  },
+  {
     label: "Settings",
     links: [
       { href: "/admin/discovery", label: "AI Discovery" },

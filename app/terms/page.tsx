@@ -110,7 +110,28 @@ export default function TermsPage() {
         <p>We may update these terms from time to time; continued use of the site means you accept the current version.</p>
       </Section>
 
-      <Section n="09" title="Contact">
+      <Section n="09" title="Payments and refunds">
+        <p>
+          Browsing, voting, reviewing, and basic ownership claims are free. Submitting a new
+          tool and requesting paid listing updates (screenshots, video, priority review) require
+          a one-time payment, processed by PayPal. AIPick never stores your card or PayPal
+          account details.
+        </p>
+        <p className="mt-3">
+          Prices are shown before you pay and may change at any time; the price you paid at
+          checkout is honored for that submission. Payments are for editorial review and
+          publication effort, not a guarantee of approval or of any particular ranking —
+          rankings are always determined by community votes and reviews, never by payment.
+        </p>
+        <p className="mt-3">
+          If your submission is rejected during review, contact{" "}
+          <a href="mailto:billing@aipick.site" className="text-plum hover:underline">billing@aipick.site</a>{" "}
+          for a refund. Coupon codes, when offered, are limited-time and may be withdrawn or
+          restricted at any time.
+        </p>
+      </Section>
+
+      <Section n="10" title="Contact">
         <p>Questions about these terms: <a href="mailto:legal@aipick.site" className="text-plum hover:underline">legal@aipick.site</a></p>
       </Section>
     </main>

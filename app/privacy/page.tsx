@@ -78,7 +78,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section n="03" title="Sharing">
-        <p>We share data only with service providers that help us run AIPick (hosting, database, email delivery, analytics), and only as needed for them to provide that service, or where required by law.</p>
+        <p>We share data only with service providers that help us run AIPick (hosting, database, email delivery, analytics, payment processing via PayPal), and only as needed for them to provide that service, or where required by law.</p>
       </Section>
 
       <Section n="04" title="Your choices">
@@ -103,7 +103,16 @@ export default function PrivacyPage() {
         <p>If this policy changes in a material way, we'll post the update on this page.</p>
       </Section>
 
-      <Section n="08" title="Contact">
+      <Section n="08" title="Payment information">
+        <p>
+          Paid submissions and listing updates are processed by PayPal. We receive your email
+          and the transaction status and amount, but AIPick never sees or stores your card
+          number, bank details, or PayPal password — PayPal handles that directly under its own
+          privacy policy.
+        </p>
+      </Section>
+
+      <Section n="09" title="Contact">
         <p>Questions about this policy: <a href="mailto:privacy@aipick.site" className="text-plum hover:underline">privacy@aipick.site</a></p>
       </Section>
     </main>

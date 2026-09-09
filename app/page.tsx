@@ -47,19 +47,19 @@ const FEATURES = [
 const FAQS = [
   {
     q: "Is AIPick free to use?",
-    a: "Yes. Browsing, searching, voting, and writing reviews are free for everyone. Tool owners can also claim and maintain their own listing at no cost.",
+    a: "Yes. Browsing, searching, voting, and writing reviews are always free for everyone. Tool owners can also claim their listing at no cost. Submitting a new tool and requesting paid enrichments (screenshots, video, priority review) carry a small one-time fee — see below.",
   },
   {
     q: "How is a tool's rank calculated?",
-    a: "The AIPick Score combines real community upvotes, published reviews, and recent activity — never payment. See the full breakdown on the How Ranking Works page.",
+    a: "The AIPick Score combines real community upvotes, published reviews, and recent activity — never payment. Featured placements are clearly labelled and never affect a tool's organic score. See the full breakdown on the How Ranking Works page.",
   },
   {
-    q: "Can I add my own AI tool to the directory?",
-    a: "Yes — submit it from the Submit a Tool page. Every submission is reviewed before it goes live to keep listings accurate and spam-free.",
+    q: "Can I add my own AI tool to the directory, and does it cost anything?",
+    a: "Yes — submit it from the Submit a Tool page. A one-time listing fee applies (from $19.99, with a Featured tier at $99 for homepage placement). Every submission is still reviewed before it goes live to keep listings accurate and spam-free.",
   },
   {
     q: "I already run one of the listed tools — can I manage its page?",
-    a: "Claim your listing to verify ownership. Once approved, you can update the description, pricing, and screenshot yourself from your dashboard.",
+    a: "Claiming to verify ownership is free. If you'd also like to update the description, pricing, add a screenshot, or add a YouTube overview video, do that from the Update a Listing page for a small one-time fee.",
   },
   {
     q: "How often are new tools added?",
@@ -80,6 +80,7 @@ export default async function HomePage() {
     { data: categoryLinks },
     { data: recentTools },
     { data: recentPosts },
+    { data: featuredTools },
     heroImage,
   ] = await Promise.all([
     supabase
@@ -106,6 +107,18 @@ export default async function HomePage() {
       .not("published_at", "is", null)
       .order("published_at", { ascending: false })
       .limit(3),
+    // Paid "Featured listing" placements ($99/submit_featured plan) — shown here
+    // for as long as tools.featured_until is in the future. This was set on
+    // approval (see admin/moderation-actions.ts) but had no homepage section
+    // actually reading it, so featured customers weren't getting what they paid
+    // for; this query + the section below is that missing piece.
+    supabase
+      .from("tools")
+      .select("*")
+      .eq("status", "active")
+      .gt("featured_until", new Date().toISOString())
+      .order("featured_until", { ascending: false })
+      .limit(6),
     getPexelsImage("futuristic technology gradient abstract", "landscape"),
   ]);
 
@@ -263,6 +276,24 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {featuredTools && featuredTools.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 pb-16">
+          <div className="flex items-baseline justify-between mb-1">
+            <h2 className="font-display font-bold text-2xl">Featured</h2>
+            <span className="text-xs text-ink/40">Paid placement — never affects AIPick Score</span>
+          </div>
+          <p className="text-sm text-ink/50 mb-6">
+            Tools currently in their featured window. This is a labeled paid placement, separate
+            from the ranked list below.
+          </p>
+          <div className="flex flex-col">
+            {(featuredTools as Tool[]).map((tool) => (
+              <ToolRow key={tool.id} tool={tool} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
         <div className="flex items-baseline justify-between mb-1">

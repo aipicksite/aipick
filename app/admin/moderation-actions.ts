@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
+import { getPlan } from "@/lib/pricing";
 import { revalidatePath } from "next/cache";
 
 export async function addAdmin(formData: FormData) {
@@ -57,6 +58,13 @@ export async function approveSubmission(submissionId: string) {
 
   if (!submission) return;
 
+  let featuredUntil: string | null = null;
+  if (submission.requested_featured) {
+    const featuredPlan = await getPlan("submit_featured");
+    const days = featuredPlan?.featured_days ?? 7;
+    featuredUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+  }
+
   const { data: tool, error } = await supabase
     .from("tools")
     .insert({
@@ -73,6 +81,7 @@ export async function approveSubmission(submissionId: string) {
         .map((h: string) => h.trim())
         .filter(Boolean),
       status: "active",
+      featured_until: featuredUntil,
     })
     .select("id")
     .single();
@@ -151,10 +160,20 @@ export async function approveClaim(claimId: string) {
 
   if (!claim) return;
 
-  await supabase
-    .from("tools")
-    .update({ owner_id: claim.user_id, verified: true })
-    .eq("id", claim.tool_id);
+  const toolUpdate: Record<string, unknown> = { owner_id: claim.user_id, verified: true };
+
+  // Paid "update" claims (from /update-ai) carry proposed edits — apply the
+  // ones the owner actually filled in. Plain free claims (kind === 'claim')
+  // only verify ownership and touch nothing else.
+  if (claim.kind === "update") {
+    if (claim.requested_short_description) toolUpdate.short_description = claim.requested_short_description;
+    if (claim.requested_description) toolUpdate.description = claim.requested_description;
+    if (claim.requested_pricing_summary) toolUpdate.pricing_summary = claim.requested_pricing_summary;
+    if (claim.requested_screenshot_url) toolUpdate.screenshot_url = claim.requested_screenshot_url;
+    if (claim.requested_video_url) toolUpdate.video_url = claim.requested_video_url;
+  }
+
+  await supabase.from("tools").update(toolUpdate).eq("id", claim.tool_id);
 
   await supabase
     .from("tool_claims")

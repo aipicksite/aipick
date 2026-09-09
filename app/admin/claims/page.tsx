@@ -26,11 +26,47 @@ export default async function AdminClaimsPage() {
           <div key={c.id} className="bg-surface border border-line rounded-lg p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h3 className="font-display font-semibold">{c.tools?.name ?? "Unknown tool"}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-display font-semibold">{c.tools?.name ?? "Unknown tool"}</h3>
+                  {c.kind === "update" && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded border border-plum/30 text-plum bg-plum/5 uppercase tracking-wide">
+                      Paid update
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-ink/60 mt-1">
                   {c.business_email} {c.role && <span className="text-ink/40">· {c.role}</span>}
                 </p>
                 {c.note && <p className="text-sm text-ink/55 mt-2">{c.note}</p>}
+
+                {c.kind === "update" && (
+                  <div className="mt-3 space-y-1.5 text-sm bg-white/60 border border-line rounded-md p-3">
+                    {c.requested_short_description && (
+                      <p><span className="text-ink/40">Short desc:</span> {c.requested_short_description}</p>
+                    )}
+                    {c.requested_description && (
+                      <p><span className="text-ink/40">Description:</span> {c.requested_description}</p>
+                    )}
+                    {c.requested_pricing_summary && (
+                      <p><span className="text-ink/40">Pricing:</span> {c.requested_pricing_summary}</p>
+                    )}
+                    {c.requested_video_url && (
+                      <p>
+                        <span className="text-ink/40">Video:</span>{" "}
+                        <a href={c.requested_video_url} target="_blank" className="text-plum hover:underline">
+                          {c.requested_video_url}
+                        </a>
+                      </p>
+                    )}
+                    {c.requested_screenshot_url && (
+                      <img
+                        src={c.requested_screenshot_url}
+                        alt="Requested screenshot"
+                        className="mt-1 rounded border border-line max-w-[200px]"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
               <span className="text-xs px-2 py-1 rounded-full border border-gold/40 text-gold bg-gold-soft shrink-0">
                 pending

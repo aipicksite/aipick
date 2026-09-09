@@ -1,6 +1,7 @@
-import SubmitButton from "@/components/SubmitButton";
 import { createClient } from "@/lib/supabase/server";
+import { getActivePlans } from "@/lib/pricing";
 import { submitTool } from "./actions";
+import SubmitFlow from "@/components/SubmitFlow";
 import type { ToolSubmission } from "@/types/database";
 import Link from "next/link";
 
@@ -25,12 +26,27 @@ export default async function SubmitPage({
     myRecent = (data as ToolSubmission[] | null) ?? [];
   }
 
+  const plansRaw = await getActivePlans();
+  const plans = plansRaw
+    .filter((p) => p.key === "submit_basic" || p.key === "submit_featured")
+    .sort((a, b) => (a.key === "submit_basic" ? -1 : 1))
+    .map((p) => ({
+      key: p.key,
+      label: p.label,
+      amount_cents: p.amount_cents,
+      currency: p.currency,
+      isFreeNow: !!p.free_until && new Date(p.free_until).getTime() > Date.now(),
+      featured_days: p.featured_days,
+    }));
+
   return (
     <main className="max-w-xl mx-auto px-4 py-16">
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Submit</span>
       <h1 className="font-display font-bold text-3xl mt-1">Submit an AI tool</h1>
       <p className="text-ink/60 mt-3 leading-relaxed">
-        Free to list. Every submission is reviewed before it goes live — usually within a couple of days.
+        Choose a plan below. Every submission is still reviewed before it goes live, and
+        ranking always stays based on real votes and reviews — paying only gets your tool
+        listed and, on the Featured plan, put in front of more people early on.
       </p>
 
       {searchParams.submitted && (
@@ -50,96 +66,7 @@ export default async function SubmitPage({
           </Link>
         </div>
       ) : (
-        <form action={submitTool} className="mt-8 space-y-4">
-          <div>
-            <label className="text-sm font-medium block mb-1">Tool name *</label>
-            <input
-              name="name"
-              required
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">Website URL *</label>
-            <input
-              name="website_url"
-              type="url"
-              required
-              placeholder="https://"
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">Short description</label>
-            <input
-              name="short_description"
-              maxLength={140}
-              placeholder="One line — what does it do?"
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">Full description</label>
-            <textarea
-              name="description"
-              rows={4}
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium block mb-1">Pricing type</label>
-              <select
-                name="pricing_type"
-                defaultValue="freemium"
-                className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-              >
-                <option value="free">Free</option>
-                <option value="freemium">Freemium</option>
-                <option value="paid">Paid</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium block mb-1">Pricing summary</label>
-              <input
-                name="pricing_summary"
-                placeholder="e.g. From $19/mo"
-                className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">Categories</label>
-            <input
-              name="category_names"
-              placeholder="Comma-separated, e.g. Writing, SEO"
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">
-              Highlights / key features (one per line)
-            </label>
-            <textarea
-              name="highlights"
-              rows={4}
-              placeholder={"Real-time collaboration\nExports to Figma\nFree tier includes 3 projects"}
-              className="w-full bg-surface border border-line rounded-md px-3.5 py-2.5 text-sm focus:outline-none focus:border-plum"
-            />
-            <p className="text-xs text-ink/45 mt-1">
-              These show as bullet points on ranking pages once approved — the more specific, the better.
-            </p>
-          </div>
-
-          {searchParams.error && <p className="text-sm text-coral">{searchParams.error}</p>}
-
-          <SubmitButton
-            pendingText="Submitting…"
-            className="bg-plum text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
-          >
-            Submit for review
-          </SubmitButton>
-        </form>
+        <SubmitFlow plans={plans} submitAction={submitTool} error={searchParams.error} />
       )}
 
       {myRecent.length > 0 && (
