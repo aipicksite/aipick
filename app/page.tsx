@@ -328,6 +328,7 @@ export default async function HomePage() {
                       websiteUrl={tool.website_url}
                       overrideUrl={tool.screenshot_url}
                       name={tool.name}
+                      priority={i < 5}
                     />
                   </div>
                   <div className="p-4 flex flex-col flex-1">
@@ -541,9 +542,14 @@ export default async function HomePage() {
               >
                 {post.cover_image_url && (
                   <div className="aspect-[16/9] overflow-hidden border-b border-line">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={post.cover_image_url}
                       alt={post.title}
+                      width={640}
+                      height={360}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
