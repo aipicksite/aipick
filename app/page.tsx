@@ -91,6 +91,7 @@ export default async function HomePage() {
     { data: recentTools },
     { data: recentPosts },
     { data: featuredCandidatesRaw },
+    { data: reviewsForTestimonials },
   ] = await Promise.all([
     supabase
       .from("tools")
@@ -128,6 +129,17 @@ export default async function HomePage() {
       .not("featured_requested_at", "is", null)
       .order("featured_requested_at", { ascending: true })
       .limit(200),
+    // Real community reviews for the homepage testimonials strip — never
+    // fabricated. Only published, high-rated reviews with actual written
+    // feedback qualify; genuinely empty if none exist yet.
+    supabase
+      .from("reviews")
+      .select("*, profiles(username), tools(name, slug)")
+      .eq("status", "published")
+      .gte("rating", 4)
+      .not("body", "is", null)
+      .order("helpful_count", { ascending: false })
+      .limit(9),
   ]);
 
   const toolList = (tools as Tool[] | null) ?? [];
@@ -155,6 +167,33 @@ export default async function HomePage() {
       categoryCounts.set(link.category_id, (categoryCounts.get(link.category_id) ?? 0) + 1);
     }
   }
+
+  // 2-level category tree for the homepage "Browse by category" section —
+  // falls back gracefully to a flat list of top-level cards if parent_id
+  // isn't set on any category yet (e.g. before the restructure migration
+  // has been run).
+  const childCategories = new Map<string, Category[]>();
+  for (const cat of categoryList) {
+    if (cat.parent_id) {
+      const list = childCategories.get(cat.parent_id) ?? [];
+      list.push(cat);
+      childCategories.set(cat.parent_id, list);
+    }
+  }
+  const parentCategories = categoryList
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => {
+      const countA = (categoryCounts.get(a.id) ?? 0) +
+        (childCategories.get(a.id) ?? []).reduce((s, c) => s + (categoryCounts.get(c.id) ?? 0), 0);
+      const countB = (categoryCounts.get(b.id) ?? 0) +
+        (childCategories.get(b.id) ?? []).reduce((s, c) => s + (categoryCounts.get(c.id) ?? 0), 0);
+      return countB - countA;
+    })
+    .slice(0, 8);
+
+  const testimonialReviews = ((reviewsForTestimonials as any[] | null) ?? [])
+    .filter((r) => r.body && r.body.trim().length > 0)
+    .slice(0, 6);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -333,34 +372,50 @@ export default async function HomePage() {
         <p className="text-sm text-ink/50 mb-6">
           From image generators to sales tools — find AI built for the job you&apos;re actually trying to do.
         </p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {categoryList.map((cat, i) => {
+        <div className="grid sm:grid-cols-2 gap-4">
+          {parentCategories.map((parent, i) => {
             const bg = ["bg-plum/10", "bg-gold/15", "bg-forest/10", "bg-coral/10"][i % 4];
+            const children = childCategories.get(parent.id) ?? [];
+            const parentCount =
+              (categoryCounts.get(parent.id) ?? 0) +
+              children.reduce((sum, c) => sum + (categoryCounts.get(c.id) ?? 0), 0);
             return (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.slug}`}
-              className="flex items-start gap-3 bg-surface border border-line rounded-lg p-4 hover:border-plum transition-colors"
-            >
-              {cat.icon && (
-                <span className={`text-xl leading-none shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${bg}`}>
-                  {cat.icon}
-                </span>
-              )}
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display font-medium text-[15px]">{cat.name}</h3>
-                  <span className="text-xs text-ink/40 tabular-nums shrink-0">
-                    {categoryCounts.get(cat.id) ?? 0}
-                  </span>
-                </div>
-                {cat.description && (
-                  <p className="text-sm text-ink/55 mt-1 leading-snug line-clamp-2">
-                    {cat.description}
-                  </p>
+              <div
+                key={parent.id}
+                className="bg-surface border border-line rounded-lg p-4 hover:border-plum transition-colors"
+              >
+                <Link href={`/category/${parent.slug}`} className="flex items-start gap-3">
+                  {parent.icon && (
+                    <span className={`text-xl leading-none shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${bg}`}>
+                      {parent.icon}
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display font-medium text-[15px]">{parent.name}</h3>
+                      <span className="text-xs text-ink/40 tabular-nums shrink-0">{parentCount}</span>
+                    </div>
+                    {parent.description && (
+                      <p className="text-sm text-ink/55 mt-1 leading-snug line-clamp-2">
+                        {parent.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+                {children.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3 pl-12">
+                    {children.slice(0, 6).map((child) => (
+                      <Link
+                        key={child.id}
+                        href={`/category/${child.slug}`}
+                        className="text-xs px-2.5 py-1 rounded-full border border-line text-ink/55 hover:border-plum hover:text-plum transition-colors"
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
-            </Link>
             );
           })}
         </div>
@@ -369,6 +424,7 @@ export default async function HomePage() {
       <section className="max-w-6xl mx-auto px-4 pb-24">
         <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-display font-bold text-2xl">Top Ranked</h2>
+
           <Link href="/tools" className="text-sm font-medium text-plum hover:underline">
             View all tools
           </Link>
@@ -387,6 +443,58 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <section className="max-w-6xl mx-auto px-4 pb-24">
+        <div className="bg-surface border border-line rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 justify-between">
+          <div>
+            <h2 className="font-display font-bold text-xl sm:text-2xl">
+              Not sure which tool fits? Compare them side by side.
+            </h2>
+            <p className="text-sm text-ink/55 mt-2 max-w-lg leading-relaxed">
+              Line up pricing, platforms, ratings and features for any two or more tools
+              before you commit — no guessing, no sales pitch.
+            </p>
+          </div>
+          <Link
+            href="/compare"
+            className="shrink-0 bg-plum text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-plum-deep transition-colors"
+          >
+            Compare tools →
+          </Link>
+        </div>
+      </section>
+
+      {testimonialReviews.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 pb-24">
+          <div className="flex items-baseline justify-between mb-1">
+            <h2 className="font-display font-bold text-2xl">What the community is saying</h2>
+          </div>
+          <p className="text-sm text-ink/50 mb-6">
+            Real reviews from real users — pulled straight from the ratings on each tool&apos;s page.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {testimonialReviews.map((review) => (
+              <Link
+                key={review.id}
+                href={`/tool/${review.tools?.slug}#reviews`}
+                className="flex flex-col bg-surface border border-line rounded-lg p-5 hover:border-plum transition-colors"
+              >
+                <span className="text-gold text-sm">
+                  {"★".repeat(review.rating)}
+                  <span className="text-ink/20">{"★".repeat(5 - review.rating)}</span>
+                </span>
+                <p className="text-sm text-ink/70 mt-3 leading-relaxed line-clamp-4">
+                  &ldquo;{review.body}&rdquo;
+                </p>
+                <div className="mt-4 pt-3 border-t border-line flex items-center justify-between text-xs text-ink/45">
+                  <span>{review.profiles?.username ?? "AIPick user"}</span>
+                  <span className="font-medium text-plum">{review.tools?.name}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {recentToolList.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 pb-24">
