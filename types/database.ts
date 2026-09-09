@@ -21,6 +21,8 @@ export type Tool = {
   use_cases: string[];
   audience: string[];
   screenshot_url: string | null;
+  featured_until: string | null;
+  featured_requested_at: string | null;
   created_at: string;
   updated_at: string;
 };

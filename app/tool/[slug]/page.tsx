@@ -212,6 +212,14 @@ export default async function ToolPage({ params }: Props) {
                 ✓ Verified
               </span>
             )}
+            {!tool.verified && tool.owner_id && (
+              <span
+                title="Ownership of this listing has been claimed"
+                className="inline-flex items-center gap-1 text-xs font-medium text-plum bg-plum/10 px-2 py-0.5 rounded-full shrink-0"
+              >
+                🏷 Ownership claimed
+              </span>
+            )}
           </div>
           <p className="text-ink/60 mt-1.5 leading-relaxed text-lg max-w-2xl">
             {tool.short_description}

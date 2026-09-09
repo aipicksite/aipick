@@ -9,6 +9,37 @@ export const metadata = {
     "List your AI tool on AIPick and get in front of people actively comparing tools. Reviewed submissions, real votes, optional homepage featuring.",
 };
 
+const SUBMIT_FAQS = [
+  {
+    q: "How much does it cost to submit a tool?",
+    a: "Standard listing starts at $19.99, one-time. Featured listing is $99 one-time and adds a rotating spot in the homepage Featured section for 7 days.",
+  },
+  {
+    q: "Is my tool guaranteed to be approved?",
+    a: "No — every submission is reviewed for quality and accuracy before it goes live. If it's rejected, we'll tell you why, and the listing fee is not charged again if you resubmit with fixes.",
+  },
+  {
+    q: "Does paying get my tool a higher rank?",
+    a: "No. The AIPick Score is entirely vote- and review-based and is never affected by payment. Featured is a clearly labeled, separate placement — not a ranking boost.",
+  },
+  {
+    q: "What's the difference between Standard and Featured?",
+    a: "Both get you a full, reviewed listing. Featured additionally puts your tool in the homepage Featured section for 7 days and moves you to the priority review queue.",
+  },
+  {
+    q: "Can I edit my listing after it's published?",
+    a: "Yes. Claiming ownership is free. If you also want to update the description, pricing, or add media, do that from the Claim/Update page for a small one-time fee.",
+  },
+  {
+    q: "How long does review take?",
+    a: "Most submissions are reviewed within a few days. Featured submissions go into a priority queue and are typically reviewed faster.",
+  },
+  {
+    q: "What if more than 15 tools want to be Featured at once?",
+    a: "Featured spots rotate on a fair first-come, first-served basis — up to 15 tools are shown at a time, each for a full 7 days. If all slots are taken, your listing gets its full 7 days as soon as a slot opens up.",
+  },
+];
+
 export default async function SubmitPage({
   searchParams,
 }: {
@@ -43,8 +74,23 @@ export default async function SubmitPage({
       featured_days: p.featured_days,
     }));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: SUBMIT_FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <main>
+      {/* eslint-disable-next-line react/no-danger */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">
         <div
@@ -95,8 +141,48 @@ export default async function SubmitPage({
           </div>
         )}
 
+        {/* Why list on AIPick */}
+        <div className="mt-14">
+          <h2 className="font-display font-bold text-2xl text-center">Why list your tool on AIPick?</h2>
+          <p className="text-ink/60 mt-2 text-center max-w-2xl mx-auto leading-relaxed">
+            Most directories rank by who paid the most. AIPick's score comes from real votes and
+            reviews — so the traffic you get here is people who chose your tool, not people who
+            clicked an ad. That's a better fit, and it converts better too.
+          </p>
+          <div className="mt-8 grid sm:grid-cols-3 gap-5">
+            {[
+              {
+                icon: "🔎",
+                color: "bg-plum/10 text-plum",
+                title: "Organic search traffic",
+                body: "Every listing is a real page, indexed and optimized — people find you searching for the problem you solve.",
+              },
+              {
+                icon: "🗳️",
+                color: "bg-gold/15 text-gold",
+                title: "Real votes, real reviews",
+                body: "No pay-to-rank games. Users vote and review honestly, which builds more trust than any ad ever could.",
+              },
+              {
+                icon: "🤝",
+                color: "bg-forest/10 text-forest",
+                title: "A directory people actually use",
+                body: "Comparisons, category pages, and a growing community — you're listed where people are already deciding.",
+              },
+            ].map((h) => (
+              <div key={h.title} className="bg-surface border border-line rounded-xl p-6">
+                <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-lg ${h.color}`}>
+                  {h.icon}
+                </span>
+                <h3 className="font-display font-semibold mt-4">{h.title}</h3>
+                <p className="text-sm text-ink/60 mt-1.5 leading-relaxed">{h.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Pricing */}
-        <div className="mt-12 grid sm:grid-cols-2 gap-6 items-stretch">
+        <div className="mt-16 grid sm:grid-cols-2 gap-6 items-stretch">
           {plans.map((plan) => {
             const featured = plan.key === "submit_featured";
             return (
@@ -159,8 +245,41 @@ export default async function SubmitPage({
           })}
         </div>
 
+        {/* Comparison table */}
+        <div className="mt-14 overflow-x-auto">
+          <table className="w-full text-sm border border-line rounded-xl overflow-hidden">
+            <thead>
+              <tr className="bg-surface text-left">
+                <th className="p-4 font-display font-semibold">What you get</th>
+                <th className="p-4 font-display font-semibold text-center">Standard</th>
+                <th className="p-4 font-display font-semibold text-center text-plum">Featured</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Reviewed before going live", true, true],
+                ["Open to votes & reviews", true, true],
+                ["Full listing page", true, true],
+                ["Homepage spotlight (rotating, 7 days)", false, true],
+                ["Priority review queue", false, true],
+                ["Owner can claim & verify later", true, true],
+              ].map(([label, std, feat], idx) => (
+                <tr key={label as string} className={idx % 2 ? "bg-surface/50" : ""}>
+                  <td className="p-4 border-t border-line text-ink/70">{label as string}</td>
+                  <td className="p-4 border-t border-line text-center">
+                    {std ? <span className="text-forest">✓</span> : <span className="text-ink/25">—</span>}
+                  </td>
+                  <td className="p-4 border-t border-line text-center">
+                    {feat ? <span className="text-gold">★</span> : <span className="text-ink/25">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {/* How it works */}
-        <div className="mt-16 pb-16">
+        <div className="mt-16 pb-4">
           <h2 className="font-display font-bold text-lg text-center">How it works</h2>
           <div className="mt-6 grid sm:grid-cols-4 gap-6 text-sm">
             {[
@@ -176,6 +295,22 @@ export default async function SubmitPage({
                 <p className="font-medium mt-3">{title}</p>
                 <p className="text-ink/55 mt-1">{body}</p>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className="mt-16 pb-16 border-t border-line pt-12">
+          <h2 className="font-display font-bold text-2xl text-center">Frequently asked questions</h2>
+          <div className="mt-8 max-w-2xl mx-auto flex flex-col gap-3">
+            {SUBMIT_FAQS.map((f) => (
+              <details key={f.q} className="group bg-surface border border-line rounded-lg p-4">
+                <summary className="font-display font-medium text-sm cursor-pointer list-none flex items-center justify-between gap-3">
+                  {f.q}
+                  <span className="text-ink/40 group-open:rotate-45 transition-transform shrink-0">+</span>
+                </summary>
+                <p className="text-sm text-ink/60 mt-3 leading-relaxed">{f.a}</p>
+              </details>
             ))}
           </div>
         </div>

@@ -17,17 +17,20 @@ export async function submitToolUpdate(formData: FormData) {
   const payment_id = String(formData.get("payment_id") ?? "").trim();
 
   // This action is shared by the generic /update-ai flow (pick any tool) and
-  // the paid claim-and-update flow that lives on the tool's own page at
-  // /claim/[slug] — send the user back to wherever they started from.
-  const base = tool_slug ? `/claim/${tool_slug}` : "/update-ai";
+  // the paid claim-and-update checkout that lives at /claim/[slug]/checkout.
+  // Validation errors send the user back to checkout (where the form is);
+  // success sends them to the tool's main claim page, which shows the
+  // confirmation banner.
+  const errorBase = tool_slug ? `/claim/${tool_slug}/checkout` : "/update-ai";
+  const successBase = tool_slug ? `/claim/${tool_slug}` : "/update-ai";
 
-  if (!user) redirect(`/login?next=${base}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(errorBase)}`);
 
   if (!tool_id || !business_email) {
-    redirect(base + "?error=" + encodeURIComponent("Missing required fields."));
+    redirect(errorBase + "?error=" + encodeURIComponent("Missing required fields."));
   }
   if (!plan_key || !payment_id) {
-    redirect(base + "?error=" + encodeURIComponent("Payment step is missing — please start over."));
+    redirect(errorBase + "?error=" + encodeURIComponent("Payment step is missing — please start over."));
   }
 
   // Atomic "consume" — see app/submit/actions.ts for why this is an UPDATE
@@ -46,7 +49,7 @@ export async function submitToolUpdate(formData: FormData) {
 
   if (!payment) {
     redirect(
-      base +
+      errorBase +
         "?error=" +
         encodeURIComponent("We couldn't verify your payment (or it was already used). Please try again.")
     );
@@ -71,8 +74,8 @@ export async function submitToolUpdate(formData: FormData) {
   if (error) {
     const message =
       error.code === "23505" ? "You already have a pending claim or update for this tool." : error.message;
-    redirect(base + "?error=" + encodeURIComponent(message));
+    redirect(errorBase + "?error=" + encodeURIComponent(message));
   }
 
-  redirect(`${base}?submitted=1`);
+  redirect(`${successBase}?submitted=1`);
 }

@@ -9,11 +9,11 @@ export async function submitClaim(toolId: string, toolSlug: string, formData: Fo
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect(`/login?next=/claim/${toolSlug}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/claim/${toolSlug}/free`)}`);
 
   const business_email = String(formData.get("business_email") ?? "").trim();
   if (!business_email) {
-    redirect(`/claim/${toolSlug}?error=` + encodeURIComponent("A business email is required."));
+    redirect(`/claim/${toolSlug}/free?error=` + encodeURIComponent("A business email is required."));
   }
 
   const { error } = await supabase.from("tool_claims").insert({
@@ -26,7 +26,7 @@ export async function submitClaim(toolId: string, toolSlug: string, formData: Fo
 
   if (error) {
     const message = error.code === "23505" ? "You've already submitted a claim for this tool." : error.message;
-    redirect(`/claim/${toolSlug}?error=` + encodeURIComponent(message));
+    redirect(`/claim/${toolSlug}/free?error=` + encodeURIComponent(message));
   }
 
   redirect(`/claim/${toolSlug}?submitted=1`);

@@ -3,9 +3,11 @@ import type { Tool, Category, BlogPost } from "@/types/database";
 import type { Metadata } from "next";
 import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
+import ToolAvatar from "@/components/ToolAvatar";
 import CreditedImage from "@/components/CreditedImage";
 import { getPexelsImage } from "@/lib/pexels";
 import { trackPageView } from "@/lib/track-view";
+import { currentlyFeaturedIds } from "@/lib/featured-queue";
 
 export const revalidate = 3600; // ISR: refresh homepage hourly
 
@@ -80,7 +82,7 @@ export default async function HomePage() {
     { data: categoryLinks },
     { data: recentTools },
     { data: recentPosts },
-    { data: featuredTools },
+    { data: featuredCandidatesRaw },
     heroImage,
   ] = await Promise.all([
     supabase
@@ -107,18 +109,18 @@ export default async function HomePage() {
       .not("published_at", "is", null)
       .order("published_at", { ascending: false })
       .limit(3),
-    // Paid "Featured listing" placements ($99/submit_featured plan) — shown here
-    // for as long as tools.featured_until is in the future. This was set on
-    // approval (see admin/moderation-actions.ts) but had no homepage section
-    // actually reading it, so featured customers weren't getting what they paid
-    // for; this query + the section below is that missing piece.
+    // Featured homepage placements — a fair FIFO queue of up to 15 tools at
+    // once (lib/featured-queue.ts), joined either by an admin manually
+    // marking a tool "Featured" or by an approved paid submit_featured
+    // submission. We fetch every candidate (small table) and let the queue
+    // function figure out who's actually visible right now.
     supabase
       .from("tools")
       .select("*")
       .eq("status", "active")
-      .gt("featured_until", new Date().toISOString())
-      .order("featured_until", { ascending: false })
-      .limit(6),
+      .not("featured_requested_at", "is", null)
+      .order("featured_requested_at", { ascending: true })
+      .limit(200),
     getPexelsImage("futuristic technology gradient abstract", "landscape"),
   ]);
 
@@ -126,6 +128,14 @@ export default async function HomePage() {
   const categoryList = (categories as Category[] | null) ?? [];
   const recentToolList = (recentTools as Tool[] | null) ?? [];
   const recentPostList = (recentPosts as BlogPost[] | null) ?? [];
+
+  const featuredCandidates = (featuredCandidatesRaw as Tool[] | null) ?? [];
+  const visibleFeaturedIds = new Set(
+    currentlyFeaturedIds(
+      featuredCandidates.map((t) => ({ id: t.id, featured_requested_at: t.featured_requested_at as string }))
+    )
+  );
+  const featuredTools = featuredCandidates.filter((t) => visibleFeaturedIds.has(t.id));
 
   const totalVotes = (voteRows ?? []).reduce(
     (sum: number, t: { upvotes: number; downvotes: number }) => sum + t.upvotes + t.downvotes,
@@ -179,7 +189,15 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <section className="max-w-6xl mx-auto px-4 pt-14 pb-14 grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(55% 45% at 10% 0%, rgba(62,42,92,0.10), transparent), radial-gradient(45% 40% at 95% 15%, rgba(198,138,40,0.12), transparent), radial-gradient(40% 35% at 60% 100%, rgba(196,90,74,0.06), transparent)",
+          }}
+        />
+        <div className="max-w-6xl mx-auto px-4 pt-14 pb-14 grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
         <div>
           <h1 className="font-display font-bold text-4xl md:text-[3.25rem] leading-[1.05] tracking-tight">
             Find the AI tool that actually gets the job done.
@@ -206,15 +224,15 @@ export default async function HomePage() {
 
           <div className="flex gap-8 mt-9 text-sm">
             <div>
-              <span className="rank-badge block text-2xl font-bold">{totalTools ?? toolList.length}</span>
+              <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
               <span className="text-ink/50">Tools ranked</span>
             </div>
             <div>
-              <span className="rank-badge block text-2xl font-bold">{categoryList.length}</span>
+              <span className="rank-badge block text-2xl font-bold text-gold">{categoryList.length}</span>
               <span className="text-ink/50">Categories</span>
             </div>
             <div>
-              <span className="rank-badge block text-2xl font-bold">{totalVotes}</span>
+              <span className="rank-badge block text-2xl font-bold text-forest">{totalVotes}</span>
               <span className="text-ink/50">Community votes</span>
             </div>
           </div>
@@ -231,16 +249,62 @@ export default async function HomePage() {
             <div className="w-full h-full bg-gradient-to-br from-plum to-plum-deep" />
           )}
         </div>
+        </div>
       </section>
+
+      {featuredTools.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 mb-16">
+          <div className="flex items-baseline justify-between mb-1">
+            <h2 className="font-display font-bold text-2xl">
+              <span className="text-gold">★</span> Featured
+            </h2>
+            <span className="text-xs text-ink/40">Paid placement — never affects AIPick Score</span>
+          </div>
+          <p className="text-sm text-ink/50 mb-6">
+            A rotating spotlight of up to 15 tools at a time. This is a labeled paid placement — it
+            never changes a tool's AIPick Score or organic rank below.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {featuredTools.slice(0, 15).map((tool, i) => {
+              const accents = ["border-plum/25", "border-gold/35", "border-forest/25", "border-coral/25"];
+              const accent = accents[i % accents.length];
+              return (
+                <Link
+                  key={tool.id}
+                  href={`/tool/${tool.slug}`}
+                  className={`group flex flex-col bg-surface border ${accent} rounded-xl p-4 hover:shadow-lift transition-shadow`}
+                >
+                  <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={40} />
+                  <h3 className="font-display font-semibold text-sm mt-3 group-hover:text-plum leading-snug">
+                    {tool.name}
+                  </h3>
+                  <p className="text-xs text-ink/50 mt-1 leading-snug line-clamp-2 flex-1">
+                    {tool.short_description}
+                  </p>
+                  {tool.rating_count > 0 && (
+                    <span className="text-xs text-gold mt-2">
+                      ★ {tool.rating_avg.toFixed(1)}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="max-w-6xl mx-auto px-4 mb-16">
         <div className="grid sm:grid-cols-3 gap-4">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="bg-surface border border-line rounded-lg p-5">
-              <h3 className="font-display font-semibold text-sm">{f.title}</h3>
-              <p className="text-sm text-ink/55 mt-1.5 leading-relaxed">{f.body}</p>
-            </div>
-          ))}
+          {FEATURES.map((f, i) => {
+            const dots = ["bg-plum", "bg-gold", "bg-forest"];
+            return (
+              <div key={f.title} className="bg-surface border border-line rounded-lg p-5">
+                <span className={`inline-block w-2 h-2 rounded-full ${dots[i % dots.length]} mb-2`} />
+                <h3 className="font-display font-semibold text-sm">{f.title}</h3>
+                <p className="text-sm text-ink/55 mt-1.5 leading-relaxed">{f.body}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -252,13 +316,19 @@ export default async function HomePage() {
           From image generators to sales tools — find AI built for the job you&apos;re actually trying to do.
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {categoryList.map((cat) => (
+          {categoryList.map((cat, i) => {
+            const bg = ["bg-plum/10", "bg-gold/15", "bg-forest/10", "bg-coral/10"][i % 4];
+            return (
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
               className="flex items-start gap-3 bg-surface border border-line rounded-lg p-4 hover:border-plum transition-colors"
             >
-              {cat.icon && <span className="text-xl leading-none shrink-0 mt-0.5">{cat.icon}</span>}
+              {cat.icon && (
+                <span className={`text-xl leading-none shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${bg}`}>
+                  {cat.icon}
+                </span>
+              )}
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-display font-medium text-[15px]">{cat.name}</h3>
@@ -273,27 +343,10 @@ export default async function HomePage() {
                 )}
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
-
-      {featuredTools && featuredTools.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 pb-16">
-          <div className="flex items-baseline justify-between mb-1">
-            <h2 className="font-display font-bold text-2xl">Featured</h2>
-            <span className="text-xs text-ink/40">Paid placement — never affects AIPick Score</span>
-          </div>
-          <p className="text-sm text-ink/50 mb-6">
-            Tools currently in their featured window. This is a labeled paid placement, separate
-            from the ranked list below.
-          </p>
-          <div className="flex flex-col">
-            {(featuredTools as Tool[]).map((tool) => (
-              <ToolRow key={tool.id} tool={tool} />
-            ))}
-          </div>
-        </section>
-      )}
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
         <div className="flex items-baseline justify-between mb-1">

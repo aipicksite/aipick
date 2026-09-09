@@ -134,3 +134,33 @@ export async function deleteTool(toolId: string) {
   revalidatePath("/admin");
   redirect("/admin");
 }
+
+// Joins the tool into the homepage's 15-slot featured queue (see
+// lib/featured-queue.ts). Setting featured_requested_at only once — never
+// resetting it on a re-click — matters: it's what preserves the tool's fair
+// place in line if an admin toggles it by accident.
+export async function markFeatured(toolId: string) {
+  const { supabase } = await requireAdmin();
+  const { data: tool } = await supabase
+    .from("tools")
+    .select("featured_requested_at")
+    .eq("id", toolId)
+    .maybeSingle();
+
+  if (!tool?.featured_requested_at) {
+    await supabase
+      .from("tools")
+      .update({ featured_requested_at: new Date().toISOString() })
+      .eq("id", toolId);
+  }
+
+  revalidatePath("/admin/tools");
+  revalidatePath("/");
+}
+
+export async function unmarkFeatured(toolId: string) {
+  const { supabase } = await requireAdmin();
+  await supabase.from("tools").update({ featured_requested_at: null }).eq("id", toolId);
+  revalidatePath("/admin/tools");
+  revalidatePath("/");
+}

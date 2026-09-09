@@ -1,6 +1,8 @@
 import { requireAdmin } from "@/lib/admin";
 import type { Tool } from "@/types/database";
 import Link from "next/link";
+import { markFeatured, unmarkFeatured } from "@/app/admin/actions";
+import { computeFeaturedSchedule } from "@/lib/featured-queue";
 
 const PAGE_SIZE = 30;
 
@@ -45,6 +47,23 @@ export default async function AdminPage({ searchParams }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const startIdx = total === 0 ? 0 : from + 1;
   const endIdx = Math.min(total, from + toolList.length);
+
+  // Featured-queue status for every row on this page — see
+  // lib/featured-queue.ts for how the 15-slot FIFO schedule is computed.
+  const { data: featuredCandidates } = await supabase
+    .from("tools")
+    .select("id, featured_requested_at")
+    .not("featured_requested_at", "is", null);
+
+  const candidates = (featuredCandidates ?? []) as { id: string; featured_requested_at: string }[];
+  const schedule = computeFeaturedSchedule(candidates);
+  const now = Date.now();
+  const scheduleById = new Map(schedule.map((w) => [w.id, w]));
+  // Queue position among tools still waiting for their turn (1-indexed).
+  const waitingOrder = schedule
+    .filter((w) => w.startMs > now)
+    .sort((a, b) => a.startMs - b.startMs)
+    .map((w) => w.id);
 
   return (
     <main>
@@ -95,37 +114,82 @@ export default async function AdminPage({ searchParams }: Props) {
       </form>
 
       <div className="mt-6 flex flex-col gap-2">
-        {toolList.map((tool) => (
-          <div
-            key={tool.id}
-            className="flex items-center gap-4 bg-surface border border-line rounded-lg px-4 py-3"
-          >
-            <div className="flex-1 min-w-0">
-              <span className="font-medium">{tool.name}</span>
-              <span className="text-ink/45 text-sm ml-2">/{tool.slug}</span>
-            </div>
-            {tool.rating_count > 0 && (
-              <span className="text-xs text-ink/45 shrink-0">
-                ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count})
+        {toolList.map((tool) => {
+          const win = tool.featured_requested_at ? scheduleById.get(tool.id) : undefined;
+          const isVisible = !!win && win.startMs <= now && win.endMs > now;
+          const isQueued = !!win && win.startMs > now;
+          const queuePosition = isQueued ? waitingOrder.indexOf(tool.id) + 1 : null;
+
+          return (
+            <div
+              key={tool.id}
+              className="flex items-center gap-4 bg-surface border border-line rounded-lg px-4 py-3"
+            >
+              <div className="flex-1 min-w-0">
+                <span className="font-medium">{tool.name}</span>
+                <span className="text-ink/45 text-sm ml-2">/{tool.slug}</span>
+              </div>
+              {tool.rating_count > 0 && (
+                <span className="text-xs text-ink/45 shrink-0">
+                  ★ {tool.rating_avg.toFixed(1)} ({tool.rating_count})
+                </span>
+              )}
+              <span
+                className={`text-xs px-2 py-1 rounded-full border shrink-0 ${
+                  tool.status === "active"
+                    ? "border-forest/25 text-forest bg-forest-soft"
+                    : "border-coral/25 text-coral bg-coral-soft"
+                }`}
+              >
+                {tool.status}
               </span>
-            )}
-            <span
-              className={`text-xs px-2 py-1 rounded-full border shrink-0 ${
-                tool.status === "active"
-                  ? "border-forest/25 text-forest bg-forest-soft"
-                  : "border-coral/25 text-coral bg-coral-soft"
-              }`}
-            >
-              {tool.status}
-            </span>
-            <Link
-              href={`/admin/tools/${tool.id}/edit`}
-              className="text-sm text-plum hover:underline shrink-0"
-            >
-              Edit
-            </Link>
-          </div>
-        ))}
+
+              {isVisible && (
+                <span
+                  title={`Featured until ${new Date(win!.endMs).toLocaleDateString()}`}
+                  className="text-xs px-2 py-1 rounded-full border border-gold/40 text-gold bg-gold-soft shrink-0"
+                >
+                  ★ Featured · ends {new Date(win!.endMs).toLocaleDateString()}
+                </span>
+              )}
+              {isQueued && (
+                <span
+                  title={`Starts ${new Date(win!.startMs).toLocaleDateString()}`}
+                  className="text-xs px-2 py-1 rounded-full border border-line text-ink/50 shrink-0"
+                >
+                  Queued #{queuePosition} · from {new Date(win!.startMs).toLocaleDateString()}
+                </span>
+              )}
+
+              {tool.featured_requested_at ? (
+                <form action={unmarkFeatured.bind(null, tool.id)}>
+                  <button
+                    type="submit"
+                    className="text-sm text-coral hover:underline shrink-0"
+                  >
+                    Un-feature
+                  </button>
+                </form>
+              ) : (
+                <form action={markFeatured.bind(null, tool.id)}>
+                  <button
+                    type="submit"
+                    className="text-sm text-gold hover:underline shrink-0"
+                  >
+                    Feature
+                  </button>
+                </form>
+              )}
+
+              <Link
+                href={`/admin/tools/${tool.id}/edit`}
+                className="text-sm text-plum hover:underline shrink-0"
+              >
+                Edit
+              </Link>
+            </div>
+          );
+        })}
         {toolList.length === 0 && (
           <p className="py-8 text-sm text-ink/60">
             {q || status ? "No tools match this filter." : "No tools yet — add the first one."}

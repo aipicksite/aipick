@@ -1,7 +1,6 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
-import { getPlan } from "@/lib/pricing";
 import { revalidatePath } from "next/cache";
 
 export async function addAdmin(formData: FormData) {
@@ -58,12 +57,10 @@ export async function approveSubmission(submissionId: string) {
 
   if (!submission) return;
 
-  let featuredUntil: string | null = null;
-  if (submission.requested_featured) {
-    const featuredPlan = await getPlan("submit_featured");
-    const days = featuredPlan?.featured_days ?? 7;
-    featuredUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
-  }
+  // Featured submissions join the shared 15-slot FIFO featured queue
+  // (lib/featured-queue.ts) rather than getting an immediate fixed window —
+  // this is the same queue an admin manually marking a tool "Featured" uses.
+  const featuredRequestedAt = submission.requested_featured ? new Date().toISOString() : null;
 
   const { data: tool, error } = await supabase
     .from("tools")
@@ -81,7 +78,7 @@ export async function approveSubmission(submissionId: string) {
         .map((h: string) => h.trim())
         .filter(Boolean),
       status: "active",
-      featured_until: featuredUntil,
+      featured_requested_at: featuredRequestedAt,
     })
     .select("id")
     .single();
@@ -160,7 +157,14 @@ export async function approveClaim(claimId: string) {
 
   if (!claim) return;
 
-  const toolUpdate: Record<string, unknown> = { owner_id: claim.user_id, verified: true };
+  // Free "claim" (kind === 'claim') only proves ownership — the listing
+  // shows an "Ownership claimed" badge, not the Verified badge. Verified is
+  // reserved for paid "update" claims, which actually enrich the listing
+  // (and unlock the owner-reply-to-reviews perk). See app/tool/[slug]/page.tsx.
+  const toolUpdate: Record<string, unknown> = { owner_id: claim.user_id };
+  if (claim.kind === "update") {
+    toolUpdate.verified = true;
+  }
 
   // Paid "update" claims (from /update-ai) carry proposed edits — apply the
   // ones the owner actually filled in. Plain free claims (kind === 'claim')
