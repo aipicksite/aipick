@@ -161,7 +161,6 @@ export default async function ToolsPage({
                       {parent.icon && <span aria-hidden="true">{parent.icon}</span>}
                       <Link
                         href={buildUrl({ category: parent.slug, page: undefined })}
-                        onClick={(e) => e.stopPropagation()}
                         className={
                           isParentActive ? "text-plum font-medium" : "text-ink/80 font-medium hover:text-ink"
                         }
