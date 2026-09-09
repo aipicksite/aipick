@@ -9,6 +9,7 @@ import {
   unbanUser,
 } from "@/app/admin/users/actions";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import LiveFilterInput from "@/components/LiveFilterInput";
 import SubmitButton from "@/components/SubmitButton";
 
 const STATUS_STYLE: Record<string, string> = {
@@ -70,14 +71,13 @@ export default async function AdminUsersPage({
         </Link>
       </div>
 
-      <form className="mt-5 max-w-sm">
-        <input
-          name="q"
-          defaultValue={searchParams.q}
+      <div className="mt-5 max-w-sm">
+        <LiveFilterInput
+          defaultValue={searchParams.q ?? ""}
           placeholder="Search by email or username…"
           className="w-full border border-line rounded-md px-3.5 py-2 text-sm focus:outline-none focus:border-plum"
         />
-      </form>
+      </div>
 
       <div className="mt-6 border border-line rounded-lg overflow-hidden overflow-x-auto">
         <table className="w-full text-sm min-w-[640px]">

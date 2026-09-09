@@ -5,6 +5,7 @@ import ToolRow from "@/components/ToolRow";
 import Pagination from "@/components/Pagination";
 import type { Metadata } from "next";
 import { trackPageView } from "@/lib/track-view";
+import ToolSearchBox from "@/components/ToolSearchBox";
 
 export const metadata: Metadata = {
   title: "Browse AI Tools | AIPick",
@@ -213,19 +214,19 @@ export default async function ToolsPage({
           : ""}
       </p>
 
-      <form action="/tools" method="get" className="mt-6">
-        {category && <input type="hidden" name="category" value={category} />}
-        {pricing && <input type="hidden" name="pricing" value={pricing} />}
-        {sortKey !== "score" && <input type="hidden" name="sort" value={sortKey} />}
-        {verified === "1" && <input type="hidden" name="verified" value="1" />}
-        <input
-          type="text"
-          name="q"
-          defaultValue={q}
+      <div className="mt-6 max-w-xl">
+        <ToolSearchBox
+          variant="compact"
+          defaultValue={q ?? ""}
           placeholder="Search tools by name or feature…"
-          className="w-full max-w-xl bg-surface border border-line rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-plum"
+          extraParams={{
+            category,
+            pricing,
+            sort: sortKey !== "score" ? sortKey : undefined,
+            verified: verified === "1" ? "1" : undefined,
+          }}
         />
-      </form>
+      </div>
 
       <div className="flex flex-wrap gap-2 mt-4">
         <Link

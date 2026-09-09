@@ -3,6 +3,7 @@ import type { Tool } from "@/types/database";
 import Link from "next/link";
 import { markFeatured, unmarkFeatured } from "@/app/admin/actions";
 import { computeFeaturedSchedule } from "@/lib/featured-queue";
+import LiveFilterInput from "@/components/LiveFilterInput";
 
 const PAGE_SIZE = 30;
 
@@ -80,9 +81,7 @@ export default async function AdminPage({ searchParams }: Props) {
       </div>
 
       <form method="get" className="flex gap-2 mt-5 flex-wrap">
-        <input
-          type="text"
-          name="q"
+        <LiveFilterInput
           defaultValue={q}
           placeholder="Search by name or slug…"
           className="flex-1 min-w-[200px] border border-line rounded px-3 py-2 text-sm"

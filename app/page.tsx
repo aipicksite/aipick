@@ -3,11 +3,19 @@ import type { Tool, Category, BlogPost } from "@/types/database";
 import type { Metadata } from "next";
 import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
-import ToolAvatar from "@/components/ToolAvatar";
-import CreditedImage from "@/components/CreditedImage";
-import { getPexelsImage } from "@/lib/pexels";
+import ToolSearchBox from "@/components/ToolSearchBox";
+import FeaturedThumb from "@/components/FeaturedThumb";
 import { trackPageView } from "@/lib/track-view";
 import { currentlyFeaturedIds } from "@/lib/featured-queue";
+
+const POPULAR_SEARCHES = [
+  "AI chatbot",
+  "Image generator",
+  "Coding assistant",
+  "Writing assistant",
+  "Video generator",
+  "AI SEO tool",
+];
 
 export const revalidate = 3600; // ISR: refresh homepage hourly
 
@@ -83,7 +91,6 @@ export default async function HomePage() {
     { data: recentTools },
     { data: recentPosts },
     { data: featuredCandidatesRaw },
-    heroImage,
   ] = await Promise.all([
     supabase
       .from("tools")
@@ -121,7 +128,6 @@ export default async function HomePage() {
       .not("featured_requested_at", "is", null)
       .order("featured_requested_at", { ascending: true })
       .limit(200),
-    getPexelsImage("futuristic technology gradient abstract", "landscape"),
   ]);
 
   const toolList = (tools as Tool[] | null) ?? [];
@@ -178,6 +184,16 @@ export default async function HomePage() {
           acceptedAnswer: { "@type": "Answer", text: f.a },
         })),
       },
+      {
+        "@type": "ItemList",
+        name: "Top Ranked AI Tools on AIPick",
+        itemListElement: toolList.slice(0, 12).map((tool, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `https://aipick.site/tool/${tool.slug}`,
+          name: tool.name,
+        })),
+      },
     ],
   };
 
@@ -197,32 +213,35 @@ export default async function HomePage() {
               "radial-gradient(55% 45% at 10% 0%, rgba(62,42,92,0.10), transparent), radial-gradient(45% 40% at 95% 15%, rgba(198,138,40,0.12), transparent), radial-gradient(40% 35% at 60% 100%, rgba(196,90,74,0.06), transparent)",
           }}
         />
-        <div className="max-w-6xl mx-auto px-4 pt-14 pb-14 grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
-        <div>
+        <div className="max-w-3xl mx-auto px-4 pt-16 pb-14 text-center">
           <h1 className="font-display font-bold text-4xl md:text-[3.25rem] leading-[1.05] tracking-tight">
             Find the AI tool that actually gets the job done.
           </h1>
-          <p className="mt-5 text-lg text-ink/65 max-w-lg leading-relaxed">
+          <p className="mt-5 text-lg text-ink/65 max-w-xl mx-auto leading-relaxed">
             Ranked by the people who use them — not by whoever pays the most.
             Vote, review, and compare the tools worth your time.
           </p>
 
-          <form action="/tools" method="get" className="mt-8 flex max-w-lg">
-            <input
-              type="text"
-              name="q"
+          <div className="mt-9 max-w-2xl mx-auto">
+            <ToolSearchBox
+              variant="hero"
               placeholder={`Search ${totalTools ?? toolList.length}+ AI tools — “image generator”, “SEO”…`}
-              className="flex-1 bg-surface border border-line rounded-l-md px-4 py-3 text-sm focus:outline-none focus:border-plum"
             />
-            <button
-              type="submit"
-              className="bg-plum text-white px-5 py-3 rounded-r-md text-sm font-medium hover:bg-plum-deep transition-colors shrink-0"
-            >
-              Search
-            </button>
-          </form>
+          </div>
 
-          <div className="flex gap-8 mt-9 text-sm">
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
+            {POPULAR_SEARCHES.map((term) => (
+              <Link
+                key={term}
+                href={`/tools?q=${encodeURIComponent(term)}`}
+                className="text-xs px-3 py-1.5 rounded-full border border-line text-ink/55 hover:border-plum hover:text-plum transition-colors bg-surface"
+              >
+                {term}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-8 mt-10 text-sm">
             <div>
               <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
               <span className="text-ink/50">Tools ranked</span>
@@ -241,15 +260,6 @@ export default async function HomePage() {
             New tools added every week · No pay-to-rank listings, ever
           </p>
         </div>
-
-        <div className="hidden lg:block rounded-xl overflow-hidden border border-line shadow-lift aspect-[4/3]">
-          {heroImage ? (
-            <CreditedImage image={heroImage} className="w-full h-full" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-plum to-plum-deep" />
-          )}
-        </div>
-        </div>
       </section>
 
       {featuredTools.length > 0 && (
@@ -261,7 +271,7 @@ export default async function HomePage() {
             <span className="text-xs text-ink/40">Paid placement — never affects AIPick Score</span>
           </div>
           <p className="text-sm text-ink/50 mb-6">
-            A rotating spotlight of up to 15 tools at a time. This is a labeled paid placement — it
+            A rotating spotlight of standout tools. This is a labeled paid placement — it
             never changes a tool's AIPick Score or organic rank below.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -272,20 +282,28 @@ export default async function HomePage() {
                 <Link
                   key={tool.id}
                   href={`/tool/${tool.slug}`}
-                  className={`group flex flex-col bg-surface border ${accent} rounded-xl p-4 hover:shadow-lift transition-shadow`}
+                  className={`group flex flex-col bg-surface border ${accent} rounded-xl overflow-hidden hover:shadow-lift transition-shadow`}
                 >
-                  <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={40} />
-                  <h3 className="font-display font-semibold text-sm mt-3 group-hover:text-plum leading-snug">
-                    {tool.name}
-                  </h3>
-                  <p className="text-xs text-ink/50 mt-1 leading-snug line-clamp-2 flex-1">
-                    {tool.short_description}
-                  </p>
-                  {tool.rating_count > 0 && (
-                    <span className="text-xs text-gold mt-2">
-                      ★ {tool.rating_avg.toFixed(1)}
-                    </span>
-                  )}
+                  <div className="aspect-[16/10] overflow-hidden border-b border-line bg-ink/5">
+                    <FeaturedThumb
+                      websiteUrl={tool.website_url}
+                      overrideUrl={tool.screenshot_url}
+                      name={tool.name}
+                    />
+                  </div>
+                  <div className="p-4 flex flex-col flex-1">
+                    <h3 className="font-display font-semibold text-sm group-hover:text-plum leading-snug">
+                      {tool.name}
+                    </h3>
+                    <p className="text-xs text-ink/50 mt-1 leading-snug line-clamp-2 flex-1">
+                      {tool.short_description}
+                    </p>
+                    {tool.rating_count > 0 && (
+                      <span className="text-xs text-gold mt-2">
+                        ★ {tool.rating_avg.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
                 </Link>
               );
             })}
