@@ -120,7 +120,7 @@ export default async function RootLayout({
             <div className="flex items-center gap-2">
               <Link
                 href="/submit"
-                className="hidden sm:inline-flex text-sm font-medium px-3.5 py-2 rounded-md border border-line hover:border-plum hover:text-plum transition-colors"
+                className="hidden sm:inline-flex text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors shadow-card"
               >
                 Submit a tool
               </Link>

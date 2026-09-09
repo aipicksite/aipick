@@ -392,6 +392,7 @@ export default async function ToolPage({ params }: Props) {
               otherReviews={otherReviews}
               ratingAvg={tool.rating_avg}
               ratingCount={tool.rating_count}
+              isOwner={!!user && tool.owner_id === user.id && tool.verified}
             />
           </section>
 
@@ -512,8 +513,18 @@ export default async function ToolPage({ params }: Props) {
                   Manage this listing →
                 </Link>
               ) : !tool.owner_id ? (
-                <Link href={`/claim/${tool.slug}`} className="text-ink/40 hover:text-plum">
-                  Is this your tool? Claim this listing →
+                <Link
+                  href={`/claim/${tool.slug}`}
+                  className="flex items-center justify-between gap-2 bg-plum/5 border border-plum/15 rounded-lg px-3 py-2.5 hover:border-plum/40 transition-colors group"
+                >
+                  <span>
+                    <span className="block font-medium text-ink/80 group-hover:text-plum">
+                      Is this your tool?
+                    </span>
+                    <span className="block text-ink/50 mt-0.5">
+                      Claim it — or update it for a verified badge →
+                    </span>
+                  </span>
                 </Link>
               ) : null}
             </div>

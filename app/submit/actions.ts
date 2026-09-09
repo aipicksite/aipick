@@ -17,8 +17,13 @@ export async function submitTool(formData: FormData) {
   const plan_key = String(formData.get("plan_key") ?? "").trim();
   const payment_id = String(formData.get("payment_id") ?? "").trim();
 
+  // If payment was already done (the normal path, via /checkout/submit), send
+  // validation errors back to the checkout page so the plan stays selected —
+  // not all the way back to the public pricing page.
+  const errorBase = plan_key ? `/checkout/submit?plan=${plan_key}&` : "/submit?";
+
   if (!name || !website_url) {
-    redirect("/submit?error=" + encodeURIComponent("Name and website are required."));
+    redirect(errorBase + "error=" + encodeURIComponent("Name and website are required."));
   }
   if (!plan_key || !payment_id) {
     redirect("/submit?error=" + encodeURIComponent("Payment step is missing — please start over."));
@@ -43,7 +48,8 @@ export async function submitTool(formData: FormData) {
 
   if (!payment) {
     redirect(
-      "/submit?error=" +
+      errorBase +
+        "error=" +
         encodeURIComponent("We couldn't verify your payment (or it was already used). Please try again.")
     );
   }
@@ -64,7 +70,7 @@ export async function submitTool(formData: FormData) {
   });
 
   if (error) {
-    redirect("/submit?error=" + encodeURIComponent(error.message));
+    redirect(errorBase + "error=" + encodeURIComponent(error.message));
   }
 
   redirect("/submit?submitted=1");

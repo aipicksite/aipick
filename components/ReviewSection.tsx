@@ -16,6 +16,7 @@ export default function ReviewSection({
   otherReviews,
   ratingAvg,
   ratingCount,
+  isOwner = false,
 }: {
   toolId: string;
   toolName: string;
@@ -24,6 +25,8 @@ export default function ReviewSection({
   otherReviews: ReviewWithAuthor[];
   ratingAvg: number;
   ratingCount: number;
+  /** True only for the tool's verified owner — a perk for claimed listings. */
+  isOwner?: boolean;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(!myReview);
@@ -34,6 +37,25 @@ export default function ReviewSection({
   );
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyPending, startReplyTransition] = useTransition();
+
+  function submitOwnerReply(reviewId: string) {
+    if (!replyText.trim()) return;
+    startReplyTransition(async () => {
+      const res = await fetch("/api/reviews", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewId, toolId, response: replyText }),
+      });
+      if (res.ok) {
+        setReplyingTo(null);
+        setReplyText("");
+        router.refresh();
+      }
+    });
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -184,6 +206,57 @@ export default function ReviewSection({
               )}
             </div>
             {r.body && <p className="text-sm text-ink/70 mt-2 leading-relaxed">{r.body}</p>}
+
+            {r.owner_response && (
+              <div className="mt-3 ml-3 pl-3 border-l-2 border-plum/30 bg-plum/5 rounded-r-md py-2 pr-3">
+                <p className="text-xs font-semibold text-plum">Response from the team</p>
+                <p className="text-sm text-ink/70 mt-1 leading-relaxed">{r.owner_response}</p>
+              </div>
+            )}
+
+            {isOwner && !r.owner_response && (
+              <div className="mt-3">
+                {replyingTo === r.id ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      rows={2}
+                      placeholder="Reply as the verified owner…"
+                      className="w-full bg-base border border-line rounded-md px-3 py-2 text-sm focus:outline-none focus:border-plum"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => submitOwnerReply(r.id)}
+                        disabled={replyPending || !replyText.trim()}
+                        className="text-xs font-medium bg-plum text-white px-3 py-1.5 rounded-md hover:bg-plum-deep disabled:opacity-60"
+                      >
+                        {replyPending ? "Posting…" : "Post reply"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReplyingTo(null);
+                          setReplyText("");
+                        }}
+                        className="text-xs text-ink/50 hover:text-ink"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(r.id)}
+                    className="text-xs font-medium text-plum hover:underline"
+                  >
+                    Reply as owner
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
         {otherReviews.length === 0 && !myReview && (

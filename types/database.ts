@@ -36,6 +36,8 @@ export type Review = {
   body: string | null;
   helpful_count: number;
   status: "published" | "flagged" | "removed";
+  owner_response: string | null;
+  owner_response_at: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -10,19 +10,24 @@ export async function submitToolUpdate(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login?next=/update-ai");
-
   const tool_id = String(formData.get("tool_id") ?? "").trim();
   const tool_slug = String(formData.get("tool_slug") ?? "").trim();
   const business_email = String(formData.get("business_email") ?? "").trim();
   const plan_key = String(formData.get("plan_key") ?? "").trim();
   const payment_id = String(formData.get("payment_id") ?? "").trim();
 
+  // This action is shared by the generic /update-ai flow (pick any tool) and
+  // the paid claim-and-update flow that lives on the tool's own page at
+  // /claim/[slug] — send the user back to wherever they started from.
+  const base = tool_slug ? `/claim/${tool_slug}` : "/update-ai";
+
+  if (!user) redirect(`/login?next=${base}`);
+
   if (!tool_id || !business_email) {
-    redirect("/update-ai?error=" + encodeURIComponent("Missing required fields."));
+    redirect(base + "?error=" + encodeURIComponent("Missing required fields."));
   }
   if (!plan_key || !payment_id) {
-    redirect("/update-ai?error=" + encodeURIComponent("Payment step is missing — please start over."));
+    redirect(base + "?error=" + encodeURIComponent("Payment step is missing — please start over."));
   }
 
   // Atomic "consume" — see app/submit/actions.ts for why this is an UPDATE
@@ -41,7 +46,8 @@ export async function submitToolUpdate(formData: FormData) {
 
   if (!payment) {
     redirect(
-      "/update-ai?error=" +
+      base +
+        "?error=" +
         encodeURIComponent("We couldn't verify your payment (or it was already used). Please try again.")
     );
   }
@@ -63,8 +69,10 @@ export async function submitToolUpdate(formData: FormData) {
   });
 
   if (error) {
-    redirect("/update-ai?error=" + encodeURIComponent(error.message));
+    const message =
+      error.code === "23505" ? "You already have a pending claim or update for this tool." : error.message;
+    redirect(base + "?error=" + encodeURIComponent(message));
   }
 
-  redirect(`/update-ai?submitted=1`);
+  redirect(`${base}?submitted=1`);
 }
