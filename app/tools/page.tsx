@@ -4,8 +4,8 @@ import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import Pagination from "@/components/Pagination";
 import type { Metadata } from "next";
-import { trackPageView } from "@/lib/track-view";
 import ToolSearchBox from "@/components/ToolSearchBox";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const metadata: Metadata = {
   title: "Browse AI Tools | AIPick",
@@ -35,7 +35,6 @@ export default async function ToolsPage({
 }: {
   searchParams: SearchParams;
 }) {
-  trackPageView("/tools");
   const supabase = createClient();
   const { q, category, pricing, verified } = searchParams;
   const sortKey = searchParams.sort && SORT_OPTIONS[searchParams.sort] ? searchParams.sort : "score";
@@ -206,6 +205,7 @@ export default async function ToolsPage({
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-14">
+      <PageViewTracker path="/tools" />
       <h1 className="font-display font-bold text-3xl">Browse AI Tools</h1>
       <p className="text-ink/55 text-sm mt-1">
         {count ?? 0} tool{count === 1 ? "" : "s"}

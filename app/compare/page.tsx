@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import ComparePicker from "@/components/ComparePicker";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 3600;
 
@@ -16,7 +16,6 @@ export default async function ComparePage({
 }: {
   searchParams?: { a?: string };
 }) {
-  trackPageView("/compare");
   const supabase = createClient();
   const { data: tools } = await supabase
     .from("tools")
@@ -28,6 +27,7 @@ export default async function ComparePage({
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-16">
+      <PageViewTracker path="/compare" />
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Compare</span>
       <h1 className="font-display font-bold text-3xl mt-1">Compare AI tools</h1>
       <p className="text-ink/60 mt-3">

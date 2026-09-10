@@ -7,7 +7,7 @@ import MarkdownContent from "@/components/MarkdownContent";
 import TableOfContents from "@/components/TableOfContents";
 import ArticleSidebar from "@/components/ArticleSidebar";
 import { extractHeadings, splitAfterParagraphs } from "@/lib/article-toc";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 60; // short ISR window as a safety net alongside on-demand revalidatePath from admin edits
 
@@ -48,7 +48,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const post = await getPost(params.slug);
   if (!post) notFound();
-  trackPageView(`/blog/${post.slug}`);
 
   const toc = extractHeadings(post.body);
   const { intro, rest } = splitAfterParagraphs(post.body, 2);
@@ -56,6 +55,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-16">
+      <PageViewTracker path={`/blog/${post.slug}`} />
       <div className="max-w-2xl mx-auto lg:max-w-none">
         <Link href="/blog" className="text-sm text-plum hover:underline">← Blog</Link>
       </div>

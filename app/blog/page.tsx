@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { BlogPost } from "@/types/database";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 3600;
 
@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogIndexPage() {
-  trackPageView("/blog");
   const supabase = createClient();
   const { data } = await supabase
     .from("blog_posts")
@@ -44,6 +43,7 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-16">
+      <PageViewTracker path="/blog" />
       {jsonLd && (
         // eslint-disable-next-line react/no-danger
         <script

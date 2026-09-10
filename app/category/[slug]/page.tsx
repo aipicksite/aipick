@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
 import Pagination from "@/components/Pagination";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 21600;
 
@@ -50,7 +50,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  trackPageView(`/category/${params.slug}`);
   const result = await getCategory(params.slug);
   if (!result) notFound();
   const { category, tools } = result;
@@ -73,6 +72,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
+      <PageViewTracker path={`/category/${params.slug}`} />
       {/* eslint-disable-next-line react/no-danger */}
       <script
         type="application/ld+json"

@@ -43,7 +43,7 @@ function Bar({ label, value, max, href }: { label: string; value: number; max: n
   const inner = (
     <>
       <div className="flex items-center justify-between text-sm mb-1">
-        <span className="truncate max-w-[70%]">{label}</span>
+        <span className="truncate max-w-[70%]" title={label}>{label}</span>
         <span className="text-ink/50 font-medium shrink-0">{value}</span>
       </div>
       <div className="h-2 rounded-full bg-ink/5 overflow-hidden">
@@ -163,9 +163,10 @@ export default async function AdminOverviewPage() {
   const pathCounts = new Map<string, number>();
   const dailyCounts = new Map<string, number>();
   for (const row of (recentViewRows ?? []) as { path: string; referrer: string | null; created_at: string }[]) {
-    const source = classifyReferrer(row.referrer);
+    const source = classifyReferrer(row.referrer, row.path);
     sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
-    pathCounts.set(row.path, (pathCounts.get(row.path) ?? 0) + 1);
+    const cleanPath = row.path.split("?")[0] || row.path;
+    pathCounts.set(cleanPath, (pathCounts.get(cleanPath) ?? 0) + 1);
     const dayKey = row.created_at.slice(0, 10);
     dailyCounts.set(dayKey, (dailyCounts.get(dayKey) ?? 0) + 1);
   }

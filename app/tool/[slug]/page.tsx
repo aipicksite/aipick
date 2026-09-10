@@ -9,7 +9,7 @@ import AddToListButton from "@/components/AddToListButton";
 import ToolAvatar from "@/components/ToolAvatar";
 import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 type Props = { params: { slug: string } };
 
@@ -67,7 +67,6 @@ export default async function ToolPage({ params }: Props) {
   const tool = await getTool(params.slug);
   if (!tool) notFound();
 
-  trackPageView(`/tool/${tool.slug}`, tool.id);
 
   const {
     data: { user },
@@ -184,6 +183,7 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-14">
+      <PageViewTracker path={`/tool/${tool.slug}`} toolId={tool.id} />
       {/* eslint-disable-next-line react/no-danger */}
       <script
         type="application/ld+json"

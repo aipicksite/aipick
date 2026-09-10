@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ToolAvatar from "@/components/ToolAvatar";
 import ComparisonTable from "@/components/ComparisonTable";
-import { trackPageView } from "@/lib/track-view";
+import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 21600;
 
@@ -56,7 +56,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ComparePage({ params }: Props) {
-  trackPageView(`/compare/${params.slug}`);
   const comparison = await getComparison(params.slug);
   if (!comparison) notFound();
   const { toolA, toolB, introText } = comparison;
@@ -86,6 +85,7 @@ export default async function ComparePage({ params }: Props) {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-14">
+      <PageViewTracker path={`/compare/${params.slug}`} />
       <span className="text-xs font-medium text-plum uppercase tracking-wide">Compare</span>
       <h1 className="font-display font-bold text-3xl mt-1">
         {toolA.name} vs {toolB.name}

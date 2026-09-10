@@ -5,8 +5,8 @@ import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import ToolSearchBox from "@/components/ToolSearchBox";
 import FeaturedThumb from "@/components/FeaturedThumb";
-import { trackPageView } from "@/lib/track-view";
 import { currentlyFeaturedIds } from "@/lib/featured-queue";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const POPULAR_SEARCHES = [
   "AI chatbot",
@@ -78,7 +78,6 @@ const FAQS = [
 ];
 
 export default async function HomePage() {
-  trackPageView("/");
   const supabase = createClient();
 
   const [
@@ -238,6 +237,7 @@ export default async function HomePage() {
 
   return (
     <main>
+      <PageViewTracker path="/" />
       {/* eslint-disable-next-line react/no-danger */}
       <script
         type="application/ld+json"
