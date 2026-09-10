@@ -34,8 +34,11 @@ export default function ToolRow({ tool, rank }: { tool: Tool; rank?: number }) {
       <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} />
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-display font-medium text-[15px] leading-tight group-hover:text-plum transition-colors">
+        <h3 className="font-display font-medium text-[15px] leading-tight group-hover:text-plum transition-colors flex items-center gap-1.5">
           {tool.name}
+          {tool.verified && (
+            <span title="Verified by owner" className="text-forest text-xs">✓</span>
+          )}
         </h3>
         <p className="text-sm text-ink/55 truncate mt-0.5">
           {tool.short_description}

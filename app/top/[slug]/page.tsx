@@ -3,6 +3,7 @@ import type { Tool, Category } from "@/types/database";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
+import ToolRow from "@/components/ToolRow";
 import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 21600; // 6 hours — matches the rankings-refresh cadence
@@ -12,8 +13,15 @@ type Props = { params: { slug: string } };
 // Special ranking slugs that aren't tied to one category.
 const SPECIAL_RANKINGS: Record<
   string,
-  { title: string; blurb: string; filter: (q: any) => any }
+  { title: string; blurb: string; filter: (q: any) => any; limit?: number; compact?: boolean }
 > = {
+  "top-100-ai-tools": {
+    title: "Top 100 AI Tools",
+    blurb: "The 100 highest-rated AI tools on AIPick right now, ranked purely by community votes and reviews.",
+    filter: (q) => q,
+    limit: 100,
+    compact: true,
+  },
   "best-free-ai-tools": {
     title: "Best Free AI Tools",
     blurb: "No credit card, no trial clock — these are worth using even if you never upgrade.",
@@ -32,8 +40,13 @@ async function resolveRanking(slug: string) {
   if (SPECIAL_RANKINGS[slug]) {
     let query = supabase.from("tools").select("*").eq("status", "active");
     query = SPECIAL_RANKINGS[slug].filter(query);
-    const { data } = await query.order("score", { ascending: false }).limit(20);
-    return { title: SPECIAL_RANKINGS[slug].title, blurb: SPECIAL_RANKINGS[slug].blurb, tools: (data as Tool[]) ?? [] };
+    const { data } = await query.order("score", { ascending: false }).limit(SPECIAL_RANKINGS[slug].limit ?? 20);
+    return {
+      title: SPECIAL_RANKINGS[slug].title,
+      blurb: SPECIAL_RANKINGS[slug].blurb,
+      tools: (data as Tool[]) ?? [],
+      compact: SPECIAL_RANKINGS[slug].compact ?? false,
+    };
   }
 
   // e.g. /top/ai-writing → "Top AI Writing Tools" from the ai-writing category
@@ -60,6 +73,7 @@ async function resolveRanking(slug: string) {
     title: `Top ${category.name} AI Tools`,
     blurb: category.description ?? `Community-ranked ${category.name.toLowerCase()} tools.`,
     tools,
+    compact: false,
   };
 }
 
@@ -80,7 +94,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function TopPage({ params }: Props) {
   const ranking = await resolveRanking(params.slug);
   if (!ranking) notFound();
-  const { title, blurb, tools } = ranking;
+  const { title, blurb, tools, compact } = ranking;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -95,7 +109,7 @@ export default async function TopPage({ params }: Props) {
   };
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-14">
+    <main className={compact ? "max-w-4xl mx-auto px-4 py-14" : "max-w-3xl mx-auto px-4 py-14"}>
       <PageViewTracker path={`/top/${params.slug}`} />
       {/* eslint-disable-next-line react/no-danger */}
       <script
@@ -109,7 +123,18 @@ export default async function TopPage({ params }: Props) {
         Ranked by community votes and reviews · updated every few hours
       </p>
 
-      <ToolListicle tools={tools} />
+      {compact ? (
+        <div className="mt-8 flex flex-col gap-1.5">
+          {tools.map((tool, i) => (
+            <ToolRow key={tool.id} tool={tool} rank={i + 1} />
+          ))}
+          {tools.length === 0 && (
+            <p className="py-8 text-sm text-ink/60">No tools here yet.</p>
+          )}
+        </div>
+      ) : (
+        <ToolListicle tools={tools} />
+      )}
     </main>
   );
 }

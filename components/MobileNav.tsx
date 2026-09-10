@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/tools", label: "Browse" },
+  { href: "/tools", label: "Browse all tools" },
+  { href: "/top/top-100-ai-tools", label: "Top 100 AI Tools" },
+  { href: "/top/best-free-ai-tools", label: "Free AI Tools" },
+  { href: "/category", label: "Categories" },
   { href: "/top/trending-ai-tools", label: "Trending" },
-  { href: "/top/best-free-ai-tools", label: "Rankings" },
   { href: "/compare", label: "Compare" },
   { href: "/submit", label: "Submit a tool" },
 ];

@@ -7,6 +7,7 @@ import { getSiteSettings } from "@/lib/settings";
 import UserMenu from "@/components/UserMenu";
 import Logo from "@/components/Logo";
 import MobileNav from "@/components/MobileNav";
+import BrowseMenu from "@/components/BrowseMenu";
 import Script from "next/script";
 
 const displayFont = Space_Grotesk({
@@ -103,9 +104,7 @@ export default async function RootLayout({
             </Link>
 
             <nav className="hidden md:flex items-center gap-1 text-sm">
-              <Link href="/tools" className="px-3 py-2 rounded-md hover:bg-ink/5 transition-colors">
-                Browse
-              </Link>
+              <BrowseMenu />
               <Link href="/top/trending-ai-tools" className="px-3 py-2 rounded-md hover:bg-ink/5 transition-colors">
                 Trending
               </Link>
@@ -157,6 +156,9 @@ export default async function RootLayout({
               <h4 className="font-medium text-ink/80 mb-3">Explore</h4>
               <ul className="space-y-2 text-ink/55">
                 <li><Link href="/tools" className="hover:text-plum">Browse tools</Link></li>
+                <li><Link href="/top/top-100-ai-tools" className="hover:text-plum">Top 100 AI Tools</Link></li>
+                <li><Link href="/top/best-free-ai-tools" className="hover:text-plum">Free AI Tools</Link></li>
+                <li><Link href="/category" className="hover:text-plum">Categories</Link></li>
                 <li><Link href="/top/trending-ai-tools" className="hover:text-plum">Trending</Link></li>
                 <li><Link href="/compare" className="hover:text-plum">Compare</Link></li>
               </ul>
