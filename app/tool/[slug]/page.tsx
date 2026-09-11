@@ -13,6 +13,7 @@ import PageViewTracker from "@/components/PageViewTracker";
 import FloatingRecommendWidget from "@/components/FloatingRecommendWidget";
 import RecommendStats from "@/components/RecommendStats";
 import { getSiteSettings } from "@/lib/settings";
+import VerificationBadge from "@/components/VerificationBadge";
 
 type Props = { params: { slug: string } };
 
@@ -213,15 +214,8 @@ export default async function ToolPage({ params }: Props) {
             <h1 className="font-display font-bold text-2xl sm:text-3xl leading-tight">
               {tool.name}
             </h1>
-            {tool.verified && (
-              <span
-                title="Verified by AIPick"
-                className="inline-flex items-center gap-1 text-xs font-medium text-forest bg-forest-soft px-2 py-0.5 rounded-full shrink-0"
-              >
-                ✓ Verified
-              </span>
-            )}
-            {!tool.verified && tool.owner_id && (
+            <VerificationBadge level={tool.verification_level} />
+            {(!tool.verification_level || tool.verification_level === "unverified") && tool.owner_id && (
               <span
                 title="Ownership of this listing has been claimed"
                 className="inline-flex items-center gap-1 text-xs font-medium text-plum bg-plum/10 px-2 py-0.5 rounded-full shrink-0"
