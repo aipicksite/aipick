@@ -1,5 +1,6 @@
 import type { Tool, Category } from "@/types/database";
 import SubmitButton from "@/components/SubmitButton";
+import { VERIFICATION_LEVELS } from "@/components/VerificationBadge";
 
 type Props = {
   tool?: Tool;
@@ -185,6 +186,25 @@ export default function ToolForm({
             </label>
           ))}
         </div>
+      </div>
+
+      <div>
+        <label className="text-sm font-medium block mb-1">Verification level</label>
+        <select
+          name="verification_level"
+          defaultValue={tool?.verification_level ?? "unverified"}
+          className="w-full max-w-xs border border-line rounded px-3 py-2 text-sm"
+        >
+          {VERIFICATION_LEVELS.map((l) => (
+            <option key={l.value} value={l.value}>
+              {l.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-ink/45 mt-1">
+          Controls the badge shown on the tool page and ranking lists. Raising this above
+          &quot;Unverified&quot; also flips the legacy verified flag used elsewhere on the site.
+        </p>
       </div>
 
       <div>

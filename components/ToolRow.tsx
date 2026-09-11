@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Tool } from "@/types/database";
 import ToolAvatar from "./ToolAvatar";
+import VerificationBadge from "./VerificationBadge";
 
 const PRICING_LABEL: Record<string, string> = {
   free: "Free",
@@ -36,9 +37,7 @@ export default function ToolRow({ tool, rank }: { tool: Tool; rank?: number }) {
       <div className="flex-1 min-w-0">
         <h3 className="font-display font-medium text-[15px] leading-tight group-hover:text-plum transition-colors flex items-center gap-1.5">
           {tool.name}
-          {tool.verified && (
-            <span title="Verified by owner" className="text-forest text-xs">✓</span>
-          )}
+          <VerificationBadge level={tool.verification_level} size="sm" />
         </h3>
         <p className="text-sm text-ink/55 truncate mt-0.5">
           {tool.short_description}

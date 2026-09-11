@@ -186,6 +186,19 @@ export async function approveClaim(claimId: string) {
   const toolUpdate: Record<string, unknown> = { owner_id: claim.user_id };
   if (claim.kind === "update") {
     toolUpdate.verified = true;
+    // Only raise the tier if it isn't already at or above owner_verified
+    // (e.g. an admin who already manually admin/fully-verified this tool
+    // shouldn't get silently downgraded by an unrelated paid claim).
+    const { data: current } = await supabase
+      .from("tools")
+      .select("verification_level")
+      .eq("id", claim.tool_id)
+      .maybeSingle();
+    const rank = ["unverified", "website_verified", "owner_verified", "admin_verified", "fully_verified"];
+    const currentLevel = current?.verification_level ?? "unverified";
+    if (rank.indexOf(currentLevel) < rank.indexOf("owner_verified")) {
+      toolUpdate.verification_level = "owner_verified";
+    }
   }
 
   // Paid "update" claims (from /update-ai) carry proposed edits — apply the

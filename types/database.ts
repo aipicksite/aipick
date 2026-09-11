@@ -1,3 +1,10 @@
+export type VerificationLevel =
+  | "unverified"
+  | "website_verified"
+  | "owner_verified"
+  | "admin_verified"
+  | "fully_verified";
+
 export type Tool = {
   id: string;
   name: string;
@@ -17,6 +24,7 @@ export type Tool = {
   rating_count: number;
   owner_id: string | null;
   verified: boolean;
+  verification_level: VerificationLevel;
   highlights: string[];
   use_cases: string[];
   audience: string[];

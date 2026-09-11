@@ -53,6 +53,7 @@ export async function createTool(formData: FormData) {
       audience,
       screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
+      verification_level: String(formData.get("verification_level") ?? "unverified"),
     })
     .select("id")
     .single();
@@ -111,6 +112,7 @@ export async function updateTool(toolId: string, formData: FormData) {
       audience,
       screenshot_url: String(formData.get("screenshot_url") ?? "").trim() || null,
       status: String(formData.get("status") ?? "active"),
+      verification_level: String(formData.get("verification_level") ?? "unverified"),
       updated_at: new Date().toISOString(),
     })
     .eq("id", toolId);

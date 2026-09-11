@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Tool } from "@/types/database";
 import ToolAvatar from "./ToolAvatar";
 import ToolScreenshot from "./ToolScreenshot";
+import VerificationBadge from "./VerificationBadge";
 
 const PRICING_LABEL: Record<string, string> = {
   free: "Free",
@@ -57,11 +58,7 @@ export default function ToolListicle({ tools, rankOffset = 0 }: { tools: Tool[];
                   {tool.name}
                 </Link>
               </h2>
-              {tool.verified && (
-                <span className="text-xs font-medium text-forest bg-forest-soft px-2 py-0.5 rounded-full">
-                  ✓ Verified
-                </span>
-              )}
+              <VerificationBadge level={tool.verification_level} />
             </div>
 
             <div className="sm:grid sm:grid-cols-[220px_1fr] sm:gap-6 mt-4">
