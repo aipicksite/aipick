@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
 import ToolRow from "@/components/ToolRow";
 import PageViewTracker from "@/components/PageViewTracker";
+import RankingExplainer from "@/components/RankingExplainer";
 
 export const revalidate = 21600; // 6 hours — matches the rankings-refresh cadence
 
@@ -122,6 +123,8 @@ export default async function TopPage({ params }: Props) {
       <p className="text-xs text-ink/40 mt-2">
         Ranked by community votes and reviews · updated every few hours
       </p>
+
+      <RankingExplainer />
 
       {compact ? (
         <div className="mt-8 flex flex-col gap-1.5">
