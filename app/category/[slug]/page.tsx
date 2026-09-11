@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import ToolListicle from "@/components/ToolListicle";
 import Pagination from "@/components/Pagination";
 import PageViewTracker from "@/components/PageViewTracker";
+import RankingExplainer from "@/components/RankingExplainer";
 
 export const revalidate = 21600;
 
@@ -86,6 +87,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       <p className="text-xs text-ink/40 mt-2">
         {tools.length} tool{tools.length === 1 ? "" : "s"} · ranked by community votes and reviews
       </p>
+
+      <RankingExplainer />
 
       <ToolListicle tools={pageTools} rankOffset={(page - 1) * PAGE_SIZE} />
 
