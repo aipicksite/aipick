@@ -11,6 +11,7 @@ import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
 import PageViewTracker from "@/components/PageViewTracker";
 import FloatingRecommendWidget from "@/components/FloatingRecommendWidget";
+import RecommendStats from "@/components/RecommendStats";
 import { getSiteSettings } from "@/lib/settings";
 
 type Props = { params: { slug: string } };
@@ -488,6 +489,11 @@ export default async function ToolPage({ params }: Props) {
                 <dt className="text-ink/50">Net votes</dt>
                 <dd className="font-medium">▲ {netVotes}</dd>
               </div>
+              <RecommendStats
+                toolId={tool.id}
+                initialUp={recommendUp ?? 0}
+                initialDown={recommendDown ?? 0}
+              />
             </dl>
 
             {toolCategories.length > 0 && (
