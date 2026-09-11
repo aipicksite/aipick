@@ -111,6 +111,7 @@ export default async function AdminSeoPage() {
             defaultValue={settings.floating_widget_position}
             className="w-full border border-line rounded px-3 py-2 text-sm bg-white"
           >
+            <option value="bottom-center">Bottom center</option>
             <option value="bottom-right">Bottom right</option>
             <option value="bottom-left">Bottom left</option>
             <option value="top-right">Top right</option>

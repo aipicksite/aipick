@@ -14,6 +14,7 @@ const POSITION_CLASSES: Record<string, string> = {
   "bottom-left": "bottom-4 left-4 sm:bottom-6 sm:left-6",
   "top-right": "top-4 right-4 sm:top-6 sm:right-6",
   "top-left": "top-4 left-4 sm:top-6 sm:left-6",
+  "bottom-center": "bottom-4 left-1/2 -translate-x-1/2 sm:bottom-6",
 };
 
 const VISIBLE_MS = 400; // fade-in
@@ -108,6 +109,13 @@ export default function FloatingRecommendWidget({
         const data = await res.json();
         if (typeof data.up === "number") setUp(data.up);
         if (typeof data.down === "number") setDown(data.down);
+        if (typeof data.up === "number" && typeof data.down === "number") {
+          window.dispatchEvent(
+            new CustomEvent("aipick:recommend-updated", {
+              detail: { toolId, up: data.up, down: data.down },
+            })
+          );
+        }
       }
     } catch {
       // Keep the optimistic counts — voting still "worked" for the
