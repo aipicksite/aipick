@@ -15,6 +15,7 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
       { href: "/admin/submissions", label: "Submissions" },
       { href: "/admin/claims", label: "Claims" },
       { href: "/admin/reviews", label: "Reviews" },
+      { href: "/admin/duplicates", label: "Duplicates" },
       { href: "/admin/blog", label: "Blog" },
     ],
   },
