@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { classifyReferrer } from "@/lib/traffic-source";
+import { classifyReferrer, CATEGORY_LABELS, type TrafficCategory } from "@/lib/traffic-source";
 import Link from "next/link";
 import DailySparkline from "@/components/DailySparkline";
 
@@ -160,16 +160,23 @@ export default async function AdminOverviewPage() {
     .gte("created_at", new Date(now - 30 * day).toISOString());
 
   const sourceCounts = new Map<string, number>();
+  const categoryCounts = new Map<TrafficCategory, number>();
   const pathCounts = new Map<string, number>();
   const dailyCounts = new Map<string, number>();
   for (const row of (recentViewRows ?? []) as { path: string; referrer: string | null; created_at: string }[]) {
-    const source = classifyReferrer(row.referrer, row.path);
-    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+    const { label, category } = classifyReferrer(row.referrer, row.path);
+    sourceCounts.set(label, (sourceCounts.get(label) ?? 0) + 1);
+    categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
     const cleanPath = row.path.split("?")[0] || row.path;
     pathCounts.set(cleanPath, (pathCounts.get(cleanPath) ?? 0) + 1);
     const dayKey = row.created_at.slice(0, 10);
     dailyCounts.set(dayKey, (dailyCounts.get(dayKey) ?? 0) + 1);
   }
+
+  const topCategories = Array.from(categoryCounts.entries())
+    .map(([category, value]) => ({ label: CATEGORY_LABELS[category], value }))
+    .sort((a, b) => b.value - a.value);
+  const maxCategory = topCategories[0]?.value ?? 0;
 
   const topSources = Array.from(sourceCounts.entries())
     .map(([label, value]) => ({ label, value }))
@@ -288,9 +295,19 @@ export default async function AdminOverviewPage() {
         <section>
           <h2 className="font-display font-bold text-lg mb-1">Traffic sources (30d)</h2>
           <p className="text-xs text-ink/45 mb-4">
-            Based on the referring page for each visit — includes AI chat assistants like ChatGPT and Perplexity
-            alongside Google, social, and direct traffic.
+            Based on the referring page for each visit — grouped into search engines, AI chat
+            assistants (ChatGPT, Perplexity, etc.), social media, and other referrals.
           </p>
+          <div className="flex flex-col gap-3">
+            {topCategories.map((c) => (
+              <Bar key={c.label} label={c.label} value={c.value} max={maxCategory} />
+            ))}
+            {topCategories.length === 0 && <p className="text-sm text-ink/50">No traffic data yet.</p>}
+          </div>
+
+          <h3 className="text-xs font-medium text-ink/50 uppercase tracking-wide mt-6 mb-3">
+            By specific site
+          </h3>
           <div className="flex flex-col gap-3">
             {topSources.map((s) => (
               <Bar key={s.label} label={s.label} value={s.value} max={maxSource} />

@@ -1,3 +1,60 @@
+export type TrafficCategory = "search" | "ai" | "social" | "referral" | "email" | "direct";
+
+// Which broad bucket each specific site's label rolls up into, so the
+// admin dashboard can show both "Search engines: 412" and, underneath,
+// "Google: 380 / Bing: 32" without maintaining two separate lists.
+const LABEL_CATEGORIES: Record<string, TrafficCategory> = {
+  Google: "search",
+  Bing: "search",
+  DuckDuckGo: "search",
+  Yahoo: "search",
+  Baidu: "search",
+  "ChatGPT / OpenAI": "ai",
+  Perplexity: "ai",
+  "Google Gemini": "ai",
+  Claude: "ai",
+  Reddit: "social",
+  "X / Twitter": "social",
+  Facebook: "social",
+  LinkedIn: "social",
+  Instagram: "social",
+  Threads: "social",
+  TikTok: "social",
+  YouTube: "social",
+  Pinterest: "social",
+  Discord: "social",
+  Telegram: "social",
+  WhatsApp: "social",
+  Slack: "social",
+  Quora: "social",
+  "Product Hunt": "referral",
+  "Hacker News": "referral",
+  Medium: "referral",
+  GitHub: "referral",
+  AlternativeTo: "referral",
+  "There's An AI For That": "referral",
+  Futurepedia: "referral",
+  Newsletter: "email",
+  Email: "email",
+  "Direct / None": "direct",
+};
+
+function categoryForLabel(label: string): TrafficCategory {
+  if (label in LABEL_CATEGORIES) return LABEL_CATEGORIES[label];
+  // Anything unrecognized — "Other (somehost.com)" or a stray utm value —
+  // is a genuine external referral we just don't have a named bucket for.
+  return "referral";
+}
+
+export const CATEGORY_LABELS: Record<TrafficCategory, string> = {
+  search: "Search engines",
+  ai: "AI tools",
+  social: "Social media",
+  referral: "Referral / other sites",
+  email: "Email / newsletter",
+  direct: "Direct / None",
+};
+
 const OWN_HOSTS = ["aipick.site", "www.aipick.site", "localhost"];
 
 const SOURCE_PATTERNS: { label: string; hosts: string[] }[] = [
@@ -73,7 +130,23 @@ function hostFromReferrer(rawReferrer: string): string | null {
 // same-site navigation, and "Other (<host>)" for a real but unrecognized
 // external referrer — the host is always preserved so nothing gets
 // collapsed into an unlabeled bucket.
+// Classifies a raw `referer`/`document.referrer` value (and, as a
+// fallback, a path's own `utm_source` query param) into a human-readable
+// traffic source, plus which broad category it belongs to (search / AI
+// tool / social media / referral / email / direct). Returns
+// "Direct / None" for empty referrers or same-site navigation, and
+// "Other (<host>)" for a real but unrecognized external referrer — the
+// host is always preserved so nothing gets collapsed into an unlabeled
+// bucket.
 export function classifyReferrer(
+  rawReferrer: string | null | undefined,
+  path?: string | null
+): { label: string; category: TrafficCategory } {
+  const label = classifyReferrerLabel(rawReferrer, path);
+  return { label, category: categoryForLabel(label) };
+}
+
+function classifyReferrerLabel(
   rawReferrer: string | null | undefined,
   path?: string | null
 ): string {
