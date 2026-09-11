@@ -1,12 +1,162 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import StarRating from "./StarRating";
 import type { Review } from "@/types/database";
 
 type ReviewWithAuthor = Review & { author_label: string };
+
+const RATING_DIMENSION_LABELS: { key: "ease_of_use" | "features_rating" | "value_for_money" | "customer_support_rating"; label: string }[] = [
+  { key: "ease_of_use", label: "Ease of use" },
+  { key: "features_rating", label: "Features" },
+  { key: "value_for_money", label: "Value for money" },
+  { key: "customer_support_rating", label: "Customer support" },
+];
+
+function getVisitorId() {
+  try {
+    const existing = window.localStorage.getItem("aipick_visitor_id");
+    if (existing) return existing;
+    const fresh =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `v_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem("aipick_visitor_id", fresh);
+    return fresh;
+  } catch {
+    return `v_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+function RatingDimensionChips({ review }: { review: Review }) {
+  const set = RATING_DIMENSION_LABELS.filter(({ key }) => review[key] != null);
+  if (set.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-ink/50">
+      {set.map(({ key, label }) => (
+        <span key={key}>
+          {label}: <span className="font-medium text-ink/70">{review[key]}/5</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function ReviewFeedback({ review }: { review: ReviewWithAuthor }) {
+  const [helpful, setHelpful] = useState(review.helpful_count);
+  const [notHelpful, setNotHelpful] = useState(review.not_helpful_count);
+  const [myVote, setMyVote] = useState<"helpful" | "not_helpful" | null>(null);
+  const [isPending, setIsPending] = useState(false);
+  const [reporting, setReporting] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportSent, setReportSent] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(`aipick_review_vote_${review.id}`);
+      if (saved === "helpful" || saved === "not_helpful") setMyVote(saved);
+      if (window.localStorage.getItem(`aipick_review_reported_${review.id}`) === "1") {
+        setReportSent(true);
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [review.id]);
+
+  async function vote(voteType: "helpful" | "not_helpful") {
+    if (isPending || myVote === voteType) return;
+    setIsPending(true);
+    setMyVote(voteType);
+    if (voteType === "helpful") setHelpful((n) => n + 1);
+    else setNotHelpful((n) => n + 1);
+
+    try {
+      const res = await fetch("/api/reviews/helpful", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewId: review.id, sessionId: getVisitorId(), voteType }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.helpful === "number") setHelpful(data.helpful);
+        if (typeof data.notHelpful === "number") setNotHelpful(data.notHelpful);
+      }
+      window.localStorage.setItem(`aipick_review_vote_${review.id}`, voteType);
+    } catch {
+      // optimistic counts stand even if the network call failed
+    }
+    setIsPending(false);
+  }
+
+  async function submitReport() {
+    setIsPending(true);
+    try {
+      await fetch("/api/reviews/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewId: review.id,
+          sessionId: getVisitorId(),
+          reason: reportReason,
+        }),
+      });
+      window.localStorage.setItem(`aipick_review_reported_${review.id}`, "1");
+      setReportSent(true);
+      setReporting(false);
+    } catch {
+      // ignore — not critical enough to show an error state for
+    }
+    setIsPending(false);
+  }
+
+  return (
+    <div className="mt-3 flex items-center gap-4 text-xs text-ink/50">
+      <span>Helpful?</span>
+      <button
+        type="button"
+        onClick={() => vote("helpful")}
+        disabled={isPending}
+        className={`flex items-center gap-1 hover:text-forest ${myVote === "helpful" ? "text-forest font-medium" : ""}`}
+      >
+        👍 {helpful}
+      </button>
+      <button
+        type="button"
+        onClick={() => vote("not_helpful")}
+        disabled={isPending}
+        className={`flex items-center gap-1 hover:text-coral ${myVote === "not_helpful" ? "text-coral font-medium" : ""}`}
+      >
+        👎 {notHelpful}
+      </button>
+      <span className="text-line">·</span>
+      {reportSent ? (
+        <span>Reported</span>
+      ) : reporting ? (
+        <span className="flex items-center gap-2">
+          <input
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            placeholder="Reason (optional)"
+            className="border border-line rounded px-2 py-0.5 text-xs w-36 focus:outline-none focus:border-plum"
+          />
+          <button type="button" onClick={submitReport} disabled={isPending} className="text-coral hover:underline">
+            Submit
+          </button>
+          <button type="button" onClick={() => setReporting(false)} className="hover:text-ink">
+            Cancel
+          </button>
+        </span>
+      ) : (
+        <button type="button" onClick={() => setReporting(true)} className="hover:text-ink">
+          Report
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function ReviewSection({
   toolId,
@@ -31,6 +181,12 @@ export default function ReviewSection({
   const router = useRouter();
   const [editing, setEditing] = useState(!myReview);
   const [rating, setRating] = useState(myReview?.rating ?? 0);
+  const [easeOfUse, setEaseOfUse] = useState(myReview?.ease_of_use ?? 0);
+  const [featuresRating, setFeaturesRating] = useState(myReview?.features_rating ?? 0);
+  const [valueForMoney, setValueForMoney] = useState(myReview?.value_for_money ?? 0);
+  const [customerSupportRating, setCustomerSupportRating] = useState(
+    myReview?.customer_support_rating ?? 0
+  );
   const [body, setBody] = useState(myReview?.body ?? "");
   const [wouldRecommend, setWouldRecommend] = useState<boolean | null>(
     myReview?.would_recommend ?? null
@@ -72,7 +228,16 @@ export default function ReviewSection({
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ toolId, rating, wouldRecommend, body }),
+        body: JSON.stringify({
+          toolId,
+          rating,
+          easeOfUse: easeOfUse || null,
+          featuresRating: featuresRating || null,
+          valueForMoney: valueForMoney || null,
+          customerSupportRating: customerSupportRating || null,
+          wouldRecommend,
+          body,
+        }),
       });
       if (res.ok) {
         setEditing(false);
@@ -91,6 +256,10 @@ export default function ReviewSection({
         body: JSON.stringify({ toolId }),
       });
       setRating(0);
+      setEaseOfUse(0);
+      setFeaturesRating(0);
+      setValueForMoney(0);
+      setCustomerSupportRating(0);
       setBody("");
       setWouldRecommend(null);
       setEditing(true);
@@ -130,12 +299,31 @@ export default function ReviewSection({
               </div>
             </div>
             {myReview.body && <p className="text-sm text-ink/70 mt-2 leading-relaxed">{myReview.body}</p>}
+            <RatingDimensionChips review={myReview} />
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium">Your rating</span>
               <StarRating value={rating} onChange={setRating} />
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-ink/60">Ease of use</span>
+                <StarRating value={easeOfUse} onChange={setEaseOfUse} size={16} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-ink/60">Features</span>
+                <StarRating value={featuresRating} onChange={setFeaturesRating} size={16} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-ink/60">Value for money</span>
+                <StarRating value={valueForMoney} onChange={setValueForMoney} size={16} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-ink/60">Customer support</span>
+                <StarRating value={customerSupportRating} onChange={setCustomerSupportRating} size={16} />
+              </div>
             </div>
             <textarea
               value={body}
@@ -206,6 +394,7 @@ export default function ReviewSection({
               )}
             </div>
             {r.body && <p className="text-sm text-ink/70 mt-2 leading-relaxed">{r.body}</p>}
+            <RatingDimensionChips review={r} />
 
             {r.owner_response && (
               <div className="mt-3 ml-3 pl-3 border-l-2 border-plum/30 bg-plum/5 rounded-r-md py-2 pr-3">
@@ -257,6 +446,8 @@ export default function ReviewSection({
                 )}
               </div>
             )}
+
+            <ReviewFeedback review={r} />
           </div>
         ))}
         {otherReviews.length === 0 && !myReview && (

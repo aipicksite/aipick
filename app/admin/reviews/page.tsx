@@ -1,6 +1,7 @@
 import SubmitButton from "@/components/SubmitButton";
 import { requireAdmin } from "@/lib/admin";
-import { setReviewStatus } from "@/app/admin/moderation-actions";
+import { createServiceClient } from "@/lib/supabase/service";
+import { setReviewStatus, dismissReviewReports } from "@/app/admin/moderation-actions";
 import StarRating from "@/components/StarRating";
 
 export default async function AdminReviewsPage() {
@@ -13,6 +14,21 @@ export default async function AdminReviewsPage() {
     .limit(100);
 
   const reviewList = (reviews as any[]) ?? [];
+
+  // review_reports has no public RLS policy, so it needs the service
+  // client even from this admin page.
+  const admin = createServiceClient();
+  const { data: pendingReports } = await admin
+    .from("review_reports")
+    .select("review_id")
+    .eq("status", "pending");
+  const reportCounts = new Map<string, number>();
+  for (const r of (pendingReports as { review_id: string }[] | null) ?? []) {
+    reportCounts.set(r.review_id, (reportCounts.get(r.review_id) ?? 0) + 1);
+  }
+
+  // Reported reviews first so admins see them without having to hunt.
+  reviewList.sort((a, b) => (reportCounts.get(b.id) ?? 0) - (reportCounts.get(a.id) ?? 0));
 
   return (
     <main>
@@ -30,6 +46,11 @@ export default async function AdminReviewsPage() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-medium">{r.tools?.name ?? "Unknown tool"}</span>
                   <span className="text-ink/40">— @{r.profiles?.username ?? "user"}</span>
+                  {(reportCounts.get(r.id) ?? 0) > 0 && (
+                    <span className="text-xs px-2 py-0.5 rounded-full border border-coral/30 text-coral bg-coral-soft">
+                      🚩 Reported ({reportCounts.get(r.id)})
+                    </span>
+                  )}
                 </div>
                 <div className="mt-1"><StarRating value={r.rating} readOnly size={14} /></div>
                 {r.body && <p className="text-sm text-ink/65 mt-2 leading-relaxed">{r.body}</p>}
@@ -60,6 +81,13 @@ export default async function AdminReviewsPage() {
               {r.status !== "removed" && (
                 <form action={setReviewStatus.bind(null, r.id, "removed")}>
                   <SubmitButton pendingText="…" className="text-coral hover:underline">Remove</SubmitButton>
+                </form>
+              )}
+              {(reportCounts.get(r.id) ?? 0) > 0 && (
+                <form action={dismissReviewReports.bind(null, r.id)}>
+                  <SubmitButton pendingText="…" className="text-ink/50 hover:underline">
+                    Dismiss report{(reportCounts.get(r.id) ?? 0) > 1 ? "s" : ""}
+                  </SubmitButton>
                 </form>
               )}
             </div>

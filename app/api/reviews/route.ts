@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { toolId, rating, easeOfUse, valueForMoney, wouldRecommend, body } =
+  const { toolId, rating, easeOfUse, featuresRating, valueForMoney, customerSupportRating, wouldRecommend, body } =
     await request.json();
 
   if (!toolId || typeof rating !== "number" || rating < 1 || rating > 5) {
@@ -24,7 +24,9 @@ export async function POST(request: Request) {
       user_id: user.id,
       rating,
       ease_of_use: easeOfUse ?? null,
+      features_rating: featuresRating ?? null,
       value_for_money: valueForMoney ?? null,
+      customer_support_rating: customerSupportRating ?? null,
       would_recommend: wouldRecommend ?? null,
       body: body?.trim() || null,
       updated_at: new Date().toISOString(),

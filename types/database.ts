@@ -33,10 +33,13 @@ export type Review = {
   user_id: string;
   rating: number;
   ease_of_use: number | null;
+  features_rating: number | null;
   value_for_money: number | null;
+  customer_support_rating: number | null;
   would_recommend: boolean | null;
   body: string | null;
   helpful_count: number;
+  not_helpful_count: number;
   status: "published" | "flagged" | "removed";
   owner_response: string | null;
   owner_response_at: string | null;

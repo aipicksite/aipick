@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
+import { createServiceClient } from "@/lib/supabase/service";
 import { revalidatePath } from "next/cache";
 
 export async function addAdmin(formData: FormData) {
@@ -35,6 +36,27 @@ export async function setReviewStatus(
 ) {
   const { supabase } = await requireAdmin();
   await supabase.from("reviews").update({ status }).eq("id", reviewId);
+  // Acting on a review (flagging/removing it) resolves any open reports
+  // against it — nothing further for the admin to do on those.
+  if (status !== "published") {
+    const admin = createServiceClient();
+    await admin
+      .from("review_reports")
+      .update({ status: "resolved" })
+      .eq("review_id", reviewId)
+      .eq("status", "pending");
+  }
+  revalidatePath("/admin/reviews");
+}
+
+export async function dismissReviewReports(reviewId: string) {
+  await requireAdmin();
+  const admin = createServiceClient();
+  await admin
+    .from("review_reports")
+    .update({ status: "dismissed" })
+    .eq("review_id", reviewId)
+    .eq("status", "pending");
   revalidatePath("/admin/reviews");
 }
 
