@@ -98,6 +98,13 @@ export default async function ToolPage({ params }: Props) {
     .map((r: any) => r.categories)
     .filter(Boolean) as { id: string; name: string; slug: string }[];
 
+  const { data: recentUpdates } = await supabase
+    .from("tool_updates")
+    .select("*")
+    .eq("tool_id", tool.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   // Alternatives: other active tools sharing at least one category, ranked by score.
   let alternatives: Tool[] = [];
   if (toolCategories.length > 0) {
@@ -387,6 +394,30 @@ export default async function ToolPage({ params }: Props) {
                   </span>
                 ))}
               </div>
+            </section>
+          )}
+
+          {recentUpdates && recentUpdates.length > 0 && (
+            <section id="updates" className="mt-10 scroll-mt-32">
+              <h2 className="font-display font-bold text-xl mb-4">Recent updates</h2>
+              <ol className="relative border-l border-line pl-5 space-y-6">
+                {recentUpdates.map((u) => (
+                  <li key={u.id} className="relative">
+                    <span className="absolute -left-[25px] top-1 w-2.5 h-2.5 rounded-full bg-plum" />
+                    <div className="text-xs text-ink/40 mb-0.5">
+                      {new Date(u.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <div className="font-medium text-[15px]">{u.title}</div>
+                    {u.description && (
+                      <p className="text-sm text-ink/60 mt-1 leading-relaxed">{u.description}</p>
+                    )}
+                  </li>
+                ))}
+              </ol>
             </section>
           )}
 
