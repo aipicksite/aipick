@@ -10,6 +10,8 @@ import ToolAvatar from "@/components/ToolAvatar";
 import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
 import PageViewTracker from "@/components/PageViewTracker";
+import FloatingRecommendWidget from "@/components/FloatingRecommendWidget";
+import { getSiteSettings } from "@/lib/settings";
 
 type Props = { params: { slug: string } };
 
@@ -53,14 +55,6 @@ const PRICING_LABEL: Record<string, string> = {
   freemium: "Freemium",
   paid: "Paid",
 };
-
-function formatUpdated(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 export default async function ToolPage({ params }: Props) {
   const supabase = createClient();
@@ -127,6 +121,20 @@ export default async function ToolPage({ params }: Props) {
   const netVotes = tool.upvotes - tool.downvotes;
   const totalVotes = tool.upvotes + tool.downvotes;
   const upRatio = totalVotes > 0 ? Math.round((tool.upvotes / totalVotes) * 100) : null;
+
+  const siteSettings = await getSiteSettings();
+  const [{ count: recommendUp }, { count: recommendDown }] = await Promise.all([
+    supabase
+      .from("tool_recommend_votes")
+      .select("*", { count: "exact", head: true })
+      .eq("tool_id", tool.id)
+      .eq("vote_type", "up"),
+    supabase
+      .from("tool_recommend_votes")
+      .select("*", { count: "exact", head: true })
+      .eq("tool_id", tool.id)
+      .eq("vote_type", "down"),
+  ]);
 
   const { data: reviewRows } = await supabase
     .from("reviews")
@@ -226,19 +234,15 @@ export default async function ToolPage({ params }: Props) {
           </p>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-sm text-ink/50">
-            <span>Updated {formatUpdated(tool.updated_at)}</span>
             {upRatio !== null && (
-              <>
-                <span className="text-line">·</span>
-                <span>
-                  <span className="font-medium text-forest">{upRatio}%</span> would recommend
-                  <span className="text-ink/40"> ({totalVotes} votes)</span>
-                </span>
-              </>
+              <span>
+                <span className="font-medium text-forest">{upRatio}%</span> would recommend
+                <span className="text-ink/40"> ({totalVotes} votes)</span>
+              </span>
             )}
             {tool.rating_count > 0 && (
               <>
-                <span className="text-line">·</span>
+                {upRatio !== null && <span className="text-line">·</span>}
                 <span>★ {tool.rating_avg.toFixed(1)} ({tool.rating_count} reviews)</span>
               </>
             )}
@@ -484,10 +488,6 @@ export default async function ToolPage({ params }: Props) {
                 <dt className="text-ink/50">Net votes</dt>
                 <dd className="font-medium">▲ {netVotes}</dd>
               </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-ink/50">Last updated</dt>
-                <dd className="font-medium">{formatUpdated(tool.updated_at)}</dd>
-              </div>
             </dl>
 
             {toolCategories.length > 0 && (
@@ -540,6 +540,15 @@ export default async function ToolPage({ params }: Props) {
           </div>
         </aside>
       </div>
+
+      {siteSettings.floating_widget_enabled !== "false" && (
+        <FloatingRecommendWidget
+          toolId={tool.id}
+          initialUp={recommendUp ?? 0}
+          initialDown={recommendDown ?? 0}
+          position={siteSettings.floating_widget_position}
+        />
+      )}
     </main>
   );
 }
