@@ -35,6 +35,14 @@ export type Tool = {
   updated_at: string;
 };
 
+export type ToolUpdate = {
+  id: string;
+  tool_id: string;
+  title: string;
+  description: string | null;
+  created_at: string;
+};
+
 export type Review = {
   id: string;
   tool_id: string;

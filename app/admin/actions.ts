@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin";
+import { createServiceClient } from "@/lib/supabase/service";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -165,4 +166,36 @@ export async function unmarkFeatured(toolId: string) {
   await supabase.from("tools").update({ featured_requested_at: null }).eq("id", toolId);
   revalidatePath("/admin/tools");
   revalidatePath("/");
+}
+
+// Manual changelog entry, for updates that didn't come through an owner's
+// paid claim (e.g. admin fixed something, or a real product update the
+// admin heard about directly). Written via the service-role client since
+// tool_updates has no public/authenticated insert policy — see
+// sql/tool-updates.sql.
+export async function addToolUpdate(toolId: string, formData: FormData) {
+  await requireAdmin();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  if (!title) return;
+
+  const service = createServiceClient();
+  await service.from("tool_updates").insert({
+    tool_id: toolId,
+    title,
+    description: description || null,
+  });
+
+  const { data: tool } = await service.from("tools").select("slug").eq("id", toolId).maybeSingle();
+  revalidatePath(`/admin/tools/${toolId}/edit`);
+  if (tool?.slug) revalidatePath(`/tool/${tool.slug}`);
+}
+
+export async function deleteToolUpdate(toolId: string, updateId: string) {
+  await requireAdmin();
+  const service = createServiceClient();
+  await service.from("tool_updates").delete().eq("id", updateId);
+  const { data: tool } = await service.from("tools").select("slug").eq("id", toolId).maybeSingle();
+  revalidatePath(`/admin/tools/${toolId}/edit`);
+  if (tool?.slug) revalidatePath(`/tool/${tool.slug}`);
 }

@@ -204,15 +204,28 @@ export async function approveClaim(claimId: string) {
   // Paid "update" claims (from /update-ai) carry proposed edits — apply the
   // ones the owner actually filled in. Plain free claims (kind === 'claim')
   // only verify ownership and touch nothing else.
+  const changedFields: string[] = [];
   if (claim.kind === "update") {
+    if (claim.requested_short_description || claim.requested_description) changedFields.push("description");
     if (claim.requested_short_description) toolUpdate.short_description = claim.requested_short_description;
     if (claim.requested_description) toolUpdate.description = claim.requested_description;
-    if (claim.requested_pricing_summary) toolUpdate.pricing_summary = claim.requested_pricing_summary;
-    if (claim.requested_screenshot_url) toolUpdate.screenshot_url = claim.requested_screenshot_url;
-    if (claim.requested_video_url) toolUpdate.video_url = claim.requested_video_url;
+    if (claim.requested_pricing_summary) { toolUpdate.pricing_summary = claim.requested_pricing_summary; changedFields.push("pricing"); }
+    if (claim.requested_screenshot_url) { toolUpdate.screenshot_url = claim.requested_screenshot_url; changedFields.push("screenshot"); }
+    if (claim.requested_video_url) { toolUpdate.video_url = claim.requested_video_url; changedFields.push("video"); }
   }
 
   await supabase.from("tools").update(toolUpdate).eq("id", claim.tool_id);
+
+  // Public changelog entry — only for real content changes (not a bare
+  // ownership claim with no edits attached, and not the free "claim" kind).
+  if (claim.kind === "update" && changedFields.length > 0) {
+    const service = createServiceClient();
+    await service.from("tool_updates").insert({
+      tool_id: claim.tool_id,
+      title: "Listing updated by the owner",
+      description: `The owner verified this listing and updated its ${changedFields.join(", ")}.`,
+    });
+  }
 
   await supabase
     .from("tool_claims")
