@@ -88,6 +88,36 @@ export default async function AdminSeoPage() {
           </p>
         </div>
 
+        <div className="pt-4 border-t border-line">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="floating_widget_enabled"
+              defaultChecked={settings.floating_widget_enabled !== "false"}
+            />
+            Show the floating &quot;Recommend this tool?&quot; widget
+          </label>
+          <p className="text-xs text-ink/45 mt-1 mb-3">
+            A small floating like/dislike prompt shown on every tool page.
+            No login required to vote; it hides itself after a visitor
+            votes or closes it.
+          </p>
+
+          <label className="text-sm font-medium block mb-1">
+            Widget position
+          </label>
+          <select
+            name="floating_widget_position"
+            defaultValue={settings.floating_widget_position}
+            className="w-full border border-line rounded px-3 py-2 text-sm bg-white"
+          >
+            <option value="bottom-right">Bottom right</option>
+            <option value="bottom-left">Bottom left</option>
+            <option value="top-right">Top right</option>
+            <option value="top-left">Top left</option>
+          </select>
+        </div>
+
         <SubmitButton
           pendingText="Saving…"
           className="bg-plum text-white rounded px-5 py-2.5 text-sm font-medium hover:bg-plum-deep"

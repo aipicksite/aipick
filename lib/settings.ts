@@ -6,6 +6,8 @@ export type SiteSettings = {
   og_image_url: string;
   google_analytics_id: string;
   google_site_verification: string;
+  floating_widget_enabled: string; // "true" | "false" — stored as text like the rest of site_settings
+  floating_widget_position: "bottom-right" | "bottom-left" | "top-right" | "top-left" | string;
 };
 
 const DEFAULTS: SiteSettings = {
@@ -15,6 +17,8 @@ const DEFAULTS: SiteSettings = {
   og_image_url: "",
   google_analytics_id: "",
   google_site_verification: "",
+  floating_widget_enabled: "true",
+  floating_widget_position: "bottom-right",
 };
 
 // Reads all rows from site_settings and merges them over the defaults above,
