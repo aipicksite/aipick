@@ -5,6 +5,7 @@ import Link from "next/link";
 import ToolRow from "@/components/ToolRow";
 import ToolSearchBox from "@/components/ToolSearchBox";
 import FeaturedThumb from "@/components/FeaturedThumb";
+import ToolAvatar from "@/components/ToolAvatar";
 import { currentlyFeaturedIds } from "@/lib/featured-queue";
 import PageViewTracker from "@/components/PageViewTracker";
 
@@ -304,6 +305,7 @@ export default async function HomePage() {
 
       {featuredTools.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 mb-16">
+          <span className="inline-block text-xs font-semibold text-gold bg-gold/15 px-2.5 py-1 rounded-full mb-2">Spotlight</span>
           <div className="flex items-baseline justify-between mb-1">
             <h2 className="font-display font-bold text-2xl">
               <span className="text-gold">★</span> Featured
@@ -313,7 +315,7 @@ export default async function HomePage() {
             A rotating spotlight of standout tools. This is a labeled paid placement — it
             never changes a tool's AIPick Score or organic rank below.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {featuredTools.slice(0, 15).map((tool, i) => {
               const accents = ["border-plum/25", "border-gold/35", "border-forest/25", "border-coral/25"];
               const accent = accents[i % accents.length];
@@ -321,9 +323,9 @@ export default async function HomePage() {
                 <Link
                   key={tool.id}
                   href={`/tool/${tool.slug}`}
-                  className={`group flex flex-col bg-surface border ${accent} rounded-xl overflow-hidden hover:shadow-lift transition-shadow`}
+                  className={`group flex sm:flex-col items-center sm:items-stretch gap-3 sm:gap-0 bg-surface border ${accent} rounded-xl overflow-hidden hover:shadow-lift transition-shadow p-2.5 sm:p-0`}
                 >
-                  <div className="aspect-[16/10] overflow-hidden border-b border-line bg-ink/5">
+                  <div className="w-16 h-16 sm:w-auto sm:h-auto shrink-0 rounded-lg sm:rounded-none overflow-hidden sm:aspect-[16/10] sm:border-b sm:border-line bg-ink/5">
                     <FeaturedThumb
                       websiteUrl={tool.website_url}
                       overrideUrl={tool.screenshot_url}
@@ -331,15 +333,15 @@ export default async function HomePage() {
                       priority={i < 5}
                     />
                   </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="font-display font-semibold text-sm group-hover:text-plum leading-snug">
+                  <div className="min-w-0 flex-1 sm:p-4 sm:flex sm:flex-col sm:flex-1">
+                    <h3 className="font-display font-semibold text-sm group-hover:text-plum leading-snug truncate sm:whitespace-normal sm:line-clamp-none">
                       {tool.name}
                     </h3>
-                    <p className="text-xs text-ink/50 mt-1 leading-snug line-clamp-2 flex-1">
+                    <p className="text-xs text-ink/50 mt-0.5 sm:mt-1 leading-snug line-clamp-2 sm:flex-1">
                       {tool.short_description}
                     </p>
                     {tool.rating_count > 0 && (
-                      <span className="text-xs text-gold mt-2">
+                      <span className="text-xs text-gold mt-1 sm:mt-2 block">
                         ★ {tool.rating_avg.toFixed(1)}
                       </span>
                     )}
@@ -379,6 +381,7 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 mb-16">
+        <span className="inline-block text-xs font-semibold text-forest bg-forest/10 px-2.5 py-1 rounded-full mb-2">Explore</span>
         <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-display font-bold text-2xl">Browse by category</h2>
         </div>
@@ -435,6 +438,7 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
+        <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">Rankings</span>
         <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-display font-bold text-2xl">Top Ranked</h2>
 
@@ -458,19 +462,26 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
-        <div className="bg-surface border border-line rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 justify-between">
+        <div
+          className="relative overflow-hidden rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 justify-between"
+          style={{ background: "linear-gradient(120deg, rgba(62,42,92,0.95), rgba(45,106,79,0.9))" }}
+        >
+          <div
+            className="absolute inset-0 -z-10 opacity-40"
+            style={{ background: "radial-gradient(60% 80% at 90% 0%, rgba(198,138,40,0.55), transparent)" }}
+          />
           <div>
-            <h2 className="font-display font-bold text-xl sm:text-2xl">
+            <h2 className="font-display font-bold text-xl sm:text-2xl text-white">
               Not sure which tool fits? Compare them side by side.
             </h2>
-            <p className="text-sm text-ink/55 mt-2 max-w-lg leading-relaxed">
+            <p className="text-sm text-white/80 mt-2 max-w-lg leading-relaxed">
               Line up pricing, platforms, ratings and features for any two or more tools
               before you commit — no guessing, no sales pitch.
             </p>
           </div>
           <Link
             href="/compare"
-            className="shrink-0 bg-plum text-white px-6 py-3 rounded-md text-sm font-semibold hover:bg-plum-deep transition-colors"
+            className="shrink-0 bg-gold text-plum-deep px-6 py-3 rounded-md text-sm font-semibold hover:brightness-105 transition-all shadow-lift"
           >
             Compare tools →
           </Link>
@@ -479,6 +490,7 @@ export default async function HomePage() {
 
       {testimonialReviews.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 pb-24">
+          <span className="inline-block text-xs font-semibold text-coral bg-coral/10 px-2.5 py-1 rounded-full mb-2">Community</span>
           <div className="flex items-baseline justify-between mb-1">
             <h2 className="font-display font-bold text-2xl">What the community is saying</h2>
           </div>
@@ -511,6 +523,7 @@ export default async function HomePage() {
 
       {recentToolList.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 pb-24">
+          <span className="inline-block text-xs font-semibold text-forest bg-forest/10 px-2.5 py-1 rounded-full mb-2">Fresh</span>
           <div className="flex items-baseline justify-between mb-1">
             <h2 className="font-display font-bold text-2xl">Newest additions</h2>
           </div>
@@ -522,12 +535,15 @@ export default async function HomePage() {
               <Link
                 key={tool.id}
                 href={`/tool/${tool.slug}`}
-                className="bg-surface border border-line rounded-lg p-4 hover:border-plum transition-colors"
+                className="flex items-center gap-3 bg-surface border border-line rounded-lg p-4 hover:border-plum transition-colors"
               >
-                <h3 className="font-display font-medium text-[15px]">{tool.name}</h3>
-                <p className="text-sm text-ink/55 mt-1 leading-snug line-clamp-2">
-                  {tool.short_description}
-                </p>
+                <ToolAvatar name={tool.name} logoUrl={tool.logo_url} websiteUrl={tool.website_url} size={40} />
+                <div className="min-w-0">
+                  <h3 className="font-display font-medium text-[15px] truncate">{tool.name}</h3>
+                  <p className="text-sm text-ink/55 mt-0.5 leading-snug line-clamp-2">
+                    {tool.short_description}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
@@ -536,6 +552,7 @@ export default async function HomePage() {
 
       {recentPostList.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 pb-24">
+          <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">From the blog</span>
           <div className="flex items-baseline justify-between mb-1">
             <h2 className="font-display font-bold text-2xl">From the blog</h2>
             <Link href="/blog" className="text-sm font-medium text-plum hover:underline">
@@ -594,6 +611,97 @@ export default async function HomePage() {
               <p className="text-sm text-ink/60 mt-2.5 leading-relaxed">{faq.a}</p>
             </details>
           ))}
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-4 pb-24">
+        <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">About AIPick</span>
+        <h2 className="font-display font-bold text-2xl mb-4">
+          A community-ranked directory for finding AI tools that actually work
+        </h2>
+        <div className="text-sm text-ink/65 leading-relaxed space-y-4">
+          <p>
+            Most "best AI tools" lists online are really just paid placements dressed up as
+            recommendations. AIPick works differently: every tool in the{" "}
+            <Link href="/tools" className="text-plum hover:underline">directory</Link> earns its
+            position through the same signals that matter to real users — upvotes, written
+            reviews, and how active a listing has stayed over time. That combination is what we
+            call the{" "}
+            <Link href="/how-it-works" className="text-plum hover:underline">AIPick Score</Link>,
+            and it's calculated the same way for every tool, whether it's a scrappy new launch or
+            an established name people already know.
+          </p>
+          <p>
+            Paid placement still exists on AIPick — tool owners can request a{" "}
+            <Link href="/submit" className="text-plum hover:underline">Featured spot</Link> on the
+            homepage — but it's rotated on a fair queue and clearly labeled, and it never touches
+            a tool's organic score or its rank on the{" "}
+            <Link href="/tools" className="text-plum hover:underline">full tools page</Link>. If
+            you'd rather browse by use case than scroll a single long list, the{" "}
+            <Link href="/category" className="text-plum hover:underline">category pages</Link>{" "}
+            group tools by what they're actually for — writing, coding, image and video
+            generation, SEO, productivity, and more — so you can go straight to the tools built
+            for the job you're trying to do.
+          </p>
+          <h3 className="font-display font-semibold text-base text-ink pt-2">
+            Comparing tools instead of guessing
+          </h3>
+          <p>
+            Picking between two or three similar tools from their marketing pages alone is
+            genuinely hard — pricing pages are written to flatter, not to inform. The{" "}
+            <Link href="/compare" className="text-plum hover:underline">compare tool</Link> lines
+            up pricing, platform support, and community ratings for any set of tools side by
+            side, using the same review and voting data that powers the rankings above, so you're
+            comparing like for like instead of piecing it together from separate tabs.
+          </p>
+          <p>
+            Once you've found tools worth revisiting, you can{" "}
+            <Link href="/saved" className="text-plum hover:underline">save them</Link> to your
+            account, or group a handful into a shareable{" "}
+            <Link href="/lists" className="text-plum hover:underline">custom list</Link> — a
+            "best AI tools for freelancers" collection, say — that other visitors can browse,
+            like, and comment on. And if you actually run one of the tools listed here, claiming
+            it is free: a{" "}
+            <Link href="/claim" className="text-plum hover:underline">verified owner</Link> can
+            keep pricing and descriptions accurate as the product changes, which is part of why
+            AIPick listings tend to stay more current than a lot of static "best of" roundups.
+          </p>
+          <p>
+            None of this is static, either. New tools land in the directory regularly (see{" "}
+            <span className="text-ink/50">Newest additions</span> above), rankings shift as more
+            people vote and review, and the{" "}
+            <Link href="/blog" className="text-plum hover:underline">blog</Link> covers
+            comparisons and guides for picking the right tool in categories where the choice
+            isn't obvious. The goal is the same one AIPick started with: a directory that reflects
+            what real users think, not what advertisers paid for.
+          </p>
+          <h3 className="font-display font-semibold text-base text-ink pt-2">
+            Why votes and reviews, not payment, decide rank
+          </h3>
+          <p>
+            Anyone can leave a review or cast a vote once they've created a free account, and
+            every rating is tied to that account rather than an anonymous form submission — the
+            same friction that makes it harder for a tool owner to quietly inflate their own
+            numbers also makes the signal more trustworthy for everyone reading it. Reviews with
+            genuinely low or mixed ratings stay visible right alongside the positive ones; nothing
+            gets hidden just because a tool owner would rather it weren't there. That's also why
+            claimed, owner-verified listings carry a visible badge instead of a quiet promise —
+            you can tell at a glance whether the pricing and feature list in front of you came
+            from the team that built the tool or from the last time someone on AIPick's side
+            checked in on it.
+          </p>
+          <p>
+            If you're weighing a purchase or a subscription and want more than a single tool's
+            page to go on, that's really the shortest path through AIPick: start broad on the{" "}
+            <Link href="/tools" className="text-plum hover:underline">full directory</Link> or a
+            relevant{" "}
+            <Link href="/category" className="text-plum hover:underline">category</Link>, narrow
+            it down with the{" "}
+            <Link href="/compare" className="text-plum hover:underline">comparison tool</Link>{" "}
+            once you've got two or three finalists, and read what actual users wrote before you
+            commit. You can read more about how the whole project got started on the{" "}
+            <Link href="/about" className="text-plum hover:underline">About page</Link>.
+          </p>
         </div>
       </section>
     </main>
