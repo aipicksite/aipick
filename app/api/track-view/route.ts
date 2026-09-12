@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
     const toolId: unknown = body?.toolId;
     const referrer: unknown = body?.referrer;
     const visitorId: unknown = body?.visitorId;
+    const viewId: unknown = body?.viewId;
     const utmSource: unknown = body?.utmSource;
     const utmMedium: unknown = body?.utmMedium;
     const utmCampaign: unknown = body?.utmCampaign;
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
       tool_id: typeof toolId === "string" && toolId ? toolId : null,
       referrer: typeof referrer === "string" && referrer ? referrer : null,
       visitor_id: typeof visitorId === "string" && visitorId ? visitorId : null,
+      view_id: typeof viewId === "string" && viewId ? viewId : null,
       utm_source: typeof utmSource === "string" && utmSource ? utmSource : null,
       utm_medium: typeof utmMedium === "string" && utmMedium ? utmMedium : null,
       utm_campaign: typeof utmCampaign === "string" && utmCampaign ? utmCampaign : null,

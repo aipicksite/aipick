@@ -10,6 +10,7 @@ import ToolAvatar from "@/components/ToolAvatar";
 import ToolScreenshot from "@/components/ToolScreenshot";
 import ReviewSection from "@/components/ReviewSection";
 import PageViewTracker from "@/components/PageViewTracker";
+import OutboundLink from "@/components/OutboundLink";
 import FloatingRecommendWidget from "@/components/FloatingRecommendWidget";
 import RecommendStats from "@/components/RecommendStats";
 import { getSiteSettings } from "@/lib/settings";
@@ -251,14 +252,12 @@ export default async function ToolPage({ params }: Props) {
           </div>
         </div>
 
-        <a
+        <OutboundLink
           href={tool.website_url}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
           className="hidden sm:inline-flex items-center font-medium text-white bg-plum px-5 py-3 rounded-md hover:bg-plum-deep transition-colors shrink-0"
         >
           Try {tool.name} →
-        </a>
+        </OutboundLink>
       </div>
 
       {/* Sticky in-page section nav */}
@@ -347,14 +346,12 @@ export default async function ToolPage({ params }: Props) {
                 )}
               </div>
               <p className="text-[15px] text-ink/70 mt-1.5">{tool.pricing_summary}</p>
-              <a
+              <OutboundLink
                 href={tool.website_url}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
                 className="inline-block text-sm text-plum hover:underline mt-3"
               >
                 Verify on the official pricing page →
-              </a>
+              </OutboundLink>
             </section>
           )}
 
@@ -469,14 +466,12 @@ export default async function ToolPage({ params }: Props) {
           <div className="lg:sticky lg:top-40 bg-surface border border-line rounded-lg overflow-hidden shadow-card">
             <div className="h-1.5 bg-gradient-to-r from-plum via-gold to-forest" />
             <div className="p-5">
-            <a
+            <OutboundLink
               href={tool.website_url}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
               className="block text-center font-medium text-white bg-plum px-4 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
             >
               Visit {tool.name} →
-            </a>
+            </OutboundLink>
 
             <div className="flex items-center justify-center gap-2 mt-3">
               <VoteButton
