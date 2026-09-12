@@ -614,95 +614,128 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-4 pb-24">
+      <section className="max-w-6xl mx-auto px-4 pb-24">
         <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">About AIPick</span>
-        <h2 className="font-display font-bold text-2xl mb-4">
+        <h2 className="font-display font-bold text-2xl mb-3">
           A community-ranked directory for finding AI tools that actually work
         </h2>
-        <div className="text-sm text-ink/65 leading-relaxed space-y-4">
-          <p>
-            Most "best AI tools" lists online are really just paid placements dressed up as
-            recommendations. AIPick works differently: every tool in the{" "}
-            <Link href="/tools" className="text-plum hover:underline">directory</Link> earns its
-            position through the same signals that matter to real users — upvotes, written
-            reviews, and how active a listing has stayed over time. That combination is what we
-            call the{" "}
-            <Link href="/how-it-works" className="text-plum hover:underline">AIPick Score</Link>,
-            and it's calculated the same way for every tool, whether it's a scrappy new launch or
-            an established name people already know.
-          </p>
-          <p>
-            Paid placement still exists on AIPick — tool owners can request a{" "}
-            <Link href="/submit" className="text-plum hover:underline">Featured spot</Link> on the
-            homepage — but it's rotated on a fair queue and clearly labeled, and it never touches
+        <p className="text-sm text-ink/65 leading-relaxed max-w-3xl">
+          Most "best AI tools" lists online are really just paid placements dressed up as
+          recommendations. AIPick works differently: every tool in the{" "}
+          <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link>{" "}
+          earns its position through the same signals that matter to real users, combined into
+          one <Link href="/how-it-works" className="text-plum hover:underline font-medium">AIPick Score</Link> that's
+          calculated the same way for every tool — a scrappy new launch or a name people already know.
+        </p>
+
+        <div className="grid sm:grid-cols-3 gap-4 mt-8">
+          {[
+            { icon: "👍", color: "plum", title: "Real votes", body: "Community upvotes and downvotes — the biggest single input into the score." },
+            { icon: "✍️", color: "gold", title: "Written reviews", body: "Star ratings plus the actual text — mixed and negative reviews stay visible, never hidden." },
+            { icon: "⏱️", color: "forest", title: "Recent activity", body: "Listings that stay current and keep getting engagement rank ahead of stale, abandoned ones." },
+          ].map((f) => {
+            const s: Record<string, { bg: string; ring: string; text: string }> = {
+              plum: { bg: "bg-plum/10", ring: "ring-plum/20", text: "text-plum" },
+              gold: { bg: "bg-gold/15", ring: "ring-gold/25", text: "text-gold" },
+              forest: { bg: "bg-forest/10", ring: "ring-forest/20", text: "text-forest" },
+            };
+            const c = s[f.color];
+            return (
+              <div key={f.title} className={`rounded-xl border border-line p-5 ${c.bg}`}>
+                <span className={`inline-flex items-center justify-center w-11 h-11 rounded-full ${c.bg} ring-1 ${c.ring} text-xl mb-3`}>
+                  {f.icon}
+                </span>
+                <h3 className={`font-display font-semibold text-sm ${c.text}`}>{f.title}</h3>
+                <p className="text-sm text-ink/60 mt-1.5 leading-relaxed">{f.body}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex items-start gap-3 bg-gold/10 border border-gold/30 rounded-xl p-5 mt-6">
+          <span className="text-xl shrink-0">🏷️</span>
+          <p className="text-sm text-ink/70 leading-relaxed">
+            Paid placement still exists — tool owners can{" "}
+            <Link href="/submit" className="text-plum hover:underline font-medium">request a Featured spot</Link>{" "}
+            on the homepage — but it's rotated on a fair queue, clearly labeled, and never touches
             a tool's organic score or its rank on the{" "}
-            <Link href="/tools" className="text-plum hover:underline">full tools page</Link>. If
-            you'd rather browse by use case than scroll a single long list, the{" "}
-            <Link href="/category" className="text-plum hover:underline">category pages</Link>{" "}
-            group tools by what they're actually for — writing, coding, image and video
-            generation, SEO, productivity, and more — so you can go straight to the tools built
-            for the job you're trying to do.
-          </p>
-          <h3 className="font-display font-semibold text-base text-ink pt-2">
-            Comparing tools instead of guessing
-          </h3>
-          <p>
-            Picking between two or three similar tools from their marketing pages alone is
-            genuinely hard — pricing pages are written to flatter, not to inform. The{" "}
-            <Link href="/compare" className="text-plum hover:underline">compare tool</Link> lines
-            up pricing, platform support, and community ratings for any set of tools side by
-            side, using the same review and voting data that powers the rankings above, so you're
-            comparing like for like instead of piecing it together from separate tabs.
-          </p>
-          <p>
-            Once you've found tools worth revisiting, you can{" "}
-            <Link href="/saved" className="text-plum hover:underline">save them</Link> to your
-            account, or group a handful into a shareable{" "}
-            <Link href="/lists" className="text-plum hover:underline">custom list</Link> — a
-            "best AI tools for freelancers" collection, say — that other visitors can browse,
-            like, and comment on. And if you actually run one of the tools listed here, claiming
-            it is free: a{" "}
-            <Link href="/claim" className="text-plum hover:underline">verified owner</Link> can
-            keep pricing and descriptions accurate as the product changes, which is part of why
-            AIPick listings tend to stay more current than a lot of static "best of" roundups.
-          </p>
-          <p>
-            None of this is static, either. New tools land in the directory regularly (see{" "}
-            <span className="text-ink/50">Newest additions</span> above), rankings shift as more
-            people vote and review, and the{" "}
-            <Link href="/blog" className="text-plum hover:underline">blog</Link> covers
-            comparisons and guides for picking the right tool in categories where the choice
-            isn't obvious. The goal is the same one AIPick started with: a directory that reflects
-            what real users think, not what advertisers paid for.
-          </p>
-          <h3 className="font-display font-semibold text-base text-ink pt-2">
-            Why votes and reviews, not payment, decide rank
-          </h3>
-          <p>
-            Anyone can leave a review or cast a vote once they've created a free account, and
-            every rating is tied to that account rather than an anonymous form submission — the
-            same friction that makes it harder for a tool owner to quietly inflate their own
-            numbers also makes the signal more trustworthy for everyone reading it. Reviews with
-            genuinely low or mixed ratings stay visible right alongside the positive ones; nothing
-            gets hidden just because a tool owner would rather it weren't there. That's also why
-            claimed, owner-verified listings carry a visible badge instead of a quiet promise —
-            you can tell at a glance whether the pricing and feature list in front of you came
-            from the team that built the tool or from the last time someone on AIPick's side
-            checked in on it.
-          </p>
-          <p>
-            If you're weighing a purchase or a subscription and want more than a single tool's
-            page to go on, that's really the shortest path through AIPick: start broad on the{" "}
-            <Link href="/tools" className="text-plum hover:underline">full directory</Link> or a
-            relevant{" "}
-            <Link href="/category" className="text-plum hover:underline">category</Link>, narrow
-            it down with the{" "}
-            <Link href="/compare" className="text-plum hover:underline">comparison tool</Link>{" "}
-            once you've got two or three finalists, and read what actual users wrote before you
-            commit. You can read more about how the whole project got started on the{" "}
-            <Link href="/about" className="text-plum hover:underline">About page</Link>.
+            <Link href="/tools" className="text-plum hover:underline font-medium">full tools page</Link>.
           </p>
         </div>
+
+        <h3 className="font-display font-bold text-lg mt-10 mb-4">Three ways to find the right tool</h3>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-plum/10 text-lg mb-3">🔍</span>
+            <h4 className="font-display font-semibold text-sm">Browse by category</h4>
+            <ul className="text-sm text-ink/60 mt-2 space-y-1.5 list-disc list-inside">
+              <li>Writing, coding, image &amp; video, SEO, and more</li>
+              <li>Sorted by real AIPick Score, not payment</li>
+            </ul>
+            <div className="flex gap-3 mt-3 text-xs font-medium">
+              <Link href="/category" className="text-plum hover:underline">Categories →</Link>
+              <Link href="/tools" className="text-plum hover:underline">Full directory →</Link>
+            </div>
+          </div>
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gold/15 text-lg mb-3">⚖️</span>
+            <h4 className="font-display font-semibold text-sm">Compare finalists</h4>
+            <ul className="text-sm text-ink/60 mt-2 space-y-1.5 list-disc list-inside">
+              <li>Pricing, platforms and ratings side by side</li>
+              <li>Same review data that powers the rankings</li>
+            </ul>
+            <div className="flex gap-3 mt-3 text-xs font-medium">
+              <Link href="/compare" className="text-plum hover:underline">Compare tools →</Link>
+            </div>
+          </div>
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-forest/10 text-lg mb-3">📌</span>
+            <h4 className="font-display font-semibold text-sm">Save &amp; share</h4>
+            <ul className="text-sm text-ink/60 mt-2 space-y-1.5 list-disc list-inside">
+              <li>Bookmark tools to your account</li>
+              <li>Group favorites into a shareable list others can like &amp; comment on</li>
+            </ul>
+            <div className="flex gap-3 mt-3 text-xs font-medium">
+              <Link href="/saved" className="text-plum hover:underline">Saved tools →</Link>
+              <Link href="/lists" className="text-plum hover:underline">Custom lists →</Link>
+            </div>
+          </div>
+        </div>
+
+        <h3 className="font-display font-bold text-lg mt-10 mb-4">Why votes and reviews, not payment, decide rank</h3>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+          {[
+            { title: "Votes are tied to an account", body: "Every rating comes from a real free account, not an anonymous form — the same friction that stops a tool owner quietly inflating their own numbers." },
+            { title: "Negative reviews stay visible", body: "Mixed or low ratings sit right alongside the positive ones — nothing gets hidden just because an owner would rather it weren't there." },
+            { title: "Ownership is verified, not assumed", body: "A claimed listing carries a visible badge, so you can tell whether the pricing in front of you came from the team that built the tool." },
+            { title: "Score logic is public", body: "How votes, reviews and recency combine into the AIPick Score is explained in full on the how-it-works page, not kept behind a black box." },
+          ].map((item) => (
+            <div key={item.title} className="flex items-start gap-3">
+              <span className="shrink-0 w-6 h-6 rounded-full bg-forest/15 text-forest flex items-center justify-center text-xs mt-0.5">✓</span>
+              <div>
+                <p className="font-display font-medium text-sm">{item.title}</p>
+                <p className="text-sm text-ink/60 mt-0.5 leading-relaxed">{item.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-sm text-ink/65 leading-relaxed max-w-3xl mt-8">
+          None of this is static. New tools land in the directory regularly (see{" "}
+          <span className="text-ink/50">Newest additions</span> above), rankings shift as more
+          people vote and review, and the{" "}
+          <Link href="/blog" className="text-plum hover:underline font-medium">blog</Link> covers
+          comparisons and guides for categories where the choice isn't obvious. If you're weighing
+          a purchase, the shortest path through AIPick is usually: start on the{" "}
+          <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link> or
+          a relevant{" "}
+          <Link href="/category" className="text-plum hover:underline font-medium">category</Link>,
+          narrow it down with the{" "}
+          <Link href="/compare" className="text-plum hover:underline font-medium">comparison tool</Link>{" "}
+          once you've got two or three finalists, and read what real users wrote before you commit.
+          More on how the project started is on the{" "}
+          <Link href="/about" className="text-plum hover:underline font-medium">About page</Link>.
+        </p>
       </section>
     </main>
   );
