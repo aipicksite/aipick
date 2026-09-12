@@ -14,6 +14,7 @@ const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] 
     label: "Content",
     links: [
       { href: "/admin/tools", label: "Tools" },
+      { href: "/admin/categories", label: "Categories" },
       { href: "/admin/users", label: "Users" },
       { href: "/admin/submissions", label: "Submissions" },
       { href: "/admin/claims", label: "Claims" },

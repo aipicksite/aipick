@@ -17,6 +17,16 @@ export default function ToolForm({
   action,
   submitLabel,
 }: Props) {
+  const parents = categories.filter((c) => !c.parent_id);
+  const childrenByParent = new Map<string, Category[]>();
+  for (const c of categories) {
+    if (c.parent_id) {
+      const list = childrenByParent.get(c.parent_id) ?? [];
+      list.push(c);
+      childrenByParent.set(c.parent_id, list);
+    }
+  }
+
   return (
     <form action={action} className="space-y-5 mt-8">
       <div className="grid grid-cols-2 gap-4">
@@ -172,19 +182,49 @@ export default function ToolForm({
       </div>
 
       <div>
-        <label className="text-sm font-medium block mb-2">Categories</label>
-        <div className="flex flex-wrap gap-3">
-          {categories.map((cat) => (
-            <label key={cat.id} className="flex items-center gap-1.5 text-sm">
-              <input
-                type="checkbox"
-                name="category_ids"
-                value={cat.id}
-                defaultChecked={selectedCategoryIds.includes(cat.id)}
-              />
-              {cat.name}
-            </label>
-          ))}
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium block">Categories</label>
+          <a href="/admin/categories" target="_blank" rel="noreferrer" className="text-xs text-plum hover:underline">
+            Manage categories →
+          </a>
+        </div>
+        <p className="text-xs text-ink/45 mb-3">
+          Pick the parent category, plus any subcategories that fit — a tool can have more than one.
+        </p>
+        <div className="border border-line rounded-lg divide-y divide-line max-h-96 overflow-y-auto">
+          {parents.map((parent) => {
+            const children = childrenByParent.get(parent.id) ?? [];
+            return (
+              <div key={parent.id} className="p-3">
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    name="category_ids"
+                    value={parent.id}
+                    defaultChecked={selectedCategoryIds.includes(parent.id)}
+                  />
+                  {parent.icon && <span>{parent.icon}</span>}
+                  {parent.name}
+                </label>
+                {children.length > 0 && (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 ml-6">
+                    {children.map((child) => (
+                      <label key={child.id} className="flex items-center gap-1.5 text-sm text-ink/70">
+                        <input
+                          type="checkbox"
+                          name="category_ids"
+                          value={child.id}
+                          defaultChecked={selectedCategoryIds.includes(child.id)}
+                        />
+                        {child.icon && <span>{child.icon}</span>}
+                        {child.name}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
