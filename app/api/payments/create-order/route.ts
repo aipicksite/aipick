@@ -86,6 +86,13 @@ export async function POST(req: Request) {
       coupon_applied: priced.couponApplied,
     });
   } catch (err) {
+    // This used to be swallowed completely — the checkout button just said
+    // "ran into a problem" with zero trace of *why* on either end. PayPal's
+    // create-order error body (invalid client id/secret, live/sandbox env
+    // mismatch, account not eligible for a currency, etc.) is logged here so
+    // the real cause shows up in Vercel's function logs instead of only a
+    // generic message reaching the visitor.
+    console.error("[payments/create-order] PayPal order creation failed:", err);
     await service.from("payments").update({ status: "failed" }).eq("id", payment.id);
     return NextResponse.json({ error: "PayPal order creation failed" }, { status: 502 });
   }

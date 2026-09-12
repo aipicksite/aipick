@@ -33,6 +33,7 @@ export async function POST(req: Request) {
     const capture = result.purchase_units?.[0]?.payments?.captures?.[0];
 
     if (result.status !== "COMPLETED" || !capture) {
+      console.error("[payments/capture-order] Capture not completed:", JSON.stringify(result));
       await service.from("payments").update({ status: "failed" }).eq("id", payment_id);
       return NextResponse.json({ error: "Capture not completed" }, { status: 402 });
     }
@@ -52,6 +53,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ status: "completed", payment_id: payment.id });
   } catch (err) {
+    // Previously swallowed silently — logging the real PayPal capture error
+    // (declined card, currency/account mismatch, expired order, etc.) so it
+    // shows up in Vercel's function logs instead of vanishing entirely.
+    console.error("[payments/capture-order] PayPal capture failed:", err);
     await service.from("payments").update({ status: "failed" }).eq("id", payment_id);
     return NextResponse.json({ error: "PayPal capture failed" }, { status: 502 });
   }

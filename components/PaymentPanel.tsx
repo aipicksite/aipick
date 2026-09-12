@@ -126,8 +126,18 @@ export default function PaymentPanel({ planKey, label, amountCents, currency, is
             setPaying(false);
           }
         },
-        onError: () => {
-          setPayError("PayPal checkout ran into a problem. Please try again.");
+        onError: (err: unknown) => {
+          // The SDK calls onError AFTER createOrder's own catch already ran
+          // (createOrder sets a specific message via setPayError, then
+          // throws so the SDK knows the attempt failed) — this used to
+          // unconditionally overwrite that specific message with the
+          // generic one below, so whatever real reason createOrder found
+          // (e.g. "PayPal order creation failed") never stayed on screen.
+          // Only fall back to the generic message if nothing more specific
+          // is already showing. The real underlying error is also logged
+          // for debugging — check the browser console.
+          console.error("[PaymentPanel] PayPal SDK onError:", err);
+          setPayError((prev) => prev ?? "PayPal checkout ran into a problem. Please try again.");
         },
       })
       .render("#paypal-button-container");
@@ -191,7 +201,7 @@ export default function PaymentPanel({ planKey, label, amountCents, currency, is
         ) : (
           <>
             <Script
-              src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&intent=capture`}
+              src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&intent=capture&enable-funding=card`}
               onReady={() => setSdkReady(true)}
             />
             <div id="paypal-button-container" />
