@@ -615,18 +615,21 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pb-24">
-        <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">About AIPick</span>
-        <h2 className="font-display font-bold text-2xl mb-3">
-          A community-ranked directory for finding AI tools that actually work
-        </h2>
-        <p className="text-sm text-ink/65 leading-relaxed max-w-3xl">
-          Most "best AI tools" lists online are really just paid placements dressed up as
-          recommendations. AIPick works differently: every tool in the{" "}
-          <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link>{" "}
-          earns its position through the same signals that matter to real users, combined into
-          one <Link href="/how-it-works" className="text-plum hover:underline font-medium">AIPick Score</Link> that's
-          calculated the same way for every tool — a scrappy new launch or a name people already know.
-        </p>
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-3">About AIPick</span>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl">
+            A community-ranked directory for finding AI tools that actually work
+          </h2>
+          <div className="w-14 h-1 rounded-full mx-auto my-4 bg-gradient-to-r from-plum via-gold to-forest" />
+          <p className="text-sm text-ink/65 leading-relaxed">
+            Most "best AI tools" lists online are really just paid placements dressed up as
+            recommendations. AIPick works differently: every tool in the{" "}
+            <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link>{" "}
+            earns its position through the same signals that matter to real users, combined into
+            one <Link href="/how-it-works" className="text-plum hover:underline font-medium">AIPick Score</Link> that's
+            calculated the same way for every tool — a scrappy new launch or a name people already know.
+          </p>
+        </div>
 
         <div className="grid sm:grid-cols-3 gap-4 mt-8">
           {[
@@ -720,22 +723,32 @@ export default async function HomePage() {
           ))}
         </div>
 
-        <p className="text-sm text-ink/65 leading-relaxed max-w-3xl mt-8">
-          None of this is static. New tools land in the directory regularly (see{" "}
-          <span className="text-ink/50">Newest additions</span> above), rankings shift as more
-          people vote and review, and the{" "}
-          <Link href="/blog" className="text-plum hover:underline font-medium">blog</Link> covers
-          comparisons and guides for categories where the choice isn't obvious. If you're weighing
-          a purchase, the shortest path through AIPick is usually: start on the{" "}
-          <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link> or
-          a relevant{" "}
-          <Link href="/category" className="text-plum hover:underline font-medium">category</Link>,
-          narrow it down with the{" "}
-          <Link href="/compare" className="text-plum hover:underline font-medium">comparison tool</Link>{" "}
-          once you've got two or three finalists, and read what real users wrote before you commit.
-          More on how the project started is on the{" "}
-          <Link href="/about" className="text-plum hover:underline font-medium">About page</Link>.
-        </p>
+        <div className="relative overflow-hidden rounded-2xl mt-10 px-6 py-10 sm:px-12 text-center">
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(70% 90% at 50% 0%, rgba(62,42,92,0.08), transparent), radial-gradient(60% 70% at 100% 100%, rgba(198,138,40,0.10), transparent)",
+            }}
+          />
+          <span className="text-3xl">🧭</span>
+          <p className="text-sm text-ink/65 leading-relaxed max-w-2xl mx-auto mt-3">
+            None of this is static. New tools land in the directory regularly (see{" "}
+            <span className="text-ink/50">Newest additions</span> above), rankings shift as more
+            people vote and review, and the{" "}
+            <Link href="/blog" className="text-plum hover:underline font-medium">blog</Link> covers
+            comparisons and guides for categories where the choice isn't obvious. If you're weighing
+            a purchase, the shortest path through AIPick is usually: start on the{" "}
+            <Link href="/tools" className="text-plum hover:underline font-medium">directory</Link> or
+            a relevant{" "}
+            <Link href="/category" className="text-plum hover:underline font-medium">category</Link>,
+            narrow it down with the{" "}
+            <Link href="/compare" className="text-plum hover:underline font-medium">comparison tool</Link>{" "}
+            once you've got two or three finalists, and read what real users wrote before you commit.
+            More on how the project started is on the{" "}
+            <Link href="/about" className="text-plum hover:underline font-medium">About page</Link>.
+          </p>
+        </div>
       </section>
     </main>
   );
