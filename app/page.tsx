@@ -43,14 +43,20 @@ const FEATURES = [
   {
     title: "Vote, don't guess",
     body: "Every tool's rank comes from real upvotes and reviews — not ad spend.",
+    icon: "👍",
+    color: "plum",
   },
   {
     title: "Compare side by side",
     body: "Line up pricing, platforms and ratings before you commit to one tool.",
+    icon: "⚖️",
+    color: "gold",
   },
   {
     title: "Verified by owners",
     body: "Claimed listings are kept accurate by the people who actually run the tool.",
+    icon: "✅",
+    color: "forest",
   },
 ];
 
@@ -249,7 +255,7 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(55% 45% at 10% 0%, rgba(62,42,92,0.10), transparent), radial-gradient(45% 40% at 95% 15%, rgba(198,138,40,0.12), transparent), radial-gradient(40% 35% at 60% 100%, rgba(196,90,74,0.06), transparent)",
+              "radial-gradient(60% 50% at 8% -5%, rgba(62,42,92,0.16), transparent), radial-gradient(50% 45% at 95% 10%, rgba(198,138,40,0.18), transparent), radial-gradient(45% 40% at 60% 105%, rgba(196,90,74,0.12), transparent), radial-gradient(35% 35% at 30% 60%, rgba(45,106,79,0.08), transparent)",
           }}
         />
         <div className="max-w-3xl mx-auto px-4 pt-8 pb-5 text-center">
@@ -302,13 +308,12 @@ export default async function HomePage() {
             <h2 className="font-display font-bold text-2xl">
               <span className="text-gold">★</span> Featured
             </h2>
-            <span className="text-xs text-ink/40">Paid placement — never affects AIPick Score</span>
           </div>
           <p className="text-sm text-ink/50 mb-6">
             A rotating spotlight of standout tools. This is a labeled paid placement — it
             never changes a tool's AIPick Score or organic rank below.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {featuredTools.slice(0, 15).map((tool, i) => {
               const accents = ["border-plum/25", "border-gold/35", "border-forest/25", "border-coral/25"];
               const accent = accents[i % accents.length];
@@ -348,13 +353,25 @@ export default async function HomePage() {
 
       <section className="max-w-6xl mx-auto px-4 mb-16">
         <div className="grid sm:grid-cols-3 gap-4">
-          {FEATURES.map((f, i) => {
-            const dots = ["bg-plum", "bg-gold", "bg-forest"];
+          {FEATURES.map((f) => {
+            const styles: Record<string, { bg: string; ring: string; text: string }> = {
+              plum: { bg: "bg-plum/10", ring: "ring-plum/20", text: "text-plum" },
+              gold: { bg: "bg-gold/15", ring: "ring-gold/25", text: "text-gold" },
+              forest: { bg: "bg-forest/10", ring: "ring-forest/20", text: "text-forest" },
+            };
+            const s = styles[f.color] ?? styles.plum;
             return (
-              <div key={f.title} className="bg-surface border border-line rounded-lg p-5">
-                <span className={`inline-block w-2 h-2 rounded-full ${dots[i % dots.length]} mb-2`} />
-                <h3 className="font-display font-semibold text-sm">{f.title}</h3>
-                <p className="text-sm text-ink/55 mt-1.5 leading-relaxed">{f.body}</p>
+              <div
+                key={f.title}
+                className={`bg-surface border border-line rounded-xl p-5 hover:shadow-lift hover:-translate-y-0.5 transition-all ${s.bg}`}
+              >
+                <span
+                  className={`inline-flex items-center justify-center w-11 h-11 rounded-full ${s.bg} ring-1 ${s.ring} text-xl mb-3`}
+                >
+                  {f.icon}
+                </span>
+                <h3 className={`font-display font-semibold text-sm ${s.text}`}>{f.title}</h3>
+                <p className="text-sm text-ink/60 mt-1.5 leading-relaxed">{f.body}</p>
               </div>
             );
           })}
