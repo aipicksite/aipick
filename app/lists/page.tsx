@@ -19,7 +19,9 @@ export default async function ListsPage() {
 
   const { data: lists } = await supabase
     .from("custom_lists")
-    .select("id, title, description, is_public, created_at, list_items(tool_id)")
+    .select(
+      "id, title, description, is_public, created_at, likes_count, comments_count, list_items(tool_id)"
+    )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -42,9 +44,17 @@ export default async function ListsPage() {
           >
             <div className="flex items-center justify-between gap-3">
               <span className="font-medium">{list.title}</span>
-              <span className="text-xs text-ink/45 shrink-0">
-                {list.list_items?.length ?? 0} tool{(list.list_items?.length ?? 0) === 1 ? "" : "s"}
-                {!list.is_public && " · Private"}
+              <span className="text-xs text-ink/45 shrink-0 flex items-center gap-2">
+                <span>
+                  {list.list_items?.length ?? 0} tool{(list.list_items?.length ?? 0) === 1 ? "" : "s"}
+                </span>
+                {list.is_public && (
+                  <>
+                    <span>· ♥ {list.likes_count ?? 0}</span>
+                    <span>· 💬 {list.comments_count ?? 0}</span>
+                  </>
+                )}
+                {!list.is_public && <span>· Private</span>}
               </span>
             </div>
             {list.description && (
