@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { parseUserAgent } from "@/lib/ua-parse";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,22 @@ export async function POST(req: NextRequest) {
     const path: unknown = body?.path;
     const toolId: unknown = body?.toolId;
     const referrer: unknown = body?.referrer;
+    const visitorId: unknown = body?.visitorId;
+    const utmSource: unknown = body?.utmSource;
+    const utmMedium: unknown = body?.utmMedium;
+    const utmCampaign: unknown = body?.utmCampaign;
 
     if (typeof path !== "string" || !path) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
+
+    const ua = req.headers.get("user-agent");
+    const { device, browser, os } = parseUserAgent(ua);
+
+    // Vercel sets these on every request (Edge and Node runtimes alike) —
+    // no separate geo-IP lookup needed. Falls back to null off-Vercel
+    // (e.g. local dev), which the analytics page treats as "Unknown".
+    const country = req.headers.get("x-vercel-ip-country");
 
     // Uses the service-role client so the insert never depends on
     // page_views' RLS policy for the (usually anonymous) visitor —
@@ -31,6 +44,14 @@ export async function POST(req: NextRequest) {
       path,
       tool_id: typeof toolId === "string" && toolId ? toolId : null,
       referrer: typeof referrer === "string" && referrer ? referrer : null,
+      visitor_id: typeof visitorId === "string" && visitorId ? visitorId : null,
+      utm_source: typeof utmSource === "string" && utmSource ? utmSource : null,
+      utm_medium: typeof utmMedium === "string" && utmMedium ? utmMedium : null,
+      utm_campaign: typeof utmCampaign === "string" && utmCampaign ? utmCampaign : null,
+      device,
+      browser,
+      os,
+      country: country || null,
     });
 
     return NextResponse.json({ ok: true });

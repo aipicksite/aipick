@@ -5,7 +5,10 @@ import AdminMobileNav from "@/components/AdminMobileNav";
 const NAV_GROUPS: { label: string; links: { href: string; label: string }[] }[] = [
   {
     label: "",
-    links: [{ href: "/admin", label: "Overview" }],
+    links: [
+      { href: "/admin", label: "Overview" },
+      { href: "/admin/analytics", label: "Analytics" },
+    ],
   },
   {
     label: "Content",

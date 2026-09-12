@@ -1,8 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { classifyReferrer, CATEGORY_LABELS, type TrafficCategory } from "@/lib/traffic-source";
 import Link from "next/link";
-import DailySparkline from "@/components/DailySparkline";
 
 function StatCard({
   label,
@@ -134,72 +132,6 @@ export default async function AdminOverviewPage() {
     .slice(0, 10);
   const maxVotes = topByVotes[0]?.net ?? 0;
 
-  // Everything below is aggregated in JS from raw page_views rows — the
-  // dataset is small enough for this to be cheap, and it avoids needing
-  // Postgres functions/views just for a dashboard.
-  const { data: toolViewRows } = await admin
-    .from("page_views")
-    .select("tool_id")
-    .not("tool_id", "is", null)
-    .gte("created_at", new Date(now - 30 * day).toISOString());
-
-  const viewCounts = new Map<string, number>();
-  for (const row of (toolViewRows ?? []) as { tool_id: string }[]) {
-    viewCounts.set(row.tool_id, (viewCounts.get(row.tool_id) ?? 0) + 1);
-  }
-  const topByViews = toolList
-    .map((t: any) => ({ ...t, views: viewCounts.get(t.id) ?? 0 }))
-    .filter((t) => t.views > 0)
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
-  const maxViews = topByViews[0]?.views ?? 0;
-
-  const { data: recentViewRows } = await admin
-    .from("page_views")
-    .select("path, referrer, created_at")
-    .gte("created_at", new Date(now - 30 * day).toISOString());
-
-  const sourceCounts = new Map<string, number>();
-  const categoryCounts = new Map<TrafficCategory, number>();
-  const pathCounts = new Map<string, number>();
-  const dailyCounts = new Map<string, number>();
-  for (const row of (recentViewRows ?? []) as { path: string; referrer: string | null; created_at: string }[]) {
-    const { label, category } = classifyReferrer(row.referrer, row.path);
-    sourceCounts.set(label, (sourceCounts.get(label) ?? 0) + 1);
-    categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1);
-    const cleanPath = row.path.split("?")[0] || row.path;
-    pathCounts.set(cleanPath, (pathCounts.get(cleanPath) ?? 0) + 1);
-    const dayKey = row.created_at.slice(0, 10);
-    dailyCounts.set(dayKey, (dailyCounts.get(dayKey) ?? 0) + 1);
-  }
-
-  const topCategories = Array.from(categoryCounts.entries())
-    .map(([category, value]) => ({ label: CATEGORY_LABELS[category], value }))
-    .sort((a, b) => b.value - a.value);
-  const maxCategory = topCategories[0]?.value ?? 0;
-
-  const topSources = Array.from(sourceCounts.entries())
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 8);
-  const maxSource = topSources[0]?.value ?? 0;
-
-  const topPages = Array.from(pathCounts.entries())
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-  const maxPage = topPages[0]?.value ?? 0;
-
-  // Last 14 days, oldest to newest, zero-filled for days with no traffic.
-  const sparklineData = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(now - (13 - i) * day);
-    const key = d.toISOString().slice(0, 10);
-    return {
-      label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      value: dailyCounts.get(key) ?? 0,
-    };
-  });
-
   return (
     <main>
       <h1 className="font-display font-bold text-2xl">Overview</h1>
@@ -218,17 +150,16 @@ export default async function AdminOverviewPage() {
         <StatCard label="Active tools" value={activeTools ?? 0} href="/admin/tools" sub={`${totalTools ?? 0} total`} />
         <StatCard label="Published posts" value={(totalPosts ?? 0) - (draftPosts ?? 0)} href="/admin/blog" />
         <StatCard label="Registered users" value={totalUsers ?? 0} href="/admin/users" sub={`+${newUsers7d ?? 0} in last 7d`} />
-        <StatCard label="Page views (30d)" value={views30d ?? 0} sub={`${views7d ?? 0} in last 7d · ${viewsTotal ?? 0} all-time`} />
+        <StatCard
+          label="Page views (30d)"
+          value={views30d ?? 0}
+          href="/admin/analytics"
+          sub={`${views7d ?? 0} in last 7d · ${viewsTotal ?? 0} all-time · full breakdown →`}
+        />
         <StatCard label="Published reviews" value={reviewCount ?? 0} />
         <StatCard label="Total votes cast" value={totalVotes} />
         <StatCard label="Saved tools" value={savedCount ?? 0} />
         <StatCard label="Custom lists" value={listCount ?? 0} />
-      </div>
-
-      <div className="bg-surface border border-line rounded-lg p-5 mt-6">
-        <h2 className="font-display font-bold text-base mb-1">Page views, last 14 days</h2>
-        <p className="text-xs text-ink/45 mb-3">Every recorded view across the whole site, by day.</p>
-        <DailySparkline data={sparklineData} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 mt-10">
@@ -267,68 +198,26 @@ export default async function AdminOverviewPage() {
         </section>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mt-10">
-        <section>
-          <h2 className="font-display font-bold text-lg mb-4">Top tools by net votes</h2>
-          <div className="flex flex-col gap-3">
-            {topByVotes.map((t: any) => (
-              <Bar key={t.id} label={t.name} value={t.net} max={maxVotes} href={`/tool/${t.slug}`} />
-            ))}
-            {topByVotes.length === 0 && <p className="text-sm text-ink/50">No votes yet.</p>}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="font-display font-bold text-lg mb-4">Most-viewed tools (30d)</h2>
-          <div className="flex flex-col gap-3">
-            {topByViews.map((t: any) => (
-              <Bar key={t.id} label={t.name} value={t.views} max={maxViews} href={`/tool/${t.slug}`} />
-            ))}
-            {topByViews.length === 0 && (
-              <p className="text-sm text-ink/50">No page-view data yet — this fills in as visitors hit tool pages.</p>
-            )}
-          </div>
-        </section>
+      <div className="mt-10">
+        <h2 className="font-display font-bold text-lg mb-4">Top tools by net votes</h2>
+        <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
+          {topByVotes.map((t: any) => (
+            <Bar key={t.id} label={t.name} value={t.net} max={maxVotes} href={`/tool/${t.slug}`} />
+          ))}
+          {topByVotes.length === 0 && <p className="text-sm text-ink/50">No votes yet.</p>}
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mt-10">
-        <section>
-          <h2 className="font-display font-bold text-lg mb-1">Traffic sources (30d)</h2>
-          <p className="text-xs text-ink/45 mb-4">
-            Based on the referring page for each visit — grouped into search engines, AI chat
-            assistants (ChatGPT, Perplexity, etc.), social media, and other referrals.
+      <div className="bg-surface border border-line rounded-lg p-5 mt-10 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="font-display font-bold text-base">Want the full traffic picture?</h2>
+          <p className="text-xs text-ink/50 mt-1">
+            Traffic sources, exact referring URLs, devices, browsers, countries, and UTM campaigns all live on the Analytics page now.
           </p>
-          <div className="flex flex-col gap-3">
-            {topCategories.map((c) => (
-              <Bar key={c.label} label={c.label} value={c.value} max={maxCategory} />
-            ))}
-            {topCategories.length === 0 && <p className="text-sm text-ink/50">No traffic data yet.</p>}
-          </div>
-
-          <h3 className="text-xs font-medium text-ink/50 uppercase tracking-wide mt-6 mb-3">
-            By specific site
-          </h3>
-          <div className="flex flex-col gap-3">
-            {topSources.map((s) => (
-              <Bar key={s.label} label={s.label} value={s.value} max={maxSource} />
-            ))}
-            {topSources.length === 0 && <p className="text-sm text-ink/50">No traffic data yet.</p>}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="font-display font-bold text-lg mb-1">Top pages (30d)</h2>
-          <p className="text-xs text-ink/45 mb-4">
-            Every page path visited, not just tool pages — useful for seeing how the homepage, blog, and category
-            pages are doing too.
-          </p>
-          <div className="flex flex-col gap-3">
-            {topPages.map((p) => (
-              <Bar key={p.label} label={p.label} value={p.value} max={maxPage} href={p.label} />
-            ))}
-            {topPages.length === 0 && <p className="text-sm text-ink/50">No page-view data yet.</p>}
-          </div>
-        </section>
+        </div>
+        <Link href="/admin/analytics" className="text-sm font-medium px-4 py-2.5 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors shrink-0">
+          Open Analytics →
+        </Link>
       </div>
 
       <div className="mt-10 pt-6 border-t border-line">
