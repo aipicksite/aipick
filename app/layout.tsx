@@ -95,6 +95,7 @@ export default async function RootLayout({
           </>
         )}
         <header className="sticky top-0 z-30 backdrop-blur bg-base/85 border-b border-line relative">
+          <div className="h-[3px] bg-gradient-to-r from-plum via-gold to-forest" />
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <Logo size={32} />
@@ -105,13 +106,13 @@ export default async function RootLayout({
 
             <nav className="hidden md:flex items-center gap-1 text-sm">
               <BrowseMenu />
-              <Link href="/top/trending-ai-tools" className="px-3 py-2 rounded-md hover:bg-ink/5 transition-colors">
+              <Link href="/top/trending-ai-tools" className="px-3 py-2 rounded-md text-ink/70 hover:text-plum hover:bg-plum/5 transition-colors">
                 Trending
               </Link>
-              <Link href="/top/best-free-ai-tools" className="px-3 py-2 rounded-md hover:bg-ink/5 transition-colors">
+              <Link href="/top/best-free-ai-tools" className="px-3 py-2 rounded-md text-ink/70 hover:text-plum hover:bg-plum/5 transition-colors">
                 Rankings
               </Link>
-              <Link href="/compare" className="px-3 py-2 rounded-md hover:bg-ink/5 transition-colors">
+              <Link href="/compare" className="px-3 py-2 rounded-md text-ink/70 hover:text-plum hover:bg-plum/5 transition-colors">
                 Compare
               </Link>
             </nav>
@@ -119,7 +120,7 @@ export default async function RootLayout({
             <div className="flex items-center gap-2">
               <Link
                 href="/submit"
-                className="hidden sm:inline-flex text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors shadow-card"
+                className="hidden sm:inline-flex text-sm font-medium px-3.5 py-2 rounded-md border border-gold/40 text-gold bg-gold/10 hover:bg-gold/15 hover:border-gold/60 transition-colors"
               >
                 Submit a tool
               </Link>
@@ -128,7 +129,7 @@ export default async function RootLayout({
               ) : (
                 <Link
                   href="/login"
-                  className="text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors"
+                  className="text-sm font-medium px-3.5 py-2 rounded-md bg-plum text-white hover:bg-plum-deep transition-colors shadow-card"
                 >
                   Sign in
                 </Link>
@@ -140,7 +141,8 @@ export default async function RootLayout({
 
         {children}
 
-        <footer className="border-t border-line mt-24">
+        <footer className="border-t border-line mt-24 bg-surface/60">
+          <div className="h-[3px] bg-gradient-to-r from-plum via-gold to-forest" />
           <div className="max-w-6xl mx-auto px-4 py-12 grid gap-8 sm:grid-cols-[1.3fr_1fr_1fr_1fr]">
             <div>
               <span className="font-display font-bold text-lg flex items-center gap-2">
@@ -153,31 +155,31 @@ export default async function RootLayout({
               </p>
             </div>
             <div className="text-sm">
-              <h4 className="font-medium text-ink/80 mb-3">Explore</h4>
+              <h4 className="font-display font-semibold text-plum mb-3">Explore</h4>
               <ul className="space-y-2 text-ink/55">
-                <li><Link href="/tools" className="hover:text-plum">Browse tools</Link></li>
-                <li><Link href="/top/top-100-ai-tools" className="hover:text-plum">Top 100 AI Tools</Link></li>
-                <li><Link href="/top/best-free-ai-tools" className="hover:text-plum">Free AI Tools</Link></li>
-                <li><Link href="/category" className="hover:text-plum">Categories</Link></li>
-                <li><Link href="/top/trending-ai-tools" className="hover:text-plum">Trending</Link></li>
-                <li><Link href="/compare" className="hover:text-plum">Compare</Link></li>
+                <li><Link href="/tools" className="hover:text-plum transition-colors">Browse tools</Link></li>
+                <li><Link href="/top/top-100-ai-tools" className="hover:text-plum transition-colors">Top 100 AI Tools</Link></li>
+                <li><Link href="/top/best-free-ai-tools" className="hover:text-plum transition-colors">Free AI Tools</Link></li>
+                <li><Link href="/category" className="hover:text-plum transition-colors">Categories</Link></li>
+                <li><Link href="/top/trending-ai-tools" className="hover:text-plum transition-colors">Trending</Link></li>
+                <li><Link href="/compare" className="hover:text-plum transition-colors">Compare</Link></li>
               </ul>
             </div>
             <div className="text-sm">
-              <h4 className="font-medium text-ink/80 mb-3">Community</h4>
+              <h4 className="font-display font-semibold text-gold mb-3">Community</h4>
               <ul className="space-y-2 text-ink/55">
-                <li><Link href="/submit" className="hover:text-plum">Submit a tool</Link></li>
-                <li><Link href="/blog" className="hover:text-plum">Blog</Link></li>
-                <li><Link href="/login" className="hover:text-plum">Sign in</Link></li>
+                <li><Link href="/submit" className="hover:text-plum transition-colors">Submit a tool</Link></li>
+                <li><Link href="/blog" className="hover:text-plum transition-colors">Blog</Link></li>
+                <li><Link href="/login" className="hover:text-plum transition-colors">Sign in</Link></li>
               </ul>
             </div>
             <div className="text-sm">
-              <h4 className="font-medium text-ink/80 mb-3">Company</h4>
+              <h4 className="font-display font-semibold text-forest mb-3">Company</h4>
               <ul className="space-y-2 text-ink/55">
-                <li><Link href="/about" className="hover:text-plum">About</Link></li>
-                <li><Link href="/how-it-works" className="hover:text-plum">How ranking works</Link></li>
-                <li><Link href="/support" className="hover:text-plum">Support</Link></li>
-                <li><Link href="/contact" className="hover:text-plum">Contact</Link></li>
+                <li><Link href="/about" className="hover:text-plum transition-colors">About</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-plum transition-colors">How ranking works</Link></li>
+                <li><Link href="/support" className="hover:text-plum transition-colors">Support</Link></li>
+                <li><Link href="/contact" className="hover:text-plum transition-colors">Contact</Link></li>
               </ul>
             </div>
           </div>
@@ -185,8 +187,8 @@ export default async function RootLayout({
             <div className="max-w-6xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-ink/45">
               <span>© {new Date().getFullYear()} AIPick.site — a community-ranked directory of AI tools.</span>
               <div className="flex gap-4">
-                <Link href="/privacy" className="hover:text-plum">Privacy</Link>
-                <Link href="/terms" className="hover:text-plum">Terms</Link>
+                <Link href="/privacy" className="hover:text-plum transition-colors">Privacy</Link>
+                <Link href="/terms" className="hover:text-plum transition-colors">Terms</Link>
               </div>
             </div>
           </div>
