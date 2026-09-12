@@ -286,6 +286,30 @@ export default async function HomePage() {
             ))}
           </div>
 
+          {parentCategories.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
+              {parentCategories.slice(0, 12).map((cat, i) => {
+                const tint = ["bg-plum/10 border-plum/25 text-plum", "bg-gold/15 border-gold/30 text-gold", "bg-forest/10 border-forest/25 text-forest", "bg-coral/10 border-coral/25 text-coral"][i % 4];
+                return (
+                  <Link
+                    key={cat.id}
+                    href={`/category/${cat.slug}`}
+                    className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border ${tint} hover:brightness-95 transition-all`}
+                  >
+                    {cat.icon && <span>{cat.icon}</span>}
+                    {cat.name}
+                  </Link>
+                );
+              })}
+              <Link
+                href="/category"
+                className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-line text-ink/55 hover:border-plum hover:text-plum transition-colors"
+              >
+                All categories →
+              </Link>
+            </div>
+          )}
+
           <div className="flex flex-wrap justify-center gap-8 mt-6 text-sm">
             <div>
               <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
