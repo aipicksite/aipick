@@ -201,6 +201,11 @@ export default async function AdminAnalyticsPage({
 
   const topCountries = toSorted(countryCounts, 12);
   const maxCountry = topCountries[0]?.value ?? 0;
+  // "Countries reached" should count real countries only — an "Unknown"
+  // bucket (no Vercel geo header, e.g. localhost/non-Vercel traffic) isn't
+  // a country and was inflating this KPI to at least 1 even with zero real
+  // geo data.
+  const realCountriesReached = Array.from(countryCounts.keys()).filter((c) => c !== "Unknown").length;
 
   const topCampaigns = toSorted(campaignCounts, 10);
   const maxCampaign = topCampaigns[0]?.value ?? 0;
@@ -269,7 +274,7 @@ export default async function AdminAnalyticsPage({
         <KpiCard label="Direct traffic" value={`${directShare}%`} sub="of all views" />
         <KpiCard label="Top traffic source" value={topSource} />
         <KpiCard label="Distinct referring URLs" value={urlCounts.size} sub="real external pages" />
-        <KpiCard label="Countries reached" value={countryCounts.size} />
+        <KpiCard label="Countries reached" value={realCountriesReached} />
         <KpiCard label="Pages viewed" value={pathCounts.size} sub="distinct paths" />
       </div>
 
