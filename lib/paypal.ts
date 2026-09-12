@@ -10,7 +10,12 @@ const BASE_URL =
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
+  // Vercel env vars pasted from PayPal's dashboard commonly pick up a
+  // trailing newline or space, which silently breaks Basic auth (the
+  // credential no longer matches what PayPal has on file) and surfaces
+  // only as a generic "invalid_client" 401 with no hint that whitespace
+  // was the cause. Trimming here removes that entire class of failure.
+  return v.trim();
 }
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
@@ -35,6 +40,14 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!res.ok) {
+    // Masked diagnostics only — never the secret. This tells us, from the
+    // Vercel logs alone, exactly which client id (partial) and which
+    // PAYPAL_ENV was actually used for this failed auth attempt, so a
+    // sandbox/live credential mismatch or wrong-app credential is
+    // immediately visible without exposing anything sensitive.
+    console.error(
+      `[paypal] auth failed against ${PAYPAL_ENV} (${BASE_URL}) using client id "${clientId.slice(0, 6)}...${clientId.slice(-4)}" (len ${clientId.length}), secret len ${secret.length}`
+    );
     throw new Error(`PayPal auth failed: ${res.status} ${await res.text()}`);
   }
 
