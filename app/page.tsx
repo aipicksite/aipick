@@ -40,27 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const FEATURES = [
-  {
-    title: "Vote, don't guess",
-    body: "Every tool's rank comes from real upvotes and reviews — not ad spend.",
-    icon: "👍",
-    color: "plum",
-  },
-  {
-    title: "Compare side by side",
-    body: "Line up pricing, platforms and ratings before you commit to one tool.",
-    icon: "⚖️",
-    color: "gold",
-  },
-  {
-    title: "Verified by owners",
-    body: "Claimed listings are kept accurate by the people who actually run the tool.",
-    icon: "✅",
-    color: "forest",
-  },
-];
-
 const FAQS = [
   {
     q: "Is AIPick free to use?",
@@ -136,15 +115,16 @@ export default async function HomePage() {
       .order("featured_requested_at", { ascending: true })
       .limit(200),
     // Real community reviews for the homepage testimonials strip — never
-    // fabricated. Only published, high-rated reviews with actual written
-    // feedback qualify; genuinely empty if none exist yet.
+    // fabricated. Live query: only published, high-rated (positive) reviews
+    // with actual written feedback qualify, most recent first, so this strip
+    // always reflects the latest genuine praise rather than a static list.
     supabase
       .from("reviews")
       .select("*, profiles(username), tools(name, slug)")
       .eq("status", "published")
       .gte("rating", 4)
       .not("body", "is", null)
-      .order("helpful_count", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(9),
   ]);
 
@@ -259,13 +239,32 @@ export default async function HomePage() {
               "radial-gradient(60% 50% at 8% -5%, rgba(62,42,92,0.16), transparent), radial-gradient(50% 45% at 95% 10%, rgba(198,138,40,0.18), transparent), radial-gradient(45% 40% at 60% 105%, rgba(196,90,74,0.12), transparent), radial-gradient(35% 35% at 30% 60%, rgba(45,106,79,0.08), transparent)",
           }}
         />
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-5 text-center">
-          <h1 className="font-display font-bold text-xl sm:text-3xl md:text-4xl leading-tight tracking-tight whitespace-nowrap">
-            Find AI tools that work.
+        <div className="max-w-6xl mx-auto px-4 pt-8 pb-5 text-center">
+          <h1 className="font-display font-bold text-xl sm:text-3xl md:text-4xl leading-tight tracking-tight">
+            Find AI tools that{" "}
+            <span className="bg-gradient-to-r from-plum via-coral to-gold bg-clip-text text-transparent">
+              actually work
+            </span>{" "}
+            for you.
           </h1>
-          <p className="mt-2 text-xs sm:text-base text-ink/65 max-w-xl mx-auto leading-relaxed whitespace-nowrap">
+          <p className="mt-2 text-xs sm:text-base text-ink/65 max-w-xl mx-auto leading-relaxed">
             Real reviews. Never pay-to-rank listings.
           </p>
+
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-5 text-sm max-w-2xl mx-auto bg-surface border border-line rounded-xl px-6 py-4">
+            <div>
+              <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
+              <span className="text-ink/50">Tools ranked</span>
+            </div>
+            <div>
+              <span className="rank-badge block text-2xl font-bold text-gold">{categoryList.length}</span>
+              <span className="text-ink/50">Categories</span>
+            </div>
+            <div>
+              <span className="rank-badge block text-2xl font-bold text-forest">{totalVotes}</span>
+              <span className="text-ink/50">Community votes</span>
+            </div>
+          </div>
 
           <div className="mt-5 max-w-2xl mx-auto">
             <ToolSearchBox
@@ -309,21 +308,6 @@ export default async function HomePage() {
               </Link>
             </div>
           )}
-
-          <div className="flex flex-wrap justify-center gap-8 mt-6 text-sm">
-            <div>
-              <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
-              <span className="text-ink/50">Tools ranked</span>
-            </div>
-            <div>
-              <span className="rank-badge block text-2xl font-bold text-gold">{categoryList.length}</span>
-              <span className="text-ink/50">Categories</span>
-            </div>
-            <div>
-              <span className="rank-badge block text-2xl font-bold text-forest">{totalVotes}</span>
-              <span className="text-ink/50">Community votes</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -376,33 +360,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      <section className="max-w-6xl mx-auto px-4 mb-16">
-        <div className="grid sm:grid-cols-3 gap-4">
-          {FEATURES.map((f) => {
-            const styles: Record<string, { bg: string; ring: string; text: string }> = {
-              plum: { bg: "bg-plum/10", ring: "ring-plum/20", text: "text-plum" },
-              gold: { bg: "bg-gold/15", ring: "ring-gold/25", text: "text-gold" },
-              forest: { bg: "bg-forest/10", ring: "ring-forest/20", text: "text-forest" },
-            };
-            const s = styles[f.color] ?? styles.plum;
-            return (
-              <div
-                key={f.title}
-                className={`bg-surface border border-line rounded-xl p-5 hover:shadow-lift hover:-translate-y-0.5 transition-all ${s.bg}`}
-              >
-                <span
-                  className={`inline-flex items-center justify-center w-11 h-11 rounded-full ${s.bg} ring-1 ${s.ring} text-xl mb-3`}
-                >
-                  {f.icon}
-                </span>
-                <h3 className={`font-display font-semibold text-sm ${s.text}`}>{f.title}</h3>
-                <p className="text-sm text-ink/60 mt-1.5 leading-relaxed">{f.body}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       <section className="max-w-6xl mx-auto px-4 mb-16">
         <span className="inline-block text-xs font-semibold text-forest bg-forest/10 px-2.5 py-1 rounded-full mb-2">Explore</span>
@@ -519,7 +476,7 @@ export default async function HomePage() {
             <h2 className="font-display font-bold text-2xl">What the community is saying</h2>
           </div>
           <p className="text-sm text-ink/50 mb-6">
-            Real reviews from real users — pulled straight from the ratings on each tool&apos;s page.
+            The latest positive reviews from real users — pulled live from each tool&apos;s page.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonialReviews.map((review) => (
@@ -624,17 +581,30 @@ export default async function HomePage() {
       )}
 
       <section className="max-w-3xl mx-auto px-4 pb-24">
-        <h2 className="font-display font-bold text-2xl mb-6">Frequently asked questions</h2>
-        <div className="flex flex-col divide-y divide-line border-y border-line">
-          {FAQS.map((faq) => (
-            <details key={faq.q} className="group py-4">
-              <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-display font-medium text-[15px]">
-                {faq.q}
-                <span className="text-ink/40 group-open:rotate-45 transition-transform text-lg shrink-0">+</span>
-              </summary>
-              <p className="text-sm text-ink/60 mt-2.5 leading-relaxed">{faq.a}</p>
-            </details>
-          ))}
+        <span className="inline-block text-xs font-semibold text-gold bg-gold/15 px-2.5 py-1 rounded-full mb-2">FAQ</span>
+        <h2 className="font-display font-bold text-2xl mb-1">Frequently asked questions</h2>
+        <p className="text-sm text-ink/50 mb-6">
+          Everything about how AIPick ranks, lists, and verifies AI tools.
+        </p>
+        <div className="flex flex-col gap-3">
+          {FAQS.map((faq, i) => {
+            const tint = ["bg-plum/10 text-plum", "bg-gold/15 text-gold", "bg-forest/10 text-forest", "bg-coral/10 text-coral"][i % 4];
+            return (
+              <details
+                key={faq.q}
+                className="group bg-surface border border-line rounded-xl px-5 py-4 open:border-plum/40 open:shadow-lift transition-colors"
+              >
+                <summary className="flex items-center gap-3 cursor-pointer list-none font-display font-medium text-[15px]">
+                  <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${tint}`}>
+                    {i + 1}
+                  </span>
+                  <span className="flex-1">{faq.q}</span>
+                  <span className="text-ink/40 group-open:rotate-45 transition-transform text-lg shrink-0">+</span>
+                </summary>
+                <p className="text-sm text-ink/60 mt-3 pl-10 leading-relaxed">{faq.a}</p>
+              </details>
+            );
+          })}
         </div>
       </section>
 

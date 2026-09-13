@@ -141,7 +141,7 @@ export default async function RootLayout({
 
         {children}
 
-        <footer className="border-t border-line mt-24 bg-surface/60">
+        <footer className="border-t border-line bg-surface/60">
           <div className="h-[3px] bg-gradient-to-r from-plum via-gold to-forest" />
           <div className="max-w-6xl mx-auto px-4 py-12 grid gap-8 sm:grid-cols-[1.3fr_1fr_1fr_1fr]">
             <div>
