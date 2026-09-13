@@ -251,7 +251,7 @@ export default async function HomePage() {
             Real reviews. Never pay-to-rank listings.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-5 text-sm max-w-2xl mx-auto bg-surface border border-line rounded-xl px-6 py-4">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm max-w-3xl mx-auto">
             <div>
               <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
               <span className="text-ink/50">Tools ranked</span>
@@ -266,7 +266,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="mt-5 max-w-2xl mx-auto">
+          <div className="mt-5 max-w-3xl mx-auto">
             <ToolSearchBox
               variant="hero"
               placeholder={`Search ${totalTools ?? toolList.length}+ AI tools — “image generator”, “SEO”…`}
@@ -608,8 +608,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-24">
-        <div className="text-center max-w-2xl mx-auto">
+      <section className="max-w-6xl mx-auto px-4 pb-12">
+        <div className="text-center max-w-4xl mx-auto">
           <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-3">About AIPick</span>
           <h2 className="font-display font-bold text-2xl sm:text-3xl">
             A community-ranked directory for finding AI tools that actually work
@@ -726,7 +726,7 @@ export default async function HomePage() {
             }}
           />
           <span className="text-3xl">🧭</span>
-          <p className="text-sm text-ink/65 leading-relaxed max-w-2xl mx-auto mt-3">
+          <p className="text-sm text-ink/65 leading-relaxed max-w-4xl mx-auto mt-3">
             None of this is static. New tools land in the directory regularly (see{" "}
             <span className="text-ink/50">Newest additions</span> above), rankings shift as more
             people vote and review, and the{" "}
