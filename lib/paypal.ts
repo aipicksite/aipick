@@ -14,8 +14,21 @@ function requireEnv(name: string): string {
   // trailing newline or space, which silently breaks Basic auth (the
   // credential no longer matches what PayPal has on file) and surfaces
   // only as a generic "invalid_client" 401 with no hint that whitespace
-  // was the cause. Trimming here removes that entire class of failure.
-  return v.trim();
+  // was the cause. Trimming only handles the edges — if the value was
+  // copied from a source that line-wraps (a note, a doc, a chat message),
+  // a newline or space can end up in the *middle* of the string too, and
+  // that's invisible when eyeballing the credential. Strip ALL whitespace
+  // (PayPal client ids/secrets never legitimately contain any) and warn
+  // when we had to, so this whole class of failure surfaces immediately
+  // in the logs instead of looking like a wrong/expired credential.
+  const trimmed = v.trim();
+  const sanitized = trimmed.replace(/\s+/g, "");
+  if (sanitized !== trimmed) {
+    console.error(
+      `[paypal] ${name} contained internal whitespace/newline that was stripped — the value was likely copied from a source that line-wraps text. Re-copy it directly from the PayPal dashboard into Vercel.`
+    );
+  }
+  return sanitized;
 }
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
