@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllRows } from "@/lib/supabase/fetchAll";
 import type { Category } from "@/types/database";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -15,16 +16,16 @@ export const metadata: Metadata = {
 export default async function CategoryIndexPage() {
   const supabase = createClient();
 
-  const [{ data: categories }, { data: activeToolIds }, { data: categoryLinks }] = await Promise.all([
+  const [{ data: categories }, { data: activeToolIds }, categoryLinks] = await Promise.all([
     supabase.from("categories").select("*").order("name"),
     supabase.from("tools").select("id").eq("status", "active"),
-    supabase.from("tool_categories").select("tool_id, category_id"),
+    fetchAllRows<{ tool_id: string; category_id: string }>(supabase, "tool_categories", "tool_id, category_id"),
   ]);
 
   const categoryList = (categories as Category[] | null) ?? [];
   const activeIdSet = new Set((activeToolIds ?? []).map((t: { id: string }) => t.id));
   const categoryCounts = new Map<string, number>();
-  for (const link of (categoryLinks ?? []) as { tool_id: string; category_id: string }[]) {
+  for (const link of categoryLinks) {
     if (activeIdSet.has(link.tool_id)) {
       categoryCounts.set(link.category_id, (categoryCounts.get(link.category_id) ?? 0) + 1);
     }

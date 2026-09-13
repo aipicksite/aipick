@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllRows } from "@/lib/supabase/fetchAll";
 import type { Tool, Category, BlogPost } from "@/types/database";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -72,7 +73,7 @@ export default async function HomePage() {
     { data: voteRows },
     { data: categories },
     { data: activeToolIds },
-    { data: categoryLinks },
+    categoryLinks,
     { data: recentTools },
     { data: recentPosts },
     { data: featuredCandidatesRaw },
@@ -88,7 +89,7 @@ export default async function HomePage() {
     supabase.from("tools").select("upvotes, downvotes").eq("status", "active"),
     supabase.from("categories").select("*").order("name"),
     supabase.from("tools").select("id").eq("status", "active"),
-    supabase.from("tool_categories").select("tool_id, category_id"),
+    fetchAllRows<{ tool_id: string; category_id: string }>(supabase, "tool_categories", "tool_id, category_id"),
     supabase
       .from("tools")
       .select("*")
@@ -148,7 +149,7 @@ export default async function HomePage() {
 
   const activeIdSet = new Set((activeToolIds ?? []).map((t: { id: string }) => t.id));
   const categoryCounts = new Map<string, number>();
-  for (const link of (categoryLinks ?? []) as { tool_id: string; category_id: string }[]) {
+  for (const link of categoryLinks) {
     if (activeIdSet.has(link.tool_id)) {
       categoryCounts.set(link.category_id, (categoryCounts.get(link.category_id) ?? 0) + 1);
     }

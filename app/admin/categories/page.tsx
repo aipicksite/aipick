@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { fetchAllRows } from "@/lib/supabase/fetchAll";
 import { createCategory, deleteCategory } from "@/app/admin/categories/actions";
 import Link from "next/link";
 import type { Category } from "@/types/database";
@@ -10,12 +11,16 @@ export default async function AdminCategoriesPage({
 }) {
   const { supabase } = await requireAdmin();
 
-  const [{ data: categories }, { data: counts }] = await Promise.all([
+  const [{ data: categories }, counts] = await Promise.all([
     supabase.from("categories").select("*").order("name"),
     // One row per (category_id) — counted client-side below — cheaper than
     // N+1 count queries per category on a taxonomy that's about to get
-    // several times bigger.
-    supabase.from("tool_categories").select("category_id"),
+    // several times bigger. Paginated: tool_categories is well past 1000
+    // rows now, and an unpaginated select was silently only seeing the
+    // first 1000 (Supabase/PostgREST's default cap), which is why newer
+    // categories were showing 0 here even after tools were tagged into
+    // them.
+    fetchAllRows<{ category_id: string }>(supabase, "tool_categories", "category_id"),
   ]);
 
   const allCategories = (categories ?? []) as Category[];
@@ -29,7 +34,7 @@ export default async function AdminCategoriesPage({
     }
   }
   const toolCountByCategory = new Map<string, number>();
-  for (const row of (counts ?? []) as { category_id: string }[]) {
+  for (const row of counts) {
     toolCountByCategory.set(row.category_id, (toolCountByCategory.get(row.category_id) ?? 0) + 1);
   }
 
