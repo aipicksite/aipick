@@ -23,6 +23,41 @@ function formatDuration(seconds: number): string {
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
 }
 
+// Supabase/PostgREST caps any unbounded select() at 1000 rows by default.
+// The analytics queries below pull raw page_views rows to aggregate in
+// JS (unique visitors, traffic sources, countries, time-on-page) — with
+// 30-90 days of real traffic that's routinely 5,000-15,000+ rows, so an
+// unpaginated select was silently truncating to the first 1000 rows
+// (in whatever order Postgres happened to return them), which is why
+// "Top traffic sources" summed to exactly 1000 and unique visitors /
+// avg time / top country all looked broken or empty even though the
+// KPI's own head-count query (which doesn't fetch rows, just a count)
+// correctly showed the real total. This walks the table in 1000-row
+// pages until it has everything in range.
+async function fetchAllRows<T>(
+  admin: ReturnType<typeof import("@/lib/supabase/admin").createAdminClient>,
+  table: string,
+  select: string,
+  sinceIso: string
+): Promise<T[]> {
+  const pageSize = 1000;
+  const maxPages = 200; // safety cap: 200k rows, well beyond realistic volume
+  let all: T[] = [];
+  for (let page = 0; page < maxPages; page++) {
+    const offset = page * pageSize;
+    const { data, error } = await admin
+      .from(table)
+      .select(select)
+      .gte("created_at", sinceIso)
+      .order("created_at", { ascending: true })
+      .range(offset, offset + pageSize - 1);
+    if (error || !data || data.length === 0) break;
+    all = all.concat(data as T[]);
+    if (data.length < pageSize) break;
+  }
+  return all;
+}
+
 function KpiCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
     <div className="bg-surface border border-line rounded-lg p-4 sm:p-5">
@@ -146,19 +181,24 @@ export default async function AdminAnalyticsPage({
   const chartWindowDays = 90;
   const chartStart = new Date(now - chartWindowDays * day);
 
-  const [{ count: totalViews }, { data: rangeRows }, { data: chartRows }] = await Promise.all([
+  const [{ count: totalViews }, rangeRowsAll, chartRowsAll, outboundRowsAll] = await Promise.all([
     admin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", rangeStart.toISOString()),
-    admin
-      .from("page_views")
-      .select("path, referrer, visitor_id, country, duration_seconds, created_at")
-      .gte("created_at", rangeStart.toISOString()),
-    admin.from("page_views").select("created_at").gte("created_at", chartStart.toISOString()),
+    fetchAllRows<{
+      path: string;
+      referrer: string | null;
+      visitor_id: string | null;
+      country: string | null;
+      duration_seconds: number | null;
+      created_at: string;
+    }>(admin, "page_views", "path, referrer, visitor_id, country, duration_seconds, created_at", rangeStart.toISOString()),
+    fetchAllRows<{ created_at: string }>(admin, "page_views", "created_at", chartStart.toISOString()),
+    fetchAllRows<{ target_host: string; target_url: string; created_at: string }>(
+      admin,
+      "outbound_clicks",
+      "target_host, target_url, created_at",
+      rangeStart.toISOString()
+    ),
   ]);
-
-  const { data: outboundRows } = await admin
-    .from("outbound_clicks")
-    .select("target_host, target_url, created_at")
-    .gte("created_at", rangeStart.toISOString());
 
   type Row = {
     path: string;
@@ -168,7 +208,7 @@ export default async function AdminAnalyticsPage({
     duration_seconds: number | null;
     created_at: string;
   };
-  const rows = (rangeRows ?? []) as Row[];
+  const rows = rangeRowsAll as Row[];
 
   const uniqueVisitors = new Set(rows.map((r) => r.visitor_id).filter(Boolean)).size;
 
@@ -209,7 +249,7 @@ export default async function AdminAnalyticsPage({
 
   // ---- Where visitors go (outbound clicks) ----
   const destCounts = new Map<string, { host: string; url: string; count: number }>();
-  for (const c of (outboundRows ?? []) as { target_host: string; target_url: string }[]) {
+  for (const c of outboundRowsAll) {
     const existing = destCounts.get(c.target_host);
     if (existing) existing.count += 1;
     else destCounts.set(c.target_host, { host: c.target_host, url: c.target_url, count: 1 });
@@ -227,7 +267,7 @@ export default async function AdminAnalyticsPage({
 
   // ---- Trend chart: last 90 raw days bucketed by day / week / month ----
   const dailyCounts = new Map<string, number>();
-  for (const r of (chartRows ?? []) as { created_at: string }[]) {
+  for (const r of chartRowsAll) {
     const key = r.created_at.slice(0, 10);
     dailyCounts.set(key, (dailyCounts.get(key) ?? 0) + 1);
   }
