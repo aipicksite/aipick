@@ -7,6 +7,7 @@ import MarkdownContent from "@/components/MarkdownContent";
 import TableOfContents from "@/components/TableOfContents";
 import ArticleSidebar from "@/components/ArticleSidebar";
 import { extractHeadings, splitAfterParagraphs } from "@/lib/article-toc";
+import { extractFaqs } from "@/lib/article-schema";
 import PageViewTracker from "@/components/PageViewTracker";
 
 export const revalidate = 60; // short ISR window as a safety net alongside on-demand revalidatePath from admin edits
@@ -40,6 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `https://aipick.site/blog/${post.slug}`,
       type: "article",
       images: post.cover_image_url ? [{ url: post.cover_image_url }] : undefined,
+      publishedTime: post.published_at || post.created_at,
+      modifiedTime: post.updated_at || undefined,
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -52,10 +55,61 @@ export default async function BlogPostPage({ params }: Props) {
   const toc = extractHeadings(post.body);
   const { intro, rest } = splitAfterParagraphs(post.body, 2);
   const shareUrl = `https://aipick.site/blog/${post.slug}`;
+  const faqs = extractFaqs(post.body);
+
+  // Structured data: Article (so Google can show it as a rich article
+  // result with the real cover image and publish/update dates), a
+  // BreadcrumbList (Home > Blog > this post), and — only when the article
+  // actually has a "Frequently Asked Questions" section — FAQPage, which
+  // is what lets individual Q&As show up directly in search results.
+  // Pulled straight from the same markdown body already rendered on the
+  // page, so this stays in sync automatically as posts are edited.
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.meta_description || post.excerpt || undefined,
+    image: post.cover_image_url ? [post.cover_image_url] : undefined,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
+    author: { "@type": "Organization", name: "AIPick" },
+    publisher: {
+      "@type": "Organization",
+      name: "AIPick",
+      logo: { "@type": "ImageObject", url: "https://aipick.site/icon.png" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": shareUrl },
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://aipick.site/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://aipick.site/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: shareUrl },
+    ],
+  };
+  const faqLd =
+    faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
+          })),
+        }
+      : null;
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-16">
       <PageViewTracker path={`/blog/${post.slug}`} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {faqLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      )}
       <div className="max-w-2xl mx-auto lg:max-w-none">
         <Link href="/blog" className="text-sm text-plum hover:underline">← Blog</Link>
       </div>
@@ -69,7 +123,7 @@ export default async function BlogPostPage({ params }: Props) {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={post.cover_image_url}
-              alt=""
+              alt={post.title}
               className="w-full aspect-[16/9] object-cover rounded-lg mt-6 border border-line"
             />
           )}
