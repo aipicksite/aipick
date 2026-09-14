@@ -254,16 +254,20 @@ export default async function HomePage() {
 
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm max-w-3xl mx-auto">
             <div>
-              <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}</span>
-              <span className="text-ink/50">Tools ranked</span>
+              <span className="rank-badge block text-2xl font-bold text-plum">{totalTools ?? toolList.length}+</span>
+              <span className="text-ink/50">AI Tools Ranked</span>
             </div>
             <div>
-              <span className="rank-badge block text-2xl font-bold text-gold">{categoryList.length}</span>
+              <span className="rank-badge block text-2xl font-bold text-gold">{categoryList.length}+</span>
               <span className="text-ink/50">Categories</span>
             </div>
             <div>
-              <span className="rank-badge block text-2xl font-bold text-forest">{totalVotes}</span>
-              <span className="text-ink/50">Community votes</span>
+              <span className="rank-badge block text-2xl font-bold text-forest">Daily</span>
+              <span className="text-ink/50">Updates</span>
+            </div>
+            <div>
+              <span className="rank-badge block text-2xl font-bold text-coral">Ranked</span>
+              <span className="text-ink/50">by Users</span>
             </div>
           </div>
 
@@ -309,6 +313,37 @@ export default async function HomePage() {
               </Link>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 mb-16">
+        <div className="bg-gradient-to-r from-plum/10 via-gold/10 to-forest/10 border border-line rounded-2xl px-6 py-6 sm:py-7 flex flex-col sm:flex-row items-center gap-5 sm:gap-8">
+          <div className="flex-1 text-center sm:text-left">
+            <span className="inline-block text-xs font-semibold text-plum bg-plum/10 px-2.5 py-1 rounded-full mb-2">
+              100% free for members
+            </span>
+            <h2 className="font-display font-bold text-xl sm:text-2xl leading-snug">
+              Create a free account to vote, review, and save your favorite AI tools
+            </h2>
+            <p className="text-sm text-ink/60 mt-1.5">
+              No credit card, ever. Signing up only takes an email — build your own shortlist,
+              rate tools you&apos;ve used, and help keep the rankings honest.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center bg-plum text-white font-medium text-sm px-6 py-3 rounded-lg hover:bg-plum-deep transition-colors whitespace-nowrap"
+            >
+              Sign up free →
+            </Link>
+            <span className="text-xs text-ink/40">
+              Own a tool?{" "}
+              <Link href="/submit" className="underline hover:text-plum">
+                List or claim it here
+              </Link>
+            </span>
+          </div>
         </div>
       </section>
 

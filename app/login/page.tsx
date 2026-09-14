@@ -62,6 +62,10 @@ function LoginForm() {
       <p className="text-ink/60 mt-2 text-sm">
         We&apos;ll email you a link and a code — no password needed.
       </p>
+      <p className="text-xs text-forest bg-forest-soft border border-forest/20 rounded-md px-3 py-2 mt-3">
+        New here? This also creates your free account — vote, review, and save
+        your favorite tools at no cost.
+      </p>
 
       {!sent ? (
         <form onSubmit={handleSend} className="mt-6 space-y-3">
