@@ -28,7 +28,7 @@ const SUBMIT_FAQS = [
   },
   {
     q: "Can I edit my listing after it's published?",
-    a: "Yes. Claiming ownership is free. If you also want to update the description, pricing, or add media, do that from the Claim/Update page for a small one-time fee.",
+    a: "Yes. Head to the Claim page for your listing — claiming ownership is a small one-time fee ($9.99), and it doubles as your update request (description, pricing, media). Want homepage placement too? The $99 Claim & Feature option covers the claim as well.",
   },
   {
     q: "How long does review take?",

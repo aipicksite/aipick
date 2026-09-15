@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is AIPick free to use?",
-    a: "Yes. Browsing, searching, voting, and writing reviews are always free for everyone. Tool owners can also claim their listing at no cost. Submitting a new tool and requesting paid enrichments (screenshots, video, priority review) carry a small one-time fee — see below.",
+    a: "Yes. Browsing, searching, voting, and writing reviews are always free for everyone. Claiming a listing and submitting a new tool carry a small one-time fee — see below.",
   },
   {
     q: "How is a tool's rank calculated?",
@@ -56,7 +56,7 @@ const FAQS = [
   },
   {
     q: "I already run one of the listed tools — can I manage its page?",
-    a: "Claiming to verify ownership is free. If you'd also like to update the description, pricing, add a screenshot, or add a YouTube overview video, do that from the Update a Listing page for a small one-time fee.",
+    a: "Claiming ownership is a small one-time fee ($9.99), which also lets you update the description, pricing, screenshot, and YouTube overview video. If you'd like homepage placement too, the $99 Claim & Feature option covers the claim as well — do either from the tool's Claim page.",
   },
   {
     q: "How often are new tools added?",

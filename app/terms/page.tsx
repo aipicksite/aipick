@@ -112,10 +112,10 @@ export default function TermsPage() {
 
       <Section n="09" title="Payments and refunds">
         <p>
-          Browsing, voting, reviewing, and basic ownership claims are free. Submitting a new
-          tool and requesting paid listing updates (screenshots, video, priority review) require
-          a one-time payment, processed by PayPal. AIPick never stores your card or PayPal
-          account details.
+          Browsing, voting, and reviewing are free. Submitting a new tool, claiming ownership
+          of a listing, and requesting paid listing updates (screenshots, video, priority
+          review) all require a one-time payment, processed by PayPal. AIPick never stores
+          your card or PayPal account details.
         </p>
         <p className="mt-3">
           Prices are shown before you pay and may change at any time; the price you paid at
