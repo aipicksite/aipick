@@ -41,7 +41,7 @@ export const VERIFICATION_LEVELS: {
 const STYLES: Record<VerificationLevel, { icon: string; classes: string }> = {
   unverified: { icon: "", classes: "" },
   website_verified: { icon: "🌐", classes: "text-sky-700 bg-sky-100" },
-  owner_verified: { icon: "✓", classes: "text-forest bg-forest-soft" },
+  owner_verified: { icon: "✓", classes: "text-sky-600 bg-sky-100" },
   admin_verified: { icon: "🛡", classes: "text-plum bg-plum/10" },
   fully_verified: { icon: "★", classes: "text-gold bg-gold-soft" },
 };

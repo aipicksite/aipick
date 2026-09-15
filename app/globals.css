@@ -8,29 +8,29 @@
 }
 
 html {
-  background-color: #F6F4EE;
+  background-color: #F3F5FC;
   color-scheme: light;
 }
 
 body {
-  background-color: #F6F4EE;
-  color: #191712;
+  background-color: #F3F5FC;
+  color: #0F1729;
   forced-color-adjust: none;
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(25,23,18,0.06) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(79,70,229,0.07) 1px, transparent 0);
   background-size: 22px 22px;
 }
 
 input,
 select,
 textarea {
-  color: #191712;
+  color: #0F1729;
   background-color: #FFFFFF;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(25, 23, 18, 0.45);
+  color: rgba(15, 23, 41, 0.45);
 }
 
 .rank-badge {
@@ -42,33 +42,33 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   gap: 1.1rem;
-  padding: 1rem 1.1rem;
+  padding: 1.1rem 1.25rem;
   background: #FFFFFF;
-  border: 1px solid #E4DECD;
-  border-radius: 14px;
+  border: 1px solid #E4E8F3;
+  border-radius: 16px;
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .tool-row:hover {
-  border-color: #3E2A5C;
-  box-shadow: 0 4px 8px rgba(25,23,18,0.06), 0 16px 32px -16px rgba(25,23,18,0.18);
+  border-color: #4F46E5;
+  box-shadow: 0 4px 8px rgba(15,23,41,0.05), 0 16px 32px -16px rgba(79,70,229,0.25);
   transform: translateY(-1px);
 }
 
 .tool-row + .tool-row {
-  margin-top: 0.6rem;
+  margin-top: 0.7rem;
 }
 
-.medal-1 { background: #C68A28; color: #FFF7E8; }
-.medal-2 { background: #8C8577; color: #FFFFFF; }
-.medal-3 { background: #8C5A2E; color: #FFF3E6; }
+.medal-1 { background: #F59E0B; color: #3B2600; }
+.medal-2 { background: #94A3B8; color: #FFFFFF; }
+.medal-3 { background: #C2723A; color: #FFF3E6; }
 
 ::selection {
-  background: #3E2A5C;
+  background: #4F46E5;
   color: #FFFFFF;
 }
 
 :focus-visible {
-  outline: 2px solid #3E2A5C;
+  outline: 2px solid #4F46E5;
   outline-offset: 2px;
 }

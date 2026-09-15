@@ -8,18 +8,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        base: "#F6F4EE",       // warm paper — the page background
+        base: "#F3F5FC",        // soft indigo-tinted page background
         surface: "#FFFFFF",     // card/row surfaces
-        ink: "#191712",         // near-black text, warm not blue-black
-        line: "#E4DECD",        // hairline borders
-        plum: "#3E2A5C",        // primary brand accent (buttons, links, active states)
-        "plum-deep": "#2C1D43",
-        gold: "#C68A28",        // rank/medal accent
-        "gold-soft": "#F4E3BE",
-        forest: "#28603F",      // verified / positive
-        "forest-soft": "#DCEBE0",
-        coral: "#B84A3A",       // downvote / negative
-        "coral-soft": "#F3DAD3",
+        ink: "#0F1729",         // near-black text, cool not warm
+        line: "#E4E8F3",        // hairline borders
+        plum: "#4F46E5",        // primary brand accent — indigo/blue-purple (buttons, links, active states)
+        "plum-deep": "#3730A3",
+        gold: "#F59E0B",        // rank/medal + rating-star accent
+        "gold-soft": "#FEF3C7",
+        forest: "#0EA5A4",      // verified / positive / upvote (teal)
+        "forest-soft": "#CCFBF1",
+        coral: "#7C3AED",       // secondary accent — purple (gradients, video/creative icons)
+        "coral-soft": "#EDE4FB",
       },
       fontFamily: {
         display: ["var(--font-display)", "sans-serif"],

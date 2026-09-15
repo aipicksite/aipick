@@ -237,13 +237,13 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(60% 50% at 8% -5%, rgba(62,42,92,0.16), transparent), radial-gradient(50% 45% at 95% 10%, rgba(198,138,40,0.18), transparent), radial-gradient(45% 40% at 60% 105%, rgba(196,90,74,0.12), transparent), radial-gradient(35% 35% at 30% 60%, rgba(45,106,79,0.08), transparent)",
+              "radial-gradient(60% 50% at 8% -5%, rgba(79,70,229,0.16), transparent), radial-gradient(50% 45% at 95% 10%, rgba(124,58,237,0.16), transparent), radial-gradient(45% 40% at 60% 105%, rgba(14,165,164,0.10), transparent), radial-gradient(35% 35% at 30% 60%, rgba(245,158,11,0.08), transparent)",
           }}
         />
         <div className="max-w-6xl mx-auto px-4 pt-8 pb-5 text-center">
           <h1 className="font-display font-bold text-xl sm:text-3xl md:text-4xl leading-tight tracking-tight">
             Find AI tools that{" "}
-            <span className="bg-gradient-to-r from-plum via-coral to-gold bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-plum via-coral to-blue-500 bg-clip-text text-transparent">
               actually work
             </span>{" "}
             for you.
@@ -481,11 +481,11 @@ export default async function HomePage() {
       <section className="max-w-6xl mx-auto px-4 pb-24">
         <div
           className="relative overflow-hidden rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10 justify-between"
-          style={{ background: "linear-gradient(120deg, rgba(62,42,92,0.95), rgba(45,106,79,0.9))" }}
+          style={{ background: "linear-gradient(120deg, rgba(79,70,229,0.95), rgba(124,58,237,0.9))" }}
         >
           <div
             className="absolute inset-0 -z-10 opacity-40"
-            style={{ background: "radial-gradient(60% 80% at 90% 0%, rgba(198,138,40,0.55), transparent)" }}
+            style={{ background: "radial-gradient(60% 80% at 90% 0%, rgba(245,158,11,0.55), transparent)" }}
           />
           <div>
             <h2 className="font-display font-bold text-xl sm:text-2xl text-white">
@@ -758,7 +758,7 @@ export default async function HomePage() {
             className="absolute inset-0 -z-10"
             style={{
               background:
-                "radial-gradient(70% 90% at 50% 0%, rgba(62,42,92,0.08), transparent), radial-gradient(60% 70% at 100% 100%, rgba(198,138,40,0.10), transparent)",
+                "radial-gradient(70% 90% at 50% 0%, rgba(79,70,229,0.08), transparent), radial-gradient(60% 70% at 100% 100%, rgba(124,58,237,0.10), transparent)",
             }}
           />
           <span className="text-3xl">🧭</span>
