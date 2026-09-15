@@ -32,9 +32,30 @@ export default function MarkdownContent({ content }: { content: string }) {
             <h3 id={id} className="font-display font-semibold text-lg mt-8 mb-2.5 text-ink scroll-mt-28">{children}</h3>
           ),
           br: () => <br />,
-          div: ({ children }) => <div className="mb-4">{children}</div>,
+          div: ({ className, children }) => {
+            if (className === "callout") {
+              return (
+                <div className="my-6 rounded-lg border border-plum/25 bg-plum/5 px-5 py-4 text-ink/80">
+                  {children}
+                </div>
+              );
+            }
+            return <div className="mb-4">{children}</div>;
+          },
           span: ({ children }) => <span>{children}</span>,
-          p: ({ children }) => <p className="mb-4">{children}</p>,
+          p: ({ className, children }) => {
+            // A raw `<p class="statement">…</p>` in the markdown source
+            // renders as a big, colorful 1-2 sentence pull-line — used to
+            // break up long sections and vary an article's rhythm.
+            if (className === "statement") {
+              return (
+                <p className="font-display font-bold text-2xl sm:text-3xl leading-snug text-plum my-8">
+                  {children}
+                </p>
+              );
+            }
+            return <p className="mb-4">{children}</p>;
+          },
           a: ({ href, children }) => {
             const isInternal = href?.startsWith("/") || href?.startsWith("https://aipick.site");
             if (isInternal && href) {

@@ -141,7 +141,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Sidebar — hidden on mobile, sticky on desktop */}
         <div className="hidden lg:block">
-          <ArticleSidebar toc={toc} shareUrl={shareUrl} />
+          <ArticleSidebar shareUrl={shareUrl} />
         </div>
       </div>
     </main>
