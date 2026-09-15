@@ -31,11 +31,12 @@ export default async function UpdateAiPage({
       <h1 className="font-display font-bold text-3xl mt-1">Claim & enrich a tool's page</h1>
       <p className="text-ink/60 mt-3 leading-relaxed">
         Update pricing and description, add a screenshot and a YouTube overview video, and
-        get a verified badge. Basic ownership claims (no media) are still free from the{" "}
+        get a verified badge. Claiming ownership is part of this paid plan — there's no
+        separate free claim step anymore. Want homepage placement too? Claim from{" "}
         <Link href="/tool" className="text-plum hover:underline">
-          tool's own page
-        </Link>
-        .
+          the tool's own page
+        </Link>{" "}
+        instead and pick the "Claim & feature" option.
       </p>
 
       {searchParams.submitted && (

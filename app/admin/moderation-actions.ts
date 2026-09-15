@@ -179,10 +179,11 @@ export async function approveClaim(claimId: string) {
 
   if (!claim) return;
 
-  // Free "claim" (kind === 'claim') only proves ownership — the listing
-  // shows an "Ownership claimed" badge, not the Verified badge. Verified is
-  // reserved for paid "update" claims, which actually enrich the listing
-  // (and unlock the owner-reply-to-reviews perk). See app/tool/[slug]/page.tsx.
+  // Claiming is now always a paid step (kind is always 'update' going
+  // forward — the old free 'claim' kind is legacy data only). Two plans can
+  // land here: update_tool ($9.99, claim + edit rights) and submit_featured
+  // ($99, claim + edit rights + homepage placement — it does not stack with
+  // update_tool, it's a standalone alternative that includes the claim).
   const toolUpdate: Record<string, unknown> = { owner_id: claim.user_id };
   if (claim.kind === "update") {
     toolUpdate.verified = true;
@@ -199,6 +200,19 @@ export async function approveClaim(claimId: string) {
     if (rank.indexOf(currentLevel) < rank.indexOf("owner_verified")) {
       toolUpdate.verification_level = "owner_verified";
     }
+  }
+
+  // submit_featured claims also buy homepage placement — same mechanism the
+  // $99 plan uses on new submissions (see app/page.tsx's featuredTools
+  // query), just triggered from the claim/checkout flow instead of /submit.
+  if (claim.plan_key === "submit_featured") {
+    const { data: featuredPlan } = await supabase
+      .from("pricing_plans")
+      .select("featured_days")
+      .eq("key", "submit_featured")
+      .maybeSingle();
+    const days = featuredPlan?.featured_days ?? 7;
+    toolUpdate.featured_until = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
   }
 
   // Paid "update" claims (from /update-ai) carry proposed edits — apply the

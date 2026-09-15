@@ -28,7 +28,12 @@ export default async function AdminClaimsPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-display font-semibold">{c.tools?.name ?? "Unknown tool"}</h3>
-                  {c.kind === "update" && (
+                  {c.kind === "update" && c.plan_key === "submit_featured" && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded border border-gold/40 text-gold bg-gold-soft uppercase tracking-wide">
+                      Claim & feature
+                    </span>
+                  )}
+                  {c.kind === "update" && c.plan_key !== "submit_featured" && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded border border-plum/30 text-plum bg-plum/5 uppercase tracking-wide">
                       Paid update
                     </span>

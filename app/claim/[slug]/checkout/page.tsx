@@ -8,7 +8,15 @@ import type { Tool } from "@/types/database";
 
 type Props = {
   params: { slug: string };
-  searchParams: { error?: string };
+  searchParams: { error?: string; plan?: string };
+};
+
+// Two plan_key options land here: "update" -> update_tool ($9.99, claim +
+// edit rights), "featured" -> submit_featured ($99, claim + homepage
+// placement). Anything else/missing defaults to "update".
+const PLAN_KEY_BY_OPTION: Record<string, string> = {
+  update: "update_tool",
+  featured: "submit_featured",
 };
 
 export default async function ClaimCheckoutPage({ params, searchParams }: Props) {
@@ -32,15 +40,19 @@ export default async function ClaimCheckoutPage({ params, searchParams }: Props)
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/claim/${t.slug}/checkout`)}`);
+    const qs = searchParams.plan ? `?plan=${encodeURIComponent(searchParams.plan)}` : "";
+    redirect(`/login?next=${encodeURIComponent(`/claim/${t.slug}/checkout${qs}`)}`);
   }
 
-  const planRaw = await getPlan("update_tool");
+  const option = searchParams.plan === "featured" ? "featured" : "update";
+  const planKey = PLAN_KEY_BY_OPTION[option];
+
+  const planRaw = await getPlan(planKey);
   if (!planRaw) {
     redirect(`/claim/${t.slug}`);
   }
 
-  const updatePlan = {
+  const plan = {
     key: planRaw.key,
     label: planRaw.label,
     amount_cents: planRaw.amount_cents,
@@ -56,7 +68,7 @@ export default async function ClaimCheckoutPage({ params, searchParams }: Props)
       <div className="mt-6 bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-card">
         <ClaimCheckoutFlow
           tool={{ id: t.id, slug: t.slug, name: t.name, website_url: t.website_url }}
-          updatePlan={updatePlan}
+          plan={plan}
           updateAction={submitToolUpdate}
           defaultEmail={user.email ?? undefined}
           error={searchParams.error}

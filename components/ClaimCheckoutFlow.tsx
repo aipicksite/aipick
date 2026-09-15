@@ -22,18 +22,19 @@ type Tool = {
 
 export default function ClaimCheckoutFlow({
   tool,
-  updatePlan,
+  plan,
   updateAction,
   defaultEmail,
   error,
 }: {
   tool: Tool;
-  updatePlan: Plan;
+  plan: Plan;
   updateAction: (formData: FormData) => void;
   defaultEmail?: string;
   error?: string;
 }) {
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const isFeatured = plan.key === "submit_featured";
 
   const emailPlaceholder = (() => {
     try {
@@ -48,16 +49,17 @@ export default function ClaimCheckoutFlow({
     return (
       <div>
         <span className="text-xs font-medium text-ink/45 uppercase tracking-wide">Step 1 of 2</span>
-        <h2 className="font-display font-bold text-lg mt-1">Checkout — {updatePlan.label}</h2>
+        <h2 className="font-display font-bold text-lg mt-1">Checkout — {plan.label}</h2>
         <p className="text-sm text-ink/55 mt-1 mb-5">
-          Confirm payment to unlock the update &amp; claim form for <strong>{tool.name}</strong>.
+          Confirm payment to unlock the claim{isFeatured ? " & feature" : " & update"} form for{" "}
+          <strong>{tool.name}</strong>. This payment covers the claim — there's no separate claim fee.
         </p>
         <PaymentPanel
-          planKey={updatePlan.key}
-          label={updatePlan.label}
-          amountCents={updatePlan.amount_cents}
-          currency={updatePlan.currency}
-          isFree={updatePlan.isFreeNow}
+          planKey={plan.key}
+          label={plan.label}
+          amountCents={plan.amount_cents}
+          currency={plan.currency}
+          isFree={plan.isFreeNow}
           onPaid={(id) => setPaymentId(id)}
         />
         {error && <p className="text-sm text-coral mt-4">{error}</p>}
@@ -70,13 +72,14 @@ export default function ClaimCheckoutFlow({
     <form action={updateAction} className="space-y-4">
       <input type="hidden" name="tool_id" value={tool.id} />
       <input type="hidden" name="tool_slug" value={tool.slug} />
-      <input type="hidden" name="plan_key" value={updatePlan.key} />
+      <input type="hidden" name="plan_key" value={plan.key} />
       <input type="hidden" name="payment_id" value={paymentId} />
 
       <span className="text-xs font-medium text-ink/45 uppercase tracking-wide">Step 2 of 2</span>
       <div className="bg-forest-soft border border-forest/20 text-forest rounded-lg p-3 text-sm mt-1">
-        Payment confirmed — now let's verify and update <strong>{tool.name}</strong>. Once approved
-        you'll see a verified badge on this listing.
+        Payment confirmed — now let's verify{isFeatured ? " and feature" : " and update"}{" "}
+        <strong>{tool.name}</strong>. Once approved you'll see a verified badge
+        {isFeatured ? " and homepage placement" : ""} on this listing.
       </div>
 
       <div>
@@ -153,7 +156,7 @@ export default function ClaimCheckoutFlow({
         pendingText="Submitting…"
         className="bg-plum text-white text-sm font-medium px-5 py-2.5 rounded-md hover:bg-plum-deep transition-colors"
       >
-        Submit update &amp; claim
+        {isFeatured ? "Submit claim & feature request" : "Submit update & claim"}
       </SubmitButton>
     </form>
   );
